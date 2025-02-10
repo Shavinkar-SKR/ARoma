@@ -1,0 +1,174 @@
+:root {
+    --btn-color: #e58f00;
+    --about-sec: #1d1d23;
+}
+
+/*Reset and Global styles*/
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", serif, 'Roboto';
+    box-sizing: border-box;
+    outline: none;
+    transition: 0.5s;
+    text-transform: capitalize;
+}
+
+/*Scroll behaviour*/
+html {
+    font-size: 65%;
+    scroll-behavior: smooth;
+}
+
+/*Logo*/
+.logo img {
+    width: 170px;
+    height: 140px;
+    padding-right: 1rem;
+    margin-left: -80px;
+}
+
+/*Header*/
+.header-section {
+    padding: 1rem 7%;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    background: #1d1d23;
+    min-height: 80px;
+}
+
+/*Navigation Menu*/
+.header-section ul {
+    list-style-type: none;
+    display: flex;
+    gap: 20px;
+    margin: 0.5rem;
+    padding: 0.5rem;
+    font-size: 1.5rem;
+}
+
+/*Menu Links*/
+.header-section ul li a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease-in-out;
+}
+
+/*Hover Effect*/
+.header-section ul li a:hover {
+    color: var(--btn-color);
+}
+
+/*Icons*/
+.icons div {
+    color: white;
+    font-size: 1.5rem;
+    margin-right: 10px;
+    display: none;
+    cursor: pointer;
+}
+
+.icons a {
+    color: white;
+    padding: 0.6rem 1.5rem;
+    border: 1px solid orange;
+    border-radius: 10px;
+    font-size: 18px;
+    transition: 0.5s;
+    display: inline-block;
+    text-decoration: none;
+}
+
+/*Login button hover effect*/
+.login-btn:hover {
+    transform: scale(1.1);
+    background: var(--btn-color);
+    border: 1px solid white;
+}
+
+/*Clip path effect*/
+.main-home .active {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+}
+
+
+
+
+main {
+    padding: 0px;
+    text-align: center;
+	margin-top: 1000px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Footer Section */
+footer {
+    background-color: #343a40;
+    padding: 40px 0;
+    color: #fff;
+}
+
+footer h5 {
+    font-size: 1.25rem;
+    margin-bottom: 15px;
+}
+
+footer ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+footer ul li {
+    margin-bottom: 10px;
+}
+
+footer ul li a {
+    text-decoration: none;
+    color: #fff;
+    transition: color 0.3s ease;
+}
+
+footer ul li a:hover {
+    color: #ff9f00;
+}
+
+footer .social-icons a {
+    font-size: 1.5rem;
+    color: #fff;
+    margin-right: 15px;
+}
+
+footer .social-icons a:hover {
+    color: #ff9f00;
+}
