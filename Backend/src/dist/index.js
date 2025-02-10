@@ -40,11 +40,8 @@ var express_1 = require("express"); // Entry point to the server
 var cors_1 = require("cors");
 var dotenv_1 = require("dotenv");
 var mongoose_1 = require("mongoose");
-// Load environment variables manually
 dotenv_1["default"].config();
-// Debugging: Check if MongoDB connection string is loaded
 console.log("MongoDB Connection String:", process.env.MONGODB_CONNECTION_STRING);
-// Ensure MONGODB_CONNECTION_STRING is defined before using it
 if (!process.env.MONGODB_CONNECTION_STRING) {
     console.error("Error: MONGODB_CONNECTION_STRING is not defined in .env file.");
     process.exit(1); // Exit the process if the connection string is missing
