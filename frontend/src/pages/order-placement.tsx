@@ -11,16 +11,8 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  ShoppingCart,
-  Minus,
-  Plus,
-  Trash2,
-  ChefHat,
-  Receipt,
-  CreditCard,
-  Store,
-} from "lucide-react";
+import { ShoppingCart, Minus, Plus, Trash2, ChefHat, Receipt, Store } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface CartItem {
   id: number;
@@ -36,7 +28,8 @@ const OrderPlacementPage: React.FC = () => {
   const [subtotal, setSubtotal] = useState<number>(0);
   const serviceFee: number = 3.0;
   const [total, setTotal] = useState<number>(0);
-  const apiBaseUrl = "http://localhost:5000"; // Change this to your mock server or API URL
+  const apiBaseUrl = "http://localhost:5000"; // Mock API URL
+  const navigate = useNavigate(); // For navigation
 
   // Fetch cart items from the mock API
   useEffect(() => {
@@ -100,24 +93,8 @@ const OrderPlacementPage: React.FC = () => {
     }
   };
 
-  const placeOrder = async () => {
-    try {
-      const response = await fetch(`${apiBaseUrl}/orders`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          cartItems,
-          total,
-          specialInstructions,
-        }),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to place order");
-      }
-      console.log("Order placed successfully");
-    } catch (error) {
-      console.error("Failed to place order:", error);
-    }
+  const navigateToPaymentPage = () => {
+    navigate("/payments", { state: { total } }); // Pass total to the Payment page
   };
 
   return (
@@ -239,10 +216,7 @@ const OrderPlacementPage: React.FC = () => {
             <div className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Receipt className="h-5 w-5" />
-                    Order Summary
-                  </CardTitle>
+                  <CardTitle>Order Summary</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -263,21 +237,9 @@ const OrderPlacementPage: React.FC = () => {
                 </CardContent>
                 <CardFooter className="flex flex-col gap-4">
                   {cartItems.length > 0 ? (
-                    <Button
-                      size="lg"
-                      onClick={placeOrder}
-                      className="w-full bg-green-600 hover:bg-green-700"
-                    >
-                      <CreditCard className="mr-2 h-5 w-5" />
-                      Place Order (€{total.toFixed(2)})
-                    </Button>
+                    <Button onClick={navigateToPaymentPage}>Confirm Order</Button>
                   ) : (
-                    <Alert>
-                      <AlertDescription>
-                        Your cart is empty. Add some items to proceed with
-                        checkout.
-                      </AlertDescription>
-                    </Alert>
+                    <Button disabled>Cart is Empty</Button>
                   )}
                 </CardFooter>
               </Card>
