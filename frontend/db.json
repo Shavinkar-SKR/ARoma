@@ -1,0 +1,54 @@
+{
+  "cart": [
+    {
+      "id": 1,
+      "name": "Spicy Tuna Roll",
+      "price": 14.99,
+      "quantity": 1,
+      "image": "https://via.placeholder.com/150"
+    },
+    {
+      "id": 2,
+      "name": "Margherita Pizza",
+      "price": 12.99,
+      "quantity": 1,
+      "image": "https://via.placeholder.com/150"
+    },
+    {
+      "id": 3,
+      "name": "Dragon Roll",
+      "price": 16.50,
+      "quantity": 1,
+      "image": "https://via.placeholder.com/150"
+    },
+    {
+      "id": 4,
+      "name": "Pepperoni Pizza",
+      "price": 13.99,
+      "quantity": 1,
+      "image": "https://via.placeholder.com/150"
+    },
+    {
+      "id": 5,
+      "name": "California Roll",
+      "price": 15.75,
+      "quantity": 1,
+      "image": "https://via.placeholder.com/150"
+    },
+    {
+      "id": 6,
+      "name": "Cheeseburger",
+      "price": 10.50,
+      "quantity": 1,
+      "image": "https://via.placeholder.com/150"
+    },
+    {
+      "id": 7,
+      "name": "Caesar Salad",
+      "price": 9.25,
+      "quantity": 1,
+      "image": "https://via.placeholder.com/150"
+    }
+  ],
+  "order": []
+}

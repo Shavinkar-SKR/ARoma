@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import OrderPlacementPage from "./pages/order-placement";
+import OrderPlacementPage from "./pages/order-placement"; // Fixed closing quote
 
 const AppRoutes: React.FC = () => {
   return (
