@@ -36,45 +36,21 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var express_1 = require("express");
-var body_parser_1 = require("body-parser");
-var cors_1 = require("cors"); // Import the cors package
-var orderRoutes_1 = require("./routes/orderRoutes"); // Import your order routes
-var dbConfig_1 = require("./config/dbConfig");
-var app = express_1["default"]();
-var PORT = process.env.PORT || 5001; // You can set this to 5001 or any other port you need
-// Enable CORS for all origins or restrict it to specific domains
-app.use(cors_1["default"]({
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PATCH", "DELETE"],
-    allowedHeaders: ["Content-Type"]
-}));
-app.use(body_parser_1["default"].json()); // Parse incoming JSON requests
-// Use the order routes for order-related endpoints
-app.use("/api/orders", orderRoutes_1["default"]);
-// Connect to the database and then start the server
-var startServer = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var error_1;
+exports.connectDB = void 0;
+var mongodb_1 = require("mongodb");
+var MONGODB_URI = "mongodb+srv://root:root@aroma.ae0sb.mongodb.net/";
+var DB_NAME = "ARoma";
+exports.connectDB = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var client, db;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, dbConfig_1.connectDB()];
+                client = new mongodb_1.MongoClient(MONGODB_URI);
+                return [4 /*yield*/, client.connect()];
             case 1:
                 _a.sent();
-                console.log("Connected to the database");
-                app.listen(PORT, function () {
-                    console.log("Server is running on port " + PORT);
-                });
-                return [3 /*break*/, 3];
-            case 2:
-                error_1 = _a.sent();
-                console.error("Failed to connect to the database:", error_1);
-                process.exit(1); // Exit the process if DB connection fails
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
+                db = client.db(DB_NAME);
+                return [2 /*return*/, db];
         }
     });
 }); };
-// Start the server and connect to the database
-startServer();

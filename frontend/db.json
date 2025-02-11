@@ -4,16 +4,52 @@
       "id": "6",
       "name": "Cheeseburger",
       "price": 10.5,
-      "quantity": 4,
+      "quantity": 3,
       "image": "https://via.placeholder.com/150"
     },
     {
-      "id": "6",
-      "name": "Cheeseburger",
-      "price": 10000.5,
+      "id": "4",
+      "name": "Cheeseburger Deluxe",
+      "price": 12,
+      "quantity": 1,
+      "image": "https://via.placeholder.com/150"
+    },
+    {
+      "id": "8",
+      "name": "Veggie Wrap",
+      "price": 8,
+      "quantity": 3,
+      "image": "https://via.placeholder.com/150"
+    },
+    {
+      "id": "10",
+      "name": "Chicken Nuggets",
+      "price": 6.5,
       "quantity": 4,
       "image": "https://via.placeholder.com/150"
     }
   ],
-  "order": []
+  "order": [
+    {
+      "id": "1",
+      "name": "Cheeseburger",
+      "price": 10.5,
+      "quantity": 2,
+      "image": "https://via.placeholder.com/150"
+    },
+    {
+      "id": "2",
+      "name": "Cheeseburger Deluxe",
+      "price": 12,
+      "quantity": 1,
+      "image": "https://via.placeholder.com/150"
+    },
+    {
+      "id": "3",
+      "name": "Veggie Wrap",
+      "price": 8,
+      "quantity": 3,
+      "image": "https://via.placeholder.com/150"
+    }
+  ]
 }
