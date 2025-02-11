@@ -36,45 +36,42 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var express_1 = require("express");
-var body_parser_1 = require("body-parser");
-var cors_1 = require("cors"); // Import the cors package
-var orderRoutes_1 = require("./routes/orderRoutes"); // Import your order routes
-var dbConfig_1 = require("./config/dbConfig");
-var app = express_1["default"]();
-var PORT = process.env.PORT || 5001; // You can set this to 5001 or any other port you need
-// Enable CORS for all origins or restrict it to specific domains
-app.use(cors_1["default"]({
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PATCH", "DELETE"],
-    allowedHeaders: ["Content-Type"]
-}));
-app.use(body_parser_1["default"].json()); // Parse incoming JSON requests
-// Use the order routes for order-related endpoints
-app.use("/api/orders", orderRoutes_1["default"]);
-// Connect to the database and then start the server
-var startServer = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var error_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
+exports.placeOrder = void 0;
+var dbConfig_1 = require("../config/dbConfig");
+exports.placeOrder = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, cartItems, specialInstructions, total, order, db, ordersCollection, result, error_1;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
             case 0:
-                _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, dbConfig_1.connectDB()];
+                _a = req.body, cartItems = _a.cartItems, specialInstructions = _a.specialInstructions, total = _a.total;
+                order = {
+                    cartItems: cartItems,
+                    specialInstructions: specialInstructions,
+                    total: total,
+                    status: "Pending"
+                };
+                _b.label = 1;
             case 1:
-                _a.sent();
-                console.log("Connected to the database");
-                app.listen(PORT, function () {
-                    console.log("Server is running on port " + PORT);
-                });
-                return [3 /*break*/, 3];
+                _b.trys.push([1, 4, , 5]);
+                return [4 /*yield*/, dbConfig_1.connectDB()];
             case 2:
-                error_1 = _a.sent();
-                console.error("Failed to connect to the database:", error_1);
-                process.exit(1); // Exit the process if DB connection fails
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
+                db = _b.sent();
+                ordersCollection = db.collection("orders");
+                return [4 /*yield*/, ordersCollection.insertOne(order)];
+            case 3:
+                result = _b.sent();
+                res.status(201).json({ message: "Order placed and saved successfully", orderId: result.insertedId });
+                return [3 /*break*/, 5];
+            case 4:
+                error_1 = _b.sent();
+                if (error_1 instanceof Error) {
+                    res.status(500).json({ message: "Failed to place order", error: error_1.message });
+                }
+                else {
+                    res.status(500).json({ message: "Failed to place order", error: "Unknown error" });
+                }
+                return [3 /*break*/, 5];
+            case 5: return [2 /*return*/];
         }
     });
 }); };
-// Start the server and connect to the database
-startServer();
