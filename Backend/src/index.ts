@@ -8,11 +8,13 @@ const app = express();
 const PORT = process.env.PORT || 5001; // You can set this to 5001 or any other port you need
 
 // Enable CORS for all origins or restrict it to specific domains
-app.use(cors({
-  origin: "http://localhost:5173", // Allow requests only from this origin (your frontend)
-  methods: ["GET", "POST", "PATCH", "DELETE"], // Allow the necessary HTTP methods
-  allowedHeaders: ["Content-Type"], // Allow Content-Type header
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Allow requests only from this origin (your frontend)
+    methods: ["GET", "POST", "PATCH", "DELETE"], // Allow the necessary HTTP methods
+    allowedHeaders: ["Content-Type"], // Allow Content-Type header
+  })
+);
 
 app.use(bodyParser.json()); // Parse incoming JSON requests
 
