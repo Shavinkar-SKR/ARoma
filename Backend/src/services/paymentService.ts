@@ -1,8 +1,8 @@
 import Stripe from "stripe"; // imports the stripe SDK
-import paypal from "paypal-rest-sdk"; // imports the paypal SDK
-import dotenv from "dotenv"; //Loads API keys from the .env file
-
-dotenv.config();
+//import * as paypal from "paypal-rest-sdk"; // imports the paypal SDK
+//import * as dotenv from "dotenv"; //Loads API keys from the .env file
+const paypal = require("paypal-rest-sdk"); // imports the paypal SDK
+require("dotenv").config(); // Loads API keys from the .env file
 
 //Initializing stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
@@ -53,7 +53,7 @@ export const createPayPalPayment = async (amount: string, currency: string) => {
   };
 
   return new Promise((resolve, reject) => {
-    paypal.payment.create(paymentData, (error, payment) => {
+    paypal.payment.create(paymentData, (error: Error, payment: any) => {
       if (error) {
         reject(error);
       } else {
