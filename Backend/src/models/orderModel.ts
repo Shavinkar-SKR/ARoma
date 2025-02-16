@@ -11,5 +11,5 @@ export interface Order {
   }[];
   specialInstructions: string;
   total: number;
-  status: string;
+  tableNumber: string;
 }
