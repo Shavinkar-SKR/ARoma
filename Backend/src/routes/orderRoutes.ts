@@ -1,6 +1,7 @@
-import express from "express";
+//import * as express from "express";
 import { placeOrder } from "../controllers/orderController";
 
+const express = require("express");
 const router = express.Router();
 
 // Route to place order

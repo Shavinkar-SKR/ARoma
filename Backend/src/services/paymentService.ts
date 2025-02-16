@@ -26,8 +26,14 @@ export const processStripePayment = async (
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amount * 100, //convert to cents
       currency,
+      payment_method_types: ["card"],
       payment_method: paymentMethodId,
       confirm: true,
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: "never", // Optional: Prevents redirects from occurring
+      },
+      return_url: "http://localhost:3000/payment-success",
     });
     return { success: true, client_secret: paymentIntent.client_secret };
   } catch (error) {
