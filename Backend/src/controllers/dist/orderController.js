@@ -36,21 +36,65 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.connectDB = void 0;
-var mongodb_1 = require("mongodb");
-var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017";
-var DB_NAME = process.env.DB_NAME || "ARoma";
-exports.connectDB = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var client, db;
+exports.getOrders = exports.placeOrder = void 0;
+var dbConfig_1 = require("../config/dbConfig"); // Import the connectDB utility
+// Function to place an order
+exports.placeOrder = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
+    var _a, cartItems, specialInstructions, total, tableNumber, db, ordersCollection, newOrder, result, error_1;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                _b.trys.push([0, 3, , 4]);
+                _a = req.body, cartItems = _a.cartItems, specialInstructions = _a.specialInstructions, total = _a.total, tableNumber = _a.tableNumber;
+                return [4 /*yield*/, dbConfig_1.connectDB()];
+            case 1:
+                db = _b.sent();
+                ordersCollection = db.collection('orders');
+                newOrder = {
+                    cartItems: cartItems,
+                    specialInstructions: specialInstructions,
+                    total: total,
+                    tableNumber: tableNumber
+                };
+                return [4 /*yield*/, ordersCollection.insertOne(newOrder)];
+            case 2:
+                result = _b.sent();
+                res.status(201).json({
+                    message: "Order placed successfully",
+                    orderId: result.insertedId
+                });
+                return [3 /*break*/, 4];
+            case 3:
+                error_1 = _b.sent();
+                console.error("Error placing order:", error_1);
+                res.status(500).json({ error: "Internal server error" });
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); };
+// New function to get all orders
+exports.getOrders = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
+    var db, ordersCollection, orders, error_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                client = new mongodb_1.MongoClient(MONGODB_URI);
-                return [4 /*yield*/, client.connect()];
+                _a.trys.push([0, 3, , 4]);
+                return [4 /*yield*/, dbConfig_1.connectDB()];
             case 1:
-                _a.sent();
-                db = client.db(DB_NAME);
-                return [2 /*return*/, db];
+                db = _a.sent();
+                ordersCollection = db.collection('orders');
+                return [4 /*yield*/, ordersCollection.find().toArray()];
+            case 2:
+                orders = _a.sent();
+                res.status(200).json(orders);
+                return [3 /*break*/, 4];
+            case 3:
+                error_2 = _a.sent();
+                console.error("Error fetching orders:", error_2);
+                res.status(500).json({ error: "Internal server error" });
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
         }
     });
 }); };

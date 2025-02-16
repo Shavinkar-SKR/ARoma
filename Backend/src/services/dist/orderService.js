@@ -36,21 +36,34 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.connectDB = void 0;
-var mongodb_1 = require("mongodb");
-var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017";
-var DB_NAME = process.env.DB_NAME || "ARoma";
-exports.connectDB = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var client, db;
+exports.getAllOrders = exports.saveOrder = void 0;
+var orderModel_1 = require("../models/orderModel"); // Import the order model
+// Save order to DB
+var saveOrder = function (orderData) { return __awaiter(void 0, void 0, void 0, function () {
+    var order;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                client = new mongodb_1.MongoClient(MONGODB_URI);
-                return [4 /*yield*/, client.connect()];
-            case 1:
-                _a.sent();
-                db = client.db(DB_NAME);
-                return [2 /*return*/, db];
+                order = new orderModel_1["default"]({
+                    cartItems: orderData.cartItems,
+                    specialInstructions: orderData.specialInstructions,
+                    tableNumber: orderData.tableNumber,
+                    total: orderData.total,
+                    createdAt: new Date()
+                });
+                return [4 /*yield*/, order.save()];
+            case 1: return [2 /*return*/, _a.sent()];
         }
     });
 }); };
+exports.saveOrder = saveOrder;
+// Get all orders from DB
+var getAllOrders = function () { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, orderModel_1["default"].find()];
+            case 1: return [2 /*return*/, _a.sent()]; // Fetch all orders
+        }
+    });
+}); };
+exports.getAllOrders = getAllOrders;

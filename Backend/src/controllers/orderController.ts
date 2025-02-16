@@ -1,32 +1,46 @@
-import { Request, Response } from "express";  // Importing types for Express Request and Response
-import { connectDB } from "../config/dbConfig";  // Importing the database connection function
-import { Order } from "../models/orderModel";  // Importing the Order model (data structure)
+import { Request, Response } from "express";
+import { ObjectId } from "mongodb";
+import { Order } from "../models/orderModel";
+import { connectDB } from "../config/dbConfig"; // Import the connectDB utility
 
-export const placeOrder = async (req: Request, res: Response) => {  // Asynchronous function to handle placing an order
-  // Extracting order details from the incoming request body
-  const { cartItems, specialInstructions, total } = req.body;
-
-  // Creating an order object with the received data
-  const order: Order = {
-    cartItems,  // Items added to the cart (
-    specialInstructions,  // Any special instructions 
-    total,  // Total price of the order
-    status: "Pending",  // Initially setting the order status to "Pending"
-  };
-
+// Function to place an order
+export const placeOrder = async (req: Request, res: Response): Promise<void> => {
   try {
-    // Trying to connect to the database and insert the order
-    const db = await connectDB();  // Connect to the MongoDB database
-    const ordersCollection = db.collection("orders");  // Access the "orders" collection in the database
+    const { cartItems, specialInstructions, total, tableNumber } = req.body;
 
-    const result = await ordersCollection.insertOne(order);
+    const db = await connectDB();
+    const ordersCollection = db.collection('orders');
 
-    res.status(201).json({ message: "Order placed and saved successfully", orderId: result.insertedId });
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      res.status(500).json({ message: "Failed to place order", error: error.message });
-    } else {
-      res.status(500).json({ message: "Failed to place order", error: "Unknown error" });
-    }
+    const newOrder: Order = {
+      cartItems,
+      specialInstructions,
+      total,
+      tableNumber,
+    };
+
+    // Insert into MongoDB
+    const result = await ordersCollection.insertOne(newOrder);
+
+    res.status(201).json({ 
+      message: "Order placed successfully", 
+      orderId: result.insertedId 
+    });
+  } catch (error) {
+    console.error("Error placing order:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// New function to get all orders
+export const getOrders = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const db = await connectDB();
+    const ordersCollection = db.collection('orders');
+    
+    const orders = await ordersCollection.find().toArray();
+    res.status(200).json(orders);
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
