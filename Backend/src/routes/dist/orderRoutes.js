@@ -2,9 +2,7 @@
 exports.__esModule = true;
 //import * as express from "express";
 var orderController_1 = require("../controllers/orderController");
-var orderController_2 = require("../controllers/orderController");
-var express = require("express");
 var router = express.Router();
+// Route to place order
 router.post("/place-order", orderController_1.placeOrder);
-router.get("/orders", orderController_2.getOrders);
 exports["default"] = router;

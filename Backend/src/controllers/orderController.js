@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+<<<<<<< HEAD
 var __generator = (this && this.__generator) || function (thisArg, body) {
     var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
     return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
@@ -75,4 +76,32 @@ var placeOrder = function (req, res) { return __awaiter(void 0, void 0, void 0, 
         }
     });
 }); };
+=======
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.placeOrder = void 0;
+const dbConfig_1 = require("../config/dbConfig");
+const placeOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { cartItems, specialInstructions, total } = req.body;
+    const order = {
+        cartItems,
+        specialInstructions,
+        total,
+        status: "Pending", // Initial status
+    };
+    try {
+        const db = yield (0, dbConfig_1.connectDB)();
+        const ordersCollection = db.collection("orders");
+        const result = yield ordersCollection.insertOne(order);
+        res.status(201).json({ message: "Order placed and saved successfully", orderId: result.insertedId });
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json({ message: "Failed to place order", error: error.message });
+        }
+        else {
+            res.status(500).json({ message: "Failed to place order", error: "Unknown error" });
+        }
+    }
+});
+>>>>>>> parent of cff5b68 (orderstaus page and admin page)
 exports.placeOrder = placeOrder;

@@ -36,6 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
+<<<<<<< HEAD
 var bodyParser = require("body-parser");
 var dotenv = require("dotenv");
 var orderRoutes_1 = require("./routes/orderRoutes"); // Import your order routes
@@ -46,13 +47,29 @@ dotenv.config(); // Load environment variables from a .env file
 var app = express();
 var PORT = process.env.PORT || 5001;
 app.use(cors({
+=======
+var express_1 = require("express");
+var body_parser_1 = require("body-parser");
+var cors_1 = require("cors"); // Import the cors package
+var orderRoutes_1 = require("./routes/orderRoutes"); // Import your order routes
+var dbConfig_1 = require("./config/dbConfig");
+var app = express_1["default"]();
+var PORT = process.env.PORT || 5001; // You can set this to 5001 or any other port you need
+// Enable CORS for all origins or restrict it to specific domains
+app.use(cors_1["default"]({
+>>>>>>> parent of cff5b68 (orderstaus page and admin page)
     origin: "http://localhost:5173",
     methods: ["GET", "POST", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type"]
 }));
+<<<<<<< HEAD
 app.use(bodyParser.json());
+=======
+app.use(body_parser_1["default"].json()); // Parse incoming JSON requests
+// Use the order routes for order-related endpoints
+>>>>>>> parent of cff5b68 (orderstaus page and admin page)
 app.use("/api/orders", orderRoutes_1["default"]);
-app.use("/api", orderRoutes_1["default"]);
+// Connect to the database and then start the server
 var startServer = function () { return __awaiter(void 0, void 0, void 0, function () {
     var error_1;
     return __generator(this, function (_a) {
@@ -70,10 +87,11 @@ var startServer = function () { return __awaiter(void 0, void 0, void 0, functio
             case 2:
                 error_1 = _a.sent();
                 console.error("Failed to connect to the database:", error_1);
-                process.exit(1);
+                process.exit(1); // Exit the process if DB connection fails
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }
     });
 }); };
+// Start the server and connect to the database
 startServer();
