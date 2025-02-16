@@ -15,6 +15,7 @@ import { ShoppingCart, Minus, Plus, Trash2, ChefHat, Store, CheckCircle2, Dollar
 import { useNavigate } from "react-router-dom"; // Import to navigate between pages
 import { toast, Toaster } from "sonner"; // Import toast and Toaster from sonner
 import { motion, AnimatePresence } from "framer-motion"; // Import for animation effects
+import TableNumberInput from "@/components/ui/TableNumberInput"; // Import TableNumberInput component
 
 interface CartItem {
   id: number; // id for each item
@@ -29,6 +30,7 @@ const OrderPlacementPage: React.FC = () => {
   const [specialInstructions, setSpecialInstructions] = useState<string>(""); // State for special instructions
   const [subtotal, setSubtotal] = useState<number>(0); // State for calculating subtotal
   const [isProcessing, setIsProcessing] = useState(false); // boolean value to check order is being processed or not 
+  const [tableNumber, setTableNumber] = useState<string>(""); // State for table number
 
   const serviceFee: number = 3.0; 
   const [total, setTotal] = useState<number>(0); // State to calculate the total amount
@@ -36,56 +38,53 @@ const OrderPlacementPage: React.FC = () => {
   const navigate = useNavigate(); // react hook to navigate to payment page 
 
   useEffect(() => {
-    // This function will run once when the page loads to fetch cart items
     const fetchCartItems = async () => {
       try {
-        // Fetching data from the server
-        const response = await fetch(`${apiBaseUrl}/cart`); // Waits till the server to respond before going to next line 
+        const response = await fetch(`${apiBaseUrl}/cart`);
         if (!response.ok) {
-          throw new Error("Failed to fetch cart items"); // Throws new error if fetching fails
+          throw new Error("Failed to fetch cart items");
         }
-        const data: CartItem[] = await response.json(); // Convert the response into JSON format 
-        setCartItems(data); // Update the cart item state with the fetched data
+        const data: CartItem[] = await response.json();
+        setCartItems(data);
         updateTotals(data); 
       } catch (error) {
-        console.error("Failed to fetch cart items:", error); // Show error if fetching fails
+        console.error("Failed to fetch cart items:", error);
         toast.error("Failed to load cart items. Please try again.");
       }
     };
-    fetchCartItems(); // Calling the fetch function
+    fetchCartItems();
   }, []);
 
-  const updateTotals = (items: CartItem[]) => { // method to update the total value in cart 
+  const updateTotals = (items: CartItem[]) => {
     const newSubtotal = items.reduce(
-      (sum, item) => sum + item.price * item.quantity, // Sum the total value by iterating and multiplying the price by the number of quantities
-      0 // Initial value is 0
+      (sum, item) => sum + item.price * item.quantity,
+      0
     );
-    setSubtotal(newSubtotal); // Set the new subtotal
-    setTotal(newSubtotal + serviceFee); // total value with the service fee 
+    setSubtotal(newSubtotal);
+    setTotal(newSubtotal + serviceFee);
   };
 
-  const handleQuantityChange = async (id: number, delta: number) => {    // Takes two parameters id and the number of changes in the quantity
-    const updatedItems = cartItems.map((item) => {// This is used to create a new array using the existing cart items; this doesn't modify the original item
-      return item.id === id // If item id matches
-        ? { ...item, quantity: Math.max(item.quantity + delta, 1) } // Update the quantity, ensuring it is not less than 1
+  const handleQuantityChange = async (id: number, delta: number) => {
+    const updatedItems = cartItems.map((item) => {
+      return item.id === id
+        ? { ...item, quantity: Math.max(item.quantity + delta, 1) }
         : item;
     });
-
-    setCartItems(updatedItems); // Update the state with new cart items
-    updateTotals(updatedItems); // Update the totals based on updated items
+    setCartItems(updatedItems);
+    updateTotals(updatedItems);
 
     toast.success("Quantity updated", {
-      duration: 1000, // Show notification for 1 second
-      position: "top-right", // Show at the bottom-right corner
-      style: { background: "#f3f4f6", color: "#1f2937" }, // Style for the notification
+      duration: 1000,
+      position: "top-right",
+      style: { background: "#f3f4f6", color: "#1f2937" },
     });
   };
 
-  const handleRemoveItem = (id: number) => { // seaches throgh the array 
-    const itemToRemove = cartItems.find((item) => item.id === id); // Find the item to remove
-    const updatedItems = cartItems.filter((item) => item.id !== id); // Remove the item from cart
-    setCartItems(updatedItems); // Update the cart with remaining items
-    updateTotals(updatedItems); // Update the total after removal
+  const handleRemoveItem = (id: number) => {
+    const itemToRemove = cartItems.find((item) => item.id === id);
+    const updatedItems = cartItems.filter((item) => item.id !== id);
+    setCartItems(updatedItems);
+    updateTotals(updatedItems);
 
     toast(
       <div className="flex items-center gap-2">
@@ -94,25 +93,31 @@ const OrderPlacementPage: React.FC = () => {
           variant="link"
           className="p-0 h-auto text-blue-500 hover:text-blue-700"
           onClick={() => {
-            setCartItems((prev) => [...prev, itemToRemove!]); // Add the item back to the cart
-            updateTotals([...updatedItems, itemToRemove!]); // Update totals after undo
+            setCartItems((prev) => [...prev, itemToRemove!]);
+            updateTotals([...updatedItems, itemToRemove!]);
           }}
         >
           Undo
         </Button>
       </div>,
       {
-        duration: 1000, // Show the notification for 3 seconds
-        position: "top-right", // Position at bottom-right
+        duration: 1000,
+        position: "top-right",
       }
     );
   };
 
   const navigateToPaymentPage = async () => {
-    setIsProcessing(true); // Show loading state while processing
-
+    if (!tableNumber) {
+      // If table number is not provided, show a notification and do not proceed
+      toast.error("Please enter your table number to proceed.");
+      return; // Prevent navigation
+    }
+  
+    setIsProcessing(true);
+  
     toast.promise(
-      new Promise((resolve) => setTimeout(resolve, 1000)), // Simulate processing delay of 2 seconds
+      new Promise((resolve) => setTimeout(resolve, 1000)),
       {
         loading: (
           <div className="flex items-center gap-3">
@@ -122,16 +127,16 @@ const OrderPlacementPage: React.FC = () => {
         ),
         success: () => {
           setTimeout(() => {
-            // After processing, navigate to payment page
             navigate("/payments", {
               state: {
-                total, // Pass total amount
-                cartItems, // Pass cart items
-                specialInstructions, // Pass any special instructions
+                total,
+                cartItems,
+                specialInstructions,
+                tableNumber, 
               },
             });
-          }, 500); // Delay for 0.5 seconds before redirecting
-
+          }, 500);
+  
           return (
             <div className="flex items-center gap-3 p-2">
               <div className="flex items-center justify-center bg-green-100 rounded-full p-1">
@@ -159,6 +164,7 @@ const OrderPlacementPage: React.FC = () => {
       }
     );
   };
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
@@ -168,9 +174,7 @@ const OrderPlacementPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="max-w-4xl mx-auto"
         >
-          {/* Header section */}
           <div className="flex items-center justify-between mb-8">
-            {/* Header title and description */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -179,7 +183,6 @@ const OrderPlacementPage: React.FC = () => {
               <h1 className="text-3xl font-bold tracking-tight text-gray-900">Order Summary</h1>
               <p className="mt-2 text-sm text-gray-500">Review your order before checkout</p>
             </motion.div>
-            {/* Store icon with animation */}
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -191,14 +194,12 @@ const OrderPlacementPage: React.FC = () => {
 
           <div className="grid gap-6 md:grid-cols-[1fr,380px]">
             <div className="space-y-6">
-              {/* Cart items display */}
               <Card className="overflow-hidden">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
                   <div className="space-y-1">
                     <CardTitle>Your Cart</CardTitle>
                     <CardDescription>Review and adjust your items</CardDescription>
                   </div>
-                  {/* Shopping cart icon */}
                   <ShoppingCart className="h-5 w-5 text-red-500 animate-bounce" />
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -275,11 +276,14 @@ const OrderPlacementPage: React.FC = () => {
                   <Textarea
                     placeholder="E.g., allergies, preparation preferences, or delivery instructions..."
                     value={specialInstructions}
-                    onChange={(e) => setSpecialInstructions(e.target.value)} // Update state when text changes
+                    onChange={(e) => setSpecialInstructions(e.target.value)}
                     className="min-h-[100px] focus:ring-2 focus:ring-primary/20 transition-shadow"
                   />
                 </CardContent>
               </Card>
+
+              {/* Table Number Input */}
+              <TableNumberInput tableNumber={tableNumber} setTableNumber={setTableNumber} />
             </div>
 
             {/* Order Summary Sidebar */}
@@ -293,7 +297,6 @@ const OrderPlacementPage: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {/* Display subtotal, service fee, and total */}
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Subtotal</span>
                       <span>€{subtotal.toFixed(2)}</span>
@@ -320,10 +323,15 @@ const OrderPlacementPage: React.FC = () => {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  {/* Button to proceed to payment */}
                   <Button
                     className="w-full h-12 text-lg font-semibold transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 bg-black text-white hover:bg-black focus:outline-none"
-                    disabled={isProcessing || cartItems.length === 0} // Disable button if processing or no items
+                    disabled={
+                      isProcessing ||
+                      cartItems.length === 0 ||
+                      !tableNumber ||
+                      parseInt(tableNumber) <= 0 ||  // Convert tableNumber to a number for comparison
+                      parseInt(tableNumber) >= 51   // Convert tableNumber to a number for comparison
+                    }
                     onClick={navigateToPaymentPage}
                   >
                     {isProcessing ? (
@@ -342,10 +350,9 @@ const OrderPlacementPage: React.FC = () => {
         </motion.div>
       </div>
 
-      {/* Toast notifications container */}
       <Toaster />
     </div>
   );
 };
 
-export default OrderPlacementPage; // Export the component
+export default OrderPlacementPage;

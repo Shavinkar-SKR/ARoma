@@ -3,7 +3,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 :root {
   --border: 214.3 31.8% 91.4%;
   --input: 214.3 31.8% 91.4%;
@@ -38,6 +37,11 @@
 /* Global Styles */
 body {
   @apply bg-background text-foreground;
+  font-family: 'Josefin Sans', sans-serif; /* Apply Josefin Sans to the body */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Sriracha', cursive; /* Apply Sriracha font to headings */
 }
 
 .container {

@@ -36,42 +36,65 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.placeOrder = void 0;
-var dbConfig_1 = require("../config/dbConfig"); // Importing the database connection function
-exports.placeOrder = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, cartItems, specialInstructions, total, order, db, ordersCollection, result, error_1;
+exports.getOrders = exports.placeOrder = void 0;
+var dbConfig_1 = require("../config/dbConfig"); // Import the connectDB utility
+// Function to place an order
+exports.placeOrder = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
+    var _a, cartItems, specialInstructions, total, tableNumber, db, ordersCollection, newOrder, result, error_1;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                _a = req.body, cartItems = _a.cartItems, specialInstructions = _a.specialInstructions, total = _a.total;
-                order = {
+                _b.trys.push([0, 3, , 4]);
+                _a = req.body, cartItems = _a.cartItems, specialInstructions = _a.specialInstructions, total = _a.total, tableNumber = _a.tableNumber;
+                return [4 /*yield*/, dbConfig_1.connectDB()];
+            case 1:
+                db = _b.sent();
+                ordersCollection = db.collection('orders');
+                newOrder = {
                     cartItems: cartItems,
                     specialInstructions: specialInstructions,
                     total: total,
-                    status: "Pending"
+                    tableNumber: tableNumber
                 };
-                _b.label = 1;
-            case 1:
-                _b.trys.push([1, 4, , 5]);
-                return [4 /*yield*/, dbConfig_1.connectDB()];
+                return [4 /*yield*/, ordersCollection.insertOne(newOrder)];
             case 2:
-                db = _b.sent();
-                ordersCollection = db.collection("orders");
-                return [4 /*yield*/, ordersCollection.insertOne(order)];
-            case 3:
                 result = _b.sent();
-                res.status(201).json({ message: "Order placed and saved successfully", orderId: result.insertedId });
-                return [3 /*break*/, 5];
-            case 4:
+                res.status(201).json({
+                    message: "Order placed successfully",
+                    orderId: result.insertedId
+                });
+                return [3 /*break*/, 4];
+            case 3:
                 error_1 = _b.sent();
-                if (error_1 instanceof Error) {
-                    res.status(500).json({ message: "Failed to place order", error: error_1.message });
-                }
-                else {
-                    res.status(500).json({ message: "Failed to place order", error: "Unknown error" });
-                }
-                return [3 /*break*/, 5];
-            case 5: return [2 /*return*/];
+                console.error("Error placing order:", error_1);
+                res.status(500).json({ error: "Internal server error" });
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); };
+// New function to get all orders
+exports.getOrders = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
+    var db, ordersCollection, orders, error_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 3, , 4]);
+                return [4 /*yield*/, dbConfig_1.connectDB()];
+            case 1:
+                db = _a.sent();
+                ordersCollection = db.collection('orders');
+                return [4 /*yield*/, ordersCollection.find().toArray()];
+            case 2:
+                orders = _a.sent();
+                res.status(200).json(orders);
+                return [3 /*break*/, 4];
+            case 3:
+                error_2 = _a.sent();
+                console.error("Error fetching orders:", error_2);
+                res.status(500).json({ error: "Internal server error" });
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
         }
     });
 }); };
