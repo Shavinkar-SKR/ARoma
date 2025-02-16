@@ -1,8 +1,8 @@
 import Stripe from "stripe"; // imports the stripe SDK
-//import * as paypal from "paypal-rest-sdk"; // imports the paypal SDK
-//import * as dotenv from "dotenv"; //Loads API keys from the .env file
-const paypal = require("paypal-rest-sdk"); // imports the paypal SDK
-require("dotenv").config(); // Loads API keys from the .env file
+import paypal from "paypal-rest-sdk"; // imports the paypal SDK
+import dotenv from "dotenv"; //Loads API keys from the .env file
+
+dotenv.config();
 
 //Initializing stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
@@ -26,14 +26,8 @@ export const processStripePayment = async (
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amount * 100, //convert to cents
       currency,
-      payment_method_types: ["card"],
       payment_method: paymentMethodId,
       confirm: true,
-      automatic_payment_methods: {
-        enabled: true,
-        allow_redirects: "never", // Optional: Prevents redirects from occurring
-      },
-      return_url: "http://localhost:3000/payment-success",
     });
     return { success: true, client_secret: paymentIntent.client_secret };
   } catch (error) {
@@ -59,7 +53,7 @@ export const createPayPalPayment = async (amount: string, currency: string) => {
   };
 
   return new Promise((resolve, reject) => {
-    paypal.payment.create(paymentData, (error: Error, payment: any) => {
+    paypal.payment.create(paymentData, (error, payment) => {
       if (error) {
         reject(error);
       } else {
