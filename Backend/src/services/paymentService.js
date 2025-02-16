@@ -40,9 +40,8 @@ exports.createPayPalPayment = exports.processStripePayment = void 0;
 var stripe_1 = require("stripe"); // imports the stripe SDK
 //import * as paypal from "paypal-rest-sdk"; // imports the paypal SDK
 //import * as dotenv from "dotenv"; //Loads API keys from the .env file
-var paypal = require("paypal-rest-sdk"); // PayPal SDK
+var paypal = require("paypal-rest-sdk"); // imports the paypal SDK
 require("dotenv").config(); // Loads API keys from the .env file
-//dotenv.config();
 //Initializing stripe
 var stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY, {
     apiVersion: "2025-01-27.acacia", //current Stripe API version

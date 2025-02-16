@@ -1,12 +1,12 @@
-import express from "express";
-import bodyParser from "body-parser";
-import cors from "cors"; // Import the cors package
-import dotenv from "dotenv";
+import * as bodyParser from "body-parser";
+import * as dotenv from "dotenv";
 import paymentRoutes from "./routes/paymentRoutes";
 import orderRoutes from "./routes/orderRoutes"; // Import your order routes
 import { connectDB } from "./config/dbConfig";
 
-dotenv.config();
+const express = require("express");
+const cors = require("cors");
+dotenv.config(); // Load environment variables from a .env file
 const app = express();
 const PORT = process.env.PORT || 5001; // You can set this to 5001 or any other port you need
 
