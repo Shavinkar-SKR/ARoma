@@ -38,8 +38,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.connectDB = void 0;
 var mongodb_1 = require("mongodb");
-var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017";
-var DB_NAME = process.env.DB_NAME || "ARoma";
+var MONGODB_URI = "mongodb+srv://root:root@aroma.ae0sb.mongodb.net/";
+var DB_NAME = "ARoma";
 exports.connectDB = function () { return __awaiter(void 0, void 0, void 0, function () {
     var client, db;
     return __generator(this, function (_a) {
