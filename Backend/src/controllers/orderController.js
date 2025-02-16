@@ -36,52 +36,43 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handlePayPalPayment = exports.handleStripePayment = void 0;
-var paymentService_1 = require("../services/paymentService");
-var handleStripePayment = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, amount, currency, paymentMethodId, result, error_1;
+exports.placeOrder = void 0;
+var dbConfig_1 = require("../config/dbConfig"); // Importing the database connection function
+var placeOrder = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, cartItems, specialInstructions, total, order, db, ordersCollection, result, error_1;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                _b.trys.push([0, 2, , 3]);
-                _a = req.body, amount = _a.amount, currency = _a.currency, paymentMethodId = _a.paymentMethodId;
-                return [4 /*yield*/, (0, paymentService_1.processStripePayment)(amount, currency, paymentMethodId)];
+                _a = req.body, cartItems = _a.cartItems, specialInstructions = _a.specialInstructions, total = _a.total;
+                order = {
+                    cartItems: cartItems, // Items added to the cart (
+                    specialInstructions: specialInstructions, // Any special instructions 
+                    total: total, // Total price of the order
+                    status: "Pending", // Initially setting the order status to "Pending"
+                };
+                _b.label = 1;
             case 1:
+                _b.trys.push([1, 4, , 5]);
+                return [4 /*yield*/, (0, dbConfig_1.connectDB)()];
+            case 2:
+                db = _b.sent();
+                ordersCollection = db.collection("orders");
+                return [4 /*yield*/, ordersCollection.insertOne(order)];
+            case 3:
                 result = _b.sent();
-                if (result.success) {
-                    res.status(200).json(result); //Returns 200 OK if successful
+                res.status(201).json({ message: "Order placed and saved successfully", orderId: result.insertedId });
+                return [3 /*break*/, 5];
+            case 4:
+                error_1 = _b.sent();
+                if (error_1 instanceof Error) {
+                    res.status(500).json({ message: "Failed to place order", error: error_1.message });
                 }
                 else {
-                    res.status(400).json({ error: result.message }); //400 Bad Request if payment fails
+                    res.status(500).json({ message: "Failed to place order", error: "Unknown error" });
                 }
-                return [3 /*break*/, 3];
-            case 2:
-                error_1 = _b.sent();
-                res.status(500).json({ error: "Payment failed" });
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
+                return [3 /*break*/, 5];
+            case 5: return [2 /*return*/];
         }
     });
 }); };
-exports.handleStripePayment = handleStripePayment;
-var handlePayPalPayment = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, amount, currency, payment, error_2;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
-            case 0:
-                _b.trys.push([0, 2, , 3]);
-                _a = req.body, amount = _a.amount, currency = _a.currency;
-                return [4 /*yield*/, (0, paymentService_1.createPayPalPayment)(amount, currency)];
-            case 1:
-                payment = _b.sent();
-                res.status(200).json(payment);
-                return [3 /*break*/, 3];
-            case 2:
-                error_2 = _b.sent();
-                res.status(500).json({ error: "Paypal payment failed" });
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
-        }
-    });
-}); };
-exports.handlePayPalPayment = handlePayPalPayment;
+exports.placeOrder = placeOrder;

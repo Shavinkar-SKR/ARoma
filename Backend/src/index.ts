@@ -1,9 +1,19 @@
+<<<<<<< HEAD
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import orderRoutes from "./routes/orderRoutes";
+=======
+import * as bodyParser from "body-parser";
+import * as dotenv from "dotenv";
+import paymentRoutes from "./routes/paymentRoutes";
+import orderRoutes from "./routes/orderRoutes"; // Import your order routes
+>>>>>>> 848f4b1d4ba95c88bcc3b993110908b1ecaa9b17
 import { connectDB } from "./config/dbConfig";
 
+const express = require("express");
+const cors = require("cors");
+dotenv.config(); // Load environment variables from a .env file
 const app = express();
 const PORT = process.env.PORT || 5001;
 
@@ -20,6 +30,12 @@ app.use(bodyParser.json());
 app.use("/api/orders", orderRoutes);
 app.use("/api" ,orderRoutes)
 
+<<<<<<< HEAD
+=======
+app.use("/api/payment", paymentRoutes);
+
+// Connect to the database and then start the server
+>>>>>>> 848f4b1d4ba95c88bcc3b993110908b1ecaa9b17
 const startServer = async () => {
   try {
     await connectDB();
