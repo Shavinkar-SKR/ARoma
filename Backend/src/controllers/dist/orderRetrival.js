@@ -36,42 +36,31 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var express_1 = require("express");
-var body_parser_1 = require("body-parser");
-var cors_1 = require("cors");
-var orderRoutes_1 = require("./routes/orderRoutes");
-var dbConfig_1 = require("./config/dbConfig");
-var app = express_1["default"]();
-var PORT = process.env.PORT || 5001;
-app.use(cors_1["default"]({
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PATCH", "DELETE"],
-    allowedHeaders: ["Content-Type"]
-}));
-app.use(body_parser_1["default"].json());
-app.use("/api/orders", orderRoutes_1["default"]);
-app.use("/api", orderRoutes_1["default"]);
-var startServer = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var error_1;
+exports.getOrders = void 0;
+var dbConfig_1 = require("../config/dbConfig"); // Import the connectDB utility
+// Function to retrieve all orders
+exports.getOrders = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
+    var db, ordersCollection, orders, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                _a.trys.push([0, 2, , 3]);
+                _a.trys.push([0, 3, , 4]);
                 return [4 /*yield*/, dbConfig_1.connectDB()];
             case 1:
-                _a.sent();
-                console.log("Connected to the database");
-                app.listen(PORT, function () {
-                    console.log("Server is running on port " + PORT);
-                });
-                return [3 /*break*/, 3];
+                db = _a.sent();
+                ordersCollection = db.collection("orders");
+                return [4 /*yield*/, ordersCollection.find().toArray()];
             case 2:
+                orders = _a.sent();
+                // Return the orders in the response
+                res.status(200).json(orders);
+                return [3 /*break*/, 4];
+            case 3:
                 error_1 = _a.sent();
-                console.error("Failed to connect to the database:", error_1);
-                process.exit(1);
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
+                console.error("Error fetching orders:", error_1);
+                res.status(500).json({ error: "Internal server error" });
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
         }
     });
 }); };
-startServer();
