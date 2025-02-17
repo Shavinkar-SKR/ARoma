@@ -4,6 +4,9 @@ import OrderPlacementPage from "./pages/order-placement";
 import PaymentsPage from "./pages/PaymentsPage";
 import OrderStatusPage from "./pages/order-status";
 import AdminDashboard from "./pages/adimin-dashboard";
+import RestaurantSelectionPage from "./pages/restaurant-selection";
+import DigitalMenuPage from "./pages/digital-menu";
+import CartPage from "./pages/cart-page";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -12,7 +15,13 @@ const AppRoutes: React.FC = () => {
       <Route path="/payments" element={<PaymentsPage />} />
       <Route path="/order-status" element={<OrderStatusPage />} />
       <Route path="/admin-dashboard" element={<AdminDashboard />} />
-      
+      <Route
+        path="restaurant-selection"
+        element={<RestaurantSelectionPage />}
+      />
+      <Route path="/digital-menu" element={<DigitalMenuPage />} />
+      <Route path="/cart-page" element={<CartPage />} />
+
       {/* You can add other routes here */}
     </Routes>
   );
