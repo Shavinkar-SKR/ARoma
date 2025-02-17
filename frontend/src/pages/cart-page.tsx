@@ -95,17 +95,15 @@ const CartPage: React.FC = () => {
     }
     toast.success("Proceeding to checkout...");
     navigate("/order-placement", {
-      state: { cartItems }, 
+      state: { cartItems },
     });
   };
-  
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       <Toaster />
       <div className="container mx-auto h-screen py-8 px-4">
         <div className="max-w-4xl mx-auto h-full flex flex-col">
-          {/* Header - Fixed */}
           <div className="flex items-center gap-4 mb-8">
             <Button
               variant="ghost"

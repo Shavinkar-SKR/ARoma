@@ -71,7 +71,7 @@ const RestaurantSelectionPage: React.FC = () => {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       searchRestaurants(searchQuery);
-    }, 500);
+    }, 300);
 
     return () => clearTimeout(timeoutId);
   }, [searchQuery]);
