@@ -98,8 +98,10 @@ function AdminDashboard() {
   ];
 
   const filteredOrders = orders.filter((order) =>
-    order.tableNumber.includes(searchQuery) || order.cartItems.some(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    (order.tableNumber && order.tableNumber.includes(searchQuery)) || 
+    (order.cartItems && order.cartItems.some(item => item.name.toLowerCase().includes(searchQuery.toLowerCase())))
   );
+  
 
   return (
     <div className="flex h-screen bg-gray-50">

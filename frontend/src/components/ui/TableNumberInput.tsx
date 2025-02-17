@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"; // Import UI components
 import { Table } from "lucide-react"; // Import the Table icon from lucide-react
 
+
 interface TableNumberInputProps {
   tableNumber: string; // Prop for table number value
   setTableNumber: React.Dispatch<React.SetStateAction<string>>; // Prop for updating the table number
