@@ -1,8 +1,9 @@
+import cors from "cors";
 import express from "express";
 import bodyParser from "body-parser";
-import cors from "cors";
-import orderRoutes from "./routes/orderRoutes";
 import { connectDB } from "./config/dbConfig";
+import cartRoutes from "./routes/cartRoutes";
+import orderRoutes from "./routes/orderRoutes";
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -12,13 +13,13 @@ app.use(
     origin: "http://localhost:5173",
     methods: ["GET", "POST", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type"],
-  })
+  }),
 );
 
 app.use(bodyParser.json());
 
 app.use("/api/orders", orderRoutes);
-app.use("/api" ,orderRoutes)
+app.use("/api/carts", cartRoutes);
 
 const startServer = async () => {
   try {
