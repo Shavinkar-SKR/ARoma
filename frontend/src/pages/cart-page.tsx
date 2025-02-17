@@ -94,8 +94,11 @@ const CartPage: React.FC = () => {
       return;
     }
     toast.success("Proceeding to checkout...");
-    navigate("/payments");
+    navigate("/order-placement", {
+      state: { cartItems }, 
+    });
   };
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">

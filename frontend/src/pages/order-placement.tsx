@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react"; 
-import { Button } from "@/components/ui/button"; 
-import { Textarea } from "@/components/ui/textarea"; 
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Card,
   CardContent,
@@ -8,23 +8,23 @@ import {
   CardTitle,
   CardDescription,
   CardFooter,
-} from "@/components/ui/card"; 
-import { Separator } from "@/components/ui/separator"; 
-import { Alert, AlertDescription } from "@/components/ui/alert"; 
-import { ShoppingCart, Minus, Plus, Trash2, ChefHat, Store, CheckCircle2, DollarSign } from "lucide-react"; 
-import { useNavigate } from "react-router-dom"; 
-import { toast, Toaster } from "sonner"; 
-import { motion, AnimatePresence } from "framer-motion"; 
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ShoppingCart, Minus, Plus, Trash2, ChefHat, Store, CheckCircle2, DollarSign } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { toast, Toaster } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 // Add the TableNumberInput component
 import TableNumberInput from "@/components/ui/TableNumberInput";
 
 interface CartItem {
-  id: number; 
-  name: string; 
-  price: number; 
-  quantity: number; 
-  image: string; 
+  id: number;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
 }
 
 const OrderPlacementPage: React.FC = () => {
@@ -32,45 +32,33 @@ const OrderPlacementPage: React.FC = () => {
   const [specialInstructions, setSpecialInstructions] = useState<string>(""); 
   const [subtotal, setSubtotal] = useState<number>(0); 
   const [isProcessing, setIsProcessing] = useState(false); 
-
   const serviceFee: number = 3.0; 
   const [total, setTotal] = useState<number>(0); 
-  const apiBaseUrl = "http://localhost:5000"; 
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+  const location = useLocation(); 
 
   const [tableNumber, setTableNumber] = useState<string>("");  // Table number state
 
+  // Use data passed from CartPage using react-router state
   useEffect(() => {
-    const fetchCartItems = async () => {
-      try {
-        const response = await fetch(`${apiBaseUrl}/cart`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch cart items");
-        }
-        const data: CartItem[] = await response.json();
-        setCartItems(data);
-        updateTotals(data);
-      } catch (error) {
-        console.error("Failed to fetch cart items:", error);
-        toast.error("Failed to load cart items. Please try again.");
-      }
-    };
-    fetchCartItems();
-  }, []);
+    const data = location.state?.cartItems || [];
+    setCartItems(data);
+    updateTotals(data);
+  }, [location.state?.cartItems]);
 
   const updateTotals = (items: CartItem[]) => {
     const newSubtotal = items.reduce(
-      (sum, item) => sum + item.price * item.quantity, 
-      0 
+      (sum, item) => sum + item.price * item.quantity,
+      0
     );
-    setSubtotal(newSubtotal); 
-    setTotal(newSubtotal + serviceFee); 
+    setSubtotal(newSubtotal);
+    setTotal(newSubtotal + serviceFee);
   };
 
   const handleQuantityChange = async (id: number, delta: number) => {
     const updatedItems = cartItems.map((item) => {
-      return item.id === id 
-        ? { ...item, quantity: Math.max(item.quantity + delta, 1) } 
+      return item.id === id
+        ? { ...item, quantity: Math.max(item.quantity + delta, 1) }
         : item;
     });
 
