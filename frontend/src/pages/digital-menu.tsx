@@ -1,16 +1,10 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Search,
-  ArrowLeft,
-  ShoppingCart,
-  Plus,
-  Minus,
-  View,
-} from "lucide-react";
+import { Search, ArrowLeft, ShoppingCart, View } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import CartPopup from "@/components/CartPopup";
 import { toast, Toaster } from "sonner";
 import { Badge } from "@/components/ui/badge";
 
@@ -30,6 +24,15 @@ interface MenuItem {
   hasARPreview: boolean;
 }
 
+interface CartItem {
+  _id: string;
+  menuId: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+}
+
 const DigitalMenuPage: React.FC = () => {
   const navigate = useNavigate();
   const { restaurantId } = useParams();
@@ -45,6 +48,40 @@ const DigitalMenuPage: React.FC = () => {
   });
   const [sortBy, setSortBy] = useState("default");
   const [searchQuery, setSearchQuery] = useState("");
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const addToCart = (item: MenuItem) => {
+    // Gotta add the carts via the api later as well And use that as the id later
+    setCartItems((prev) => {
+      const existingItem = prev.find(
+        (cartItem) => cartItem.menuId === item._id,
+      );
+      if (existingItem) {
+        return prev.map((cartItem) =>
+          cartItem.menuId === item._id
+            ? { ...cartItem, quantity: cartItem.quantity + 1 }
+            : cartItem,
+        );
+      }
+      return [
+        ...prev,
+        {
+          _id: cartItems.length.toString(),
+          menuId: item._id,
+          name: item.name,
+          price: item.price,
+          quantity: 1,
+          image: item.image,
+        },
+      ];
+    });
+    toast.success("Item added to cart!", {
+      description: `Added ${item.name} to your cart`,
+    });
+  };
+
+  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   useEffect(() => {
     fetchMenuItems();
@@ -288,33 +325,8 @@ const DigitalMenuPage: React.FC = () => {
                         )}
                       </div>
                       <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2">
-                          <Button
-                            onClick={() =>
-                              toast.info("Quantity adjustment coming soon!")
-                            }
-                            size="icon"
-                            variant="outline"
-                          >
-                            <Minus className="w-4 h-4" />
-                          </Button>
-                          <span>0</span>
-                          <Button
-                            onClick={() =>
-                              toast.info("Quantity adjustment coming soon!")
-                            }
-                            size="icon"
-                            variant="outline"
-                          >
-                            <Plus className="w-4 h-4" />
-                          </Button>
-                        </div>
                         <Button
-                          onClick={() => {
-                            toast.success("Item added to cart! - SIMULATED", {
-                              description: `Added ${item.name} to your cart`,
-                            });
-                          }}
+                          onClick={() => addToCart(item)}
                           className="bg-red-600 hover:bg-red-700"
                         >
                           Add to Cart
@@ -345,14 +357,19 @@ const DigitalMenuPage: React.FC = () => {
       </div>
 
       <Button
-        onClick={() => {
-          navigate("/cart-page");
-        }}
+        onClick={() => setIsCartOpen(true)}
         className="fixed bottom-6 right-6 bg-red-600 hover:bg-red-700 rounded-full p-4 shadow-lg"
       >
         <ShoppingCart className="w-6 h-6" />
-        <span className="ml-2">Cart (0)</span>
+        <span className="ml-2">Cart ({totalItems})</span>
       </Button>
+
+      <CartPopup
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        cartItems={cartItems}
+        setCartItems={setCartItems}
+      />
 
       <Toaster />
     </div>
