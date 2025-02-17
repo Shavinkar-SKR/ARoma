@@ -22,3 +22,13 @@ export const handleStripePayment = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Payment failed" });
   }
 };
+
+export const handlePayPalPayment = async (req: Request, res: Response) => {
+  try {
+    const { amount, currency } = req.body;
+    const payment = await createPayPalPayment(amount, currency);
+    res.status(200).json(payment);
+  } catch (error) {
+    res.status(500).json({ error: "PayPal payment failed" });
+  }
+};
