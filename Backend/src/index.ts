@@ -31,8 +31,9 @@ const startServer = async () => {
     });
   } catch (error) {
     console.error("Failed to connect to the database:", error);
-    process.exit(1);
+    process.exit(1); // Exit the process if DB connection fails
   }
 };
 
+// Start the server and connect to the database
 startServer();
