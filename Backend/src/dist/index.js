@@ -36,14 +36,24 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
+exports.emitOrderUpdate = void 0;
 var cors_1 = require("cors");
 var express_1 = require("express");
+var http_1 = require("http");
+var socket_io_1 = require("socket.io");
 var body_parser_1 = require("body-parser");
 var dbConfig_1 = require("./config/dbConfig");
 var cartRoutes_1 = require("./routes/cartRoutes");
 var orderRoutes_1 = require("./routes/orderRoutes");
 var app = express_1["default"]();
 var PORT = process.env.PORT || 5001;
+var httpServer = http_1.createServer(app);
+var io = new socket_io_1.Server(httpServer, {
+    cors: {
+        origin: ["http://localhost:5173", "http://localhost:3000"],
+        methods: ["GET", "POST", "PATCH", "DELETE"]
+    }
+});
 app.use(cors_1["default"]({
     origin: "http://localhost:5173",
     methods: ["GET", "POST", "PATCH", "DELETE"],
@@ -52,6 +62,18 @@ app.use(cors_1["default"]({
 app.use(body_parser_1["default"].json());
 app.use("/api/orders", orderRoutes_1["default"]);
 app.use("/api/carts", cartRoutes_1["default"]);
+// WebSocket connection
+io.on("connection", function (socket) {
+    console.log("Client connected:", socket.id);
+    socket.on("disconnect", function () {
+        console.log("Client disconnected:", socket.id);
+    });
+});
+// Add to your order routes when updating status
+var emitOrderUpdate = function (updatedOrder) {
+    io.emit("orderUpdated", updatedOrder);
+};
+exports.emitOrderUpdate = emitOrderUpdate;
 var startServer = function () { return __awaiter(void 0, void 0, void 0, function () {
     var error_1;
     return __generator(this, function (_a) {
@@ -62,18 +84,17 @@ var startServer = function () { return __awaiter(void 0, void 0, void 0, functio
             case 1:
                 _a.sent();
                 console.log("Connected to the database");
-                app.listen(PORT, function () {
+                httpServer.listen(PORT, function () {
                     console.log("Server is running on port " + PORT);
                 });
                 return [3 /*break*/, 3];
             case 2:
                 error_1 = _a.sent();
                 console.error("Failed to connect to the database:", error_1);
-                process.exit(1); // Exit the process if DB connection fails
+                process.exit(1);
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }
     });
 }); };
-// Start the server and connect to the database
 startServer();
