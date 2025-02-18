@@ -1,9 +1,10 @@
-import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Minus, Plus, Trash2, X } from "lucide-react";
+import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { X, Minus, Plus, Trash2 } from "lucide-react";
 
 interface CartItem {
   _id: string;
@@ -12,6 +13,7 @@ interface CartItem {
   price: number;
   quantity: number;
   image: string;
+  specialInstructions?: string;
 }
 
 interface CartPopupProps {
@@ -29,33 +31,33 @@ const CartPopup: React.FC<CartPopupProps> = ({
 }) => {
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
-    0,
+    0
   );
   const serviceFee = 3.0;
   const total = subtotal + serviceFee;
+  const navigate = useNavigate();
 
   const updateQuantity = (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) return;
-    console.log(cartItems);
     setCartItems((prev) =>
       prev.map((item) =>
-        item._id === itemId ? { ...item, quantity: newQuantity } : item,
-      ),
+        item._id === itemId ? { ...item, quantity: newQuantity } : item
+      )
     );
   };
 
   const removeItem = (itemId: string) => {
-    const itemToRemove = cartItems.find((item) => item._id === itemId);
-    if (!itemToRemove) return;
-
     setCartItems((prev) => prev.filter((item) => item._id !== itemId));
-    // Gotta remove the item from carts via the api later as well
-    toast.success(`Removed ${itemToRemove.name} from cart`, {
-      action: {
-        label: "Undo",
-        onClick: () => setCartItems((prev) => [...prev, itemToRemove]),
-      },
-    });
+    toast.success("Item removed from cart");
+  };
+
+  const proceedToCheckout = () => {
+    if (cartItems.length === 0) {
+      toast.error("Your cart is empty!");
+      return;
+    }
+
+    navigate("/order-placement", { state: { cartItems } });
   };
 
   if (!isOpen) return null;
@@ -135,17 +137,26 @@ const CartPopup: React.FC<CartPopupProps> = ({
                         </p>
                       </div>
                     </div>
+
+                    <textarea
+                      placeholder="Special instructions..."
+                      className="mt-2 w-full p-2 border rounded-md focus:ring focus:ring-red-400"
+                      value={item.specialInstructions || ""}
+                      onChange={(e) =>
+                        setCartItems((prev) =>
+                          prev.map((i) =>
+                            i._id === item._id
+                              ? { ...i, specialInstructions: e.target.value }
+                              : i
+                          )
+                        )
+                      }
+                    />
                   </CardContent>
                 </Card>
               </motion.div>
             ))}
           </AnimatePresence>
-
-          {cartItems.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              Your cart is empty
-            </div>
-          )}
         </div>
 
         <div className="border-t p-4 space-y-4 bg-gray-50">
@@ -166,11 +177,7 @@ const CartPopup: React.FC<CartPopupProps> = ({
 
           <Button
             className="w-full bg-red-600 hover:bg-red-700"
-            onClick={() => {
-              toast.success("Order placed successfully!");
-              setCartItems([]);
-              onClose();
-            }}
+            onClick={proceedToCheckout}
             disabled={cartItems.length === 0}
           >
             Proceed to Checkout (€{total.toFixed(2)})
