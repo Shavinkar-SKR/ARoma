@@ -73,8 +73,12 @@ const OrderPlacementPage: React.FC = () => {
   };
 
   const handleRemoveItem = (id: number) => {
-    const itemToRemove = cartItems.find((item) => item.id === id);
-    const updatedItems = cartItems.filter((item) => item.id !== id);
+  // Find the item and its index for accurate reinsertion
+  const itemIndex = cartItems.findIndex(item => item.id === id);
+  const itemToRemove = cartItems[itemIndex];
+
+  if (itemToRemove) {
+    const updatedItems = cartItems.filter(item => item.id !== id);
     setCartItems(updatedItems);
     updateTotals(updatedItems);
 
@@ -85,19 +89,28 @@ const OrderPlacementPage: React.FC = () => {
           variant="link"
           className="p-0 h-auto text-blue-500 hover:text-blue-700"
           onClick={() => {
-            setCartItems((prev) => [...prev, itemToRemove!]);
-            updateTotals([...updatedItems, itemToRemove!]);
+            // Insert the item back at its original position
+            const newItems = [...cartItems];
+            newItems.splice(itemIndex, 0, itemToRemove);
+            setCartItems(newItems);
+            updateTotals(newItems);
           }}
         >
           Undo
         </Button>
       </div>,
       {
-        duration: 1000,
+        duration: 5000, // Increased duration for better user interaction time
         position: "top-right",
       }
     );
-  };
+  } else {
+    // If no item is found, inform the user
+    toast.error("Item not found in the cart.");
+  }
+};
+
+
 
   const navigateToPaymentPage = async () => {
     setIsProcessing(true);

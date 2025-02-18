@@ -85,6 +85,7 @@ const DigitalMenuPage: React.FC = () => {
 
   useEffect(() => {
     fetchMenuItems();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restaurantId]);
 
   const fetchMenuItems = async () => {
@@ -96,6 +97,7 @@ const DigitalMenuPage: React.FC = () => {
       if (!response.ok) throw new Error("Failed to fetch menu items");
       const data = await response.json();
       setMenuItems(data);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error("Failed to load menu items");
     } finally {
@@ -118,12 +120,17 @@ const DigitalMenuPage: React.FC = () => {
       if (!response.ok) throw new Error("Search failed");
       const data = await response.json();
       setMenuItems(data);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error("Search failed");
     } finally {
       setSearching(false);
     }
   };
+
+
+
+  
 
   const filteredAndSortedItems = useMemo(() => {
     let result = [...menuItems];
@@ -175,6 +182,7 @@ const DigitalMenuPage: React.FC = () => {
     }, 300);
 
     return () => clearTimeout(timeoutId);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
 
   if (loading) {

@@ -45,6 +45,8 @@ var body_parser_1 = require("body-parser");
 var dbConfig_1 = require("./config/dbConfig");
 var cartRoutes_1 = require("./routes/cartRoutes");
 var orderRoutes_1 = require("./routes/orderRoutes");
+var restaurantRoutes_1 = require("./routes/restaurantRoutes");
+var menuRoutes_1 = require("./routes/menuRoutes");
 var app = express_1["default"]();
 var PORT = process.env.PORT || 5001;
 var httpServer = http_1.createServer(app);
@@ -62,6 +64,8 @@ app.use(cors_1["default"]({
 app.use(body_parser_1["default"].json());
 app.use("/api/orders", orderRoutes_1["default"]);
 app.use("/api/carts", cartRoutes_1["default"]);
+app.use("/api/restaurants", restaurantRoutes_1["default"]);
+app.use("/api/menus", menuRoutes_1["default"]);
 // WebSocket connection
 io.on("connection", function (socket) {
     console.log("Client connected:", socket.id);
