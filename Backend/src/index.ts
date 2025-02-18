@@ -6,6 +6,8 @@ import bodyParser from "body-parser";
 import { connectDB } from "./config/dbConfig";
 import cartRoutes from "./routes/cartRoutes";
 import orderRoutes from "./routes/orderRoutes";
+import restaurantRoutes from "./routes/restaurantRoutes";
+import menuRoutes from "./routes/menuRoutes";
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -29,6 +31,8 @@ app.use(bodyParser.json());
 
 app.use("/api/orders", orderRoutes);
 app.use("/api/carts", cartRoutes);
+app.use("/api/restaurants", restaurantRoutes);
+app.use("/api/menus", menuRoutes);
 
 // WebSocket connection
 io.on("connection", (socket) => {

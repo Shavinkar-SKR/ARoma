@@ -6,7 +6,6 @@ import OrderStatusPage from "./pages/order-status";
 import AdminDashboard from "./pages/adimin-dashboard";
 import RestaurantSelectionPage from "./pages/restaurant-selection";
 import DigitalMenuPage from "./pages/digital-menu";
-import CartPage from "./pages/cart-page";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -19,8 +18,7 @@ const AppRoutes: React.FC = () => {
         path="restaurant-selection"
         element={<RestaurantSelectionPage />}
       />
-      <Route path="/digital-menu" element={<DigitalMenuPage />} />
-      <Route path="/cart-page" element={<CartPage />} />
+      <Route path="/digital-menu/:restaurantId" element={<DigitalMenuPage />} />
 
       {/* You can add other routes here */}
     </Routes>
