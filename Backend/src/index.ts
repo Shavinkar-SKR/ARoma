@@ -8,7 +8,10 @@ import cartRoutes from "./routes/cartRoutes";
 import orderRoutes from "./routes/orderRoutes";
 import restaurantRoutes from "./routes/restaurantRoutes";
 import menuRoutes from "./routes/menuRoutes";
+import dotenv from "dotenv";
+import paymentRoutes from "./routes/paymentRoutes";
 
+dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5001;
 const httpServer = createServer(app);
@@ -29,10 +32,14 @@ app.use(
 
 app.use(bodyParser.json());
 
+app.use(cors());
+app.use(express.json());
+
 app.use("/api/orders", orderRoutes);
 app.use("/api/carts", cartRoutes);
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/menus", menuRoutes);
+app.use("/api/payment", paymentRoutes);
 
 // WebSocket connection
 io.on("connection", (socket) => {

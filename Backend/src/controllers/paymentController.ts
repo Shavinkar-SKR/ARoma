@@ -1,8 +1,16 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import {
   processStripePayment,
   createPayPalPayment,
 } from "../services/paymentService";
+import Stripe from "stripe";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+  apiVersion: "2025-01-27.acacia",
+});
 
 export const handleStripePayment = async (req: Request, res: Response) => {
   try {
@@ -30,5 +38,30 @@ export const handlePayPalPayment = async (req: Request, res: Response) => {
     res.status(200).json(payment);
   } catch (error) {
     res.status(500).json({ error: "PayPal payment failed" });
+  }
+};
+
+export const createPaymentIntent = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response | undefined> => {
+  try {
+    const { amount } = req.body; // Amount should be in cents (e.g., $50.00 -> 5000)
+
+    if (!amount) {
+      return res.status(400).json({ error: "Amount is required" });
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency: "usd",
+      payment_method_types: ["card"],
+    });
+
+    res.json({ clientSecret: paymentIntent.client_secret });
+  } catch (error) {
+    console.error("Error creating payment intent:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
