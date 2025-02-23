@@ -1,4 +1,4 @@
-import express from "express";
+const express = require("express");
 import { placeOrder } from "../controllers/orderController";
 import { getOrders } from "../controllers/orderRetrievalController";
 const router = express.Router();
