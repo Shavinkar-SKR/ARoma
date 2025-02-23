@@ -14,6 +14,8 @@ const AppRoutes: React.FC = () => {
       <Route path="/payments" element={<PaymentsPage />} />
       <Route path="/order-status" element={<OrderStatusPage />} />
       <Route path="/admin-dashboard" element={<AdminDashboard />} />
+      <Route path="/feedback"></Route>
+      
       <Route
         path="restaurant-selection"
         element={<RestaurantSelectionPage />}
