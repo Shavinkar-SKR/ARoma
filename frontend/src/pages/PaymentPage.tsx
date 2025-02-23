@@ -1,6 +1,6 @@
-import { Elements } from "@stripe/react-stripe-js";
-import { stripePromise } from "../lib/stripe";
-import PaymentForm from "../components/ui/PaymentForm";
+//import { Elements } from "@stripe/react-stripe-js";
+//import { stripePromise } from "../lib/stripe";
+//import PaymentForm from "../components/ui/PaymentForm";
 import StripeButton from "../components/ui/stripeButton";
 import PayPalButton from "../components/ui/paypalButton";
 

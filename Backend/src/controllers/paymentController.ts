@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 // import { Request, Response, NextFunction } from "express";
 // import {
 //   processStripePayment,
@@ -5,9 +6,17 @@
 // } from "../services/paymentService";
 // import Stripe from "stripe";
 // import dotenv from "dotenv";
+=======
+/*
+import { Request, Response } from "express";
+import { stripe, processStripePayment } from "../services/paymentService";
+
+const dotenv = require("dotenv");
+>>>>>>> Stashed changes
 
 // dotenv.config();
 
+<<<<<<< Updated upstream
 // const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 //   apiVersion: "2025-01-27.acacia",
 // });
@@ -92,12 +101,94 @@ export const processStripePayment = async (req: Request, res: Response) => {
     await payment.save();
 
     res.status(200).json({ clientSecret: paymentIntent.client_secret });
+=======
+export const handleStripePayment = async (req: Request, res: Response) => {
+  try {
+    const { amount, currency, paymentMethodId } = req.body;
+    const result = await processStripePayment(
+      amount,
+      currency,
+      paymentMethodId
+    );
+
+    if (result.success) {
+      res.status(200).json(result);
+    } else {
+      res.status(400).json({ error: result.message });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Payment failed" });
+  }
+};
+
+export const createPaymentIntent = async (
+  req: Request,
+  res: Response
+): Promise<Response | undefined> => {
+  try {
+    const { amount } = req.body; // Amount should be in cents (e.g., $50.00 -> 5000)
+
+    if (!amount) {
+      return res.status(400).json({ error: "Amount is required" });
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency: "usd",
+      
+      automatic_payment_methods: {
+        enabled: true, // Automatically select payment methods available for the user
+        allow_redirects: "never", // Prevent redirections
+      },
+      //return_url: "http://localhost:3000/checkout-complete",
+    });
+
+    return res.json({ clientSecret: paymentIntent.client_secret });
+>>>>>>> Stashed changes
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
   }
 };
+<<<<<<< Updated upstream
 
 export const stripeWebhook = async (req: Request, res: Response) => {
+=======
+*/
+
+import { Response, Request } from "express";
+import { stripe, Payment } from "../services/paymentService";
+require("dotenv").config();
+//const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const PaymentService = require("../services/paymentService");
+//const Payment = require("../models/paymentModel");
+
+exports.processStripePayment = async (req: Request, res: Response) => {
+  try {
+    const { amount, currency, userId } = req.body;
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency,
+      payment_method_types: ["card"],
+    });
+
+    const payment = new Payment({
+      userId,
+      amount,
+      currency,
+      status: "Pending",
+      method: "Stripe",
+      transactionId: paymentIntent.id,
+    });
+    await payment.save();
+
+    res.status(200).json({ clientSecret: paymentIntent.client_secret });
+  } catch (error) {
+    res.status(500).json({ error: (error as any).message });
+  }
+};
+
+exports.stripeWebhook = async (req: Request, res: Response) => {
+>>>>>>> Stashed changes
   const sig = req.headers["stripe-signature"];
   let event;
 

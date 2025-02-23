@@ -36,22 +36,58 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.connectDB = void 0;
-var mongodb_1 = require("mongodb");
-var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017";
-var DB_NAME = process.env.DB_NAME || "ARoma";
-var connectDB = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var client, db;
+exports.searchRestaurants = exports.getAllRestaurants = void 0;
+var dbConfig_1 = require("../config/dbConfig");
+var getAllRestaurants = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var db, restaurantsCollection, restaurants, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                client = new mongodb_1.MongoClient(MONGODB_URI);
-                return [4 /*yield*/, client.connect()];
+                _a.trys.push([0, 3, , 4]);
+                return [4 /*yield*/, (0, dbConfig_1.connectDB)()];
             case 1:
-                _a.sent();
-                db = client.db(DB_NAME);
-                return [2 /*return*/, db];
+                db = _a.sent();
+                restaurantsCollection = db.collection("restaurants");
+                return [4 /*yield*/, restaurantsCollection.find({}).toArray()];
+            case 2:
+                restaurants = _a.sent();
+                res.status(200).json(restaurants);
+                return [3 /*break*/, 4];
+            case 3:
+                error_1 = _a.sent();
+                res.status(500).json({ error: "Failed to fetch restaurants" });
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
         }
     });
 }); };
-exports.connectDB = connectDB;
+exports.getAllRestaurants = getAllRestaurants;
+var searchRestaurants = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var query, db, restaurantsCollection, restaurants, error_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 3, , 4]);
+                query = req.query.query;
+                return [4 /*yield*/, (0, dbConfig_1.connectDB)()];
+            case 1:
+                db = _a.sent();
+                restaurantsCollection = db.collection("restaurants");
+                return [4 /*yield*/, restaurantsCollection
+                        .find({
+                        name: { $regex: query, $options: "i" },
+                    })
+                        .toArray()];
+            case 2:
+                restaurants = _a.sent();
+                res.status(200).json(restaurants);
+                return [3 /*break*/, 4];
+            case 3:
+                error_2 = _a.sent();
+                res.status(500).json({ error: "Failed to search restaurants" });
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); };
+exports.searchRestaurants = searchRestaurants;
