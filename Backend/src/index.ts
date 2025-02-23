@@ -9,7 +9,7 @@ import orderRoutes from "./routes/orderRoutes";
 import restaurantRoutes from "./routes/restaurantRoutes";
 import menuRoutes from "./routes/menuRoutes";
 import dotenv from "dotenv";
-import paymentRoutes from "./routes/paymentRoutes";
+//import paymentRoutes from "./routes/paymentRoutes";
 
 dotenv.config();
 const app = express();
@@ -39,7 +39,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/carts", cartRoutes);
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/menus", menuRoutes);
-app.use("/api/payment", paymentRoutes);
+//app.use("/api/payment", paymentRoutes);
 
 // WebSocket connection
 io.on("connection", (socket) => {
