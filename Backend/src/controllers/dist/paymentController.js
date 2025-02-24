@@ -5,13 +5,10 @@
 // } from "../services/paymentService";
 // import Stripe from "stripe";
 // import dotenv from "dotenv";
-
 // dotenv.config();
-
 // const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 //   apiVersion: "2025-01-27.acacia",
 // });
-
 // export const handleStripePayment = async (req: Request, res: Response) => {
 //   try {
 //     const { amount, currency, paymentMethodId } = req.body;
@@ -20,7 +17,6 @@
 //       currency,
 //       paymentMethodId
 //     );
-
 //     if (result.success) {
 //       res.status(200).json(result);
 //     } else {
@@ -30,7 +26,6 @@
 //     res.status(500).json({ error: "Payment failed" });
 //   }
 // };
-
 // export const handlePayPalPayment = async (req: Request, res: Response) => {
 //   try {
 //     const { amount, currency } = req.body;
@@ -40,7 +35,6 @@
 //     res.status(500).json({ error: "PayPal payment failed" });
 //   }
 // };
-
 // export const createPaymentIntent = async (
 //   req: Request,
 //   res: Response,
@@ -48,75 +42,17 @@
 // ): Promise<Response | undefined> => {
 //   try {
 //     const { amount } = req.body; // Amount should be in cents (e.g., $50.00 -> 5000)
-
 //     if (!amount) {
 //       return res.status(400).json({ error: "Amount is required" });
 //     }
-
 //     const paymentIntent = await stripe.paymentIntents.create({
 //       amount,
 //       currency: "usd",
 //       payment_method_types: ["card"],
 //     });
-
 //     res.json({ clientSecret: paymentIntent.client_secret });
 //   } catch (error) {
 //     console.error("Error creating payment intent:", error);
-//     return res.status(500).json({ error: "Internal Server Error" });
+//     res.status(500).json({ error: "Internal Server Error" });
 //   }
 // };
-
-require("dotenv").config();
-import { Request, Response } from "express";
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-const PaymentService = require("../services/paymentService");
-const Payment = require("../models/paymentModel");
-
-export const processStripePayment = async (req: Request, res: Response) => {
-  try {
-    const { amount, currency, userId } = req.body;
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount,
-      currency,
-      payment_method_types: ["card"],
-    });
-
-    const payment = new Payment({
-      userId,
-      amount,
-      currency,
-      status: "Pending",
-      method: "Stripe",
-      transactionId: paymentIntent.id,
-    });
-    await payment.save();
-
-    res.status(200).json({ clientSecret: paymentIntent.client_secret });
-  } catch (error) {
-    res.status(500).json({ error: (error as Error).message });
-  }
-};
-
-export const stripeWebhook = async (req: Request, res: Response) => {
-  const sig = req.headers["stripe-signature"];
-  let event;
-
-  try {
-    event = stripe.webhooks.constructEvent(
-      req.body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET
-    );
-  } catch (err) {
-    return res.status(400).send(`Webhook Error: ${(err as Error).message}`);
-  }
-
-  if (event.type === "payment_intent.succeeded") {
-    const paymentIntent = event.data.object;
-    await Payment.findOneAndUpdate(
-      { transactionId: paymentIntent.id },
-      { status: "Completed" }
-    );
-  }
-  res.json({ received: true });
-};

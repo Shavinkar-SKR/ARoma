@@ -9,7 +9,7 @@ import orderRoutes from "./routes/orderRoutes";
 import restaurantRoutes from "./routes/restaurantRoutes";
 import menuRoutes from "./routes/menuRoutes";
 import dotenv from "dotenv";
-import paymentRoutes from "./routes/paymentRoutes";
+//import paymentRoutes from "./routes/paymentRoutes";
 
 dotenv.config();
 const app = express();
