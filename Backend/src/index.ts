@@ -39,7 +39,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/carts", cartRoutes);
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/menus", menuRoutes);
-app.use("/api/payment", paymentRoutes);
+//app.use("/api/payment", paymentRoutes);
 
 // WebSocket connection
 io.on("connection", (socket) => {
