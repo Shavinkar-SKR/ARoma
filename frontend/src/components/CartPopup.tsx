@@ -37,8 +37,9 @@ const CartPopup: React.FC<CartPopupProps> = ({
   const total = subtotal + serviceFee;
   const navigate = useNavigate();
 
+  // Update Quantity for a specific item by _id
   const updateQuantity = (itemId: string, newQuantity: number) => {
-    if (newQuantity < 1) return;
+    if (newQuantity < 1) return;  // Prevent setting quantity to less than 1
     setCartItems((prev) =>
       prev.map((item) =>
         item._id === itemId ? { ...item, quantity: newQuantity } : item
@@ -46,11 +47,13 @@ const CartPopup: React.FC<CartPopupProps> = ({
     );
   };
 
+  // Remove an item from the cart
   const removeItem = (itemId: string) => {
     setCartItems((prev) => prev.filter((item) => item._id !== itemId));
     toast.success("Item removed from cart");
   };
 
+  // Proceed to checkout
   const proceedToCheckout = () => {
     if (cartItems.length === 0) {
       toast.error("Your cart is empty!");
@@ -60,6 +63,7 @@ const CartPopup: React.FC<CartPopupProps> = ({
     navigate("/order-placement", { state: { cartItems } });
   };
 
+  // If cart is not open, return null
   if (!isOpen) return null;
 
   return (
@@ -70,6 +74,7 @@ const CartPopup: React.FC<CartPopupProps> = ({
         exit={{ x: 400 }}
         className="bg-white h-full w-full max-w-md flex flex-col"
       >
+        {/* Cart Header */}
         <div className="p-4 border-b flex justify-between items-center">
           <h2 className="text-xl font-semibold">Your Cart</h2>
           <Button variant="ghost" size="icon" onClick={onClose}>
@@ -77,11 +82,12 @@ const CartPopup: React.FC<CartPopupProps> = ({
           </Button>
         </div>
 
+        {/* Cart Items */}
         <div className="flex-1 overflow-auto p-4 space-y-4">
           <AnimatePresence>
             {cartItems.map((item) => (
               <motion.div
-                key={item._id}
+                key={item._id} // Ensure key is the unique _id
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, x: -100 }}
@@ -89,6 +95,7 @@ const CartPopup: React.FC<CartPopupProps> = ({
                 <Card>
                   <CardContent className="p-4">
                     <div className="flex gap-4">
+                      {/* Item Image */}
                       <img
                         src={item.image}
                         alt={item.name}
@@ -99,6 +106,7 @@ const CartPopup: React.FC<CartPopupProps> = ({
                         <p className="text-gray-600">
                           €{item.price.toFixed(2)} each
                         </p>
+                        {/* Quantity and Remove Buttons */}
                         <div className="flex items-center gap-2 mt-2">
                           <Button
                             size="icon"
@@ -131,6 +139,7 @@ const CartPopup: React.FC<CartPopupProps> = ({
                           </Button>
                         </div>
                       </div>
+                      {/* Item Price */}
                       <div className="text-right">
                         <p className="font-semibold">
                           €{(item.price * item.quantity).toFixed(2)}
@@ -138,6 +147,7 @@ const CartPopup: React.FC<CartPopupProps> = ({
                       </div>
                     </div>
 
+                    {/* Special Instructions */}
                     <textarea
                       placeholder="Special instructions..."
                       className="mt-2 w-full p-2 border rounded-md focus:ring focus:ring-red-400"
@@ -159,6 +169,7 @@ const CartPopup: React.FC<CartPopupProps> = ({
           </AnimatePresence>
         </div>
 
+        {/* Cart Summary */}
         <div className="border-t p-4 space-y-4 bg-gray-50">
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
@@ -175,6 +186,7 @@ const CartPopup: React.FC<CartPopupProps> = ({
             </div>
           </div>
 
+          {/* Checkout Button */}
           <Button
             className="w-full bg-red-600 hover:bg-red-700"
             onClick={proceedToCheckout}

@@ -1,16 +1,16 @@
-import cors from "cors";
-import express from "express";
+const cors = require("cors")
+const express = require("express")
 import { createServer } from "http";
 import { Server } from "socket.io";
-import bodyParser from "body-parser";
+import * as bodyParser from "body-parser";
 import { connectDB } from "./config/dbConfig";
 import cartRoutes from "./routes/cartRoutes";
 import orderRoutes from "./routes/orderRoutes";
 import restaurantRoutes from "./routes/restaurantRoutes";
 import menuRoutes from "./routes/menuRoutes";
-import dotenv from "dotenv";
+import * as  dotenv from "dotenv";
 //import paymentRoutes from "./routes/paymentRoutes";
-
+import restaurantMenuRoutes from './routes/restaurantMenuRoutes';
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -40,6 +40,7 @@ app.use("/api/carts", cartRoutes);
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/menus", menuRoutes);
 //app.use("/api/payment", paymentRoutes);
+app.use('/api/restaurants', restaurantMenuRoutes);
 
 // WebSocket connection
 io.on("connection", (socket) => {
