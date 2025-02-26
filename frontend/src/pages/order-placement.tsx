@@ -28,16 +28,16 @@ interface CartItem {
 }
 
 const OrderPlacementPage: React.FC = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]); 
-  const [specialInstructions, setSpecialInstructions] = useState<string>(""); 
-  const [subtotal, setSubtotal] = useState<number>(0); 
-  const [isProcessing, setIsProcessing] = useState(false); 
-  const serviceFee: number = 3.0; 
-  const [total, setTotal] = useState<number>(0); 
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [specialInstructions, setSpecialInstructions] = useState<string>("");
+  const [subtotal, setSubtotal] = useState<number>(0);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const serviceFee: number = 3.0;
+  const [total, setTotal] = useState<number>(0);
   const navigate = useNavigate();
-  const location = useLocation(); 
+  const location = useLocation();
 
-  const [tableNumber, setTableNumber] = useState<string>("");  // Table number state
+  const [tableNumber, setTableNumber] = useState<string>("");
 
   // Use data passed from CartPage using react-router state
   useEffect(() => {
@@ -67,50 +67,45 @@ const OrderPlacementPage: React.FC = () => {
 
     toast.success("Quantity updated", {
       duration: 1000,
-      position: "top-right", 
+      position: "top-right",
       style: { background: "#f3f4f6", color: "#1f2937" },
     });
   };
 
   const handleRemoveItem = (id: number) => {
-  // Find the item and its index for accurate reinsertion
-  const itemIndex = cartItems.findIndex(item => item.id === id);
-  const itemToRemove = cartItems[itemIndex];
+    const itemIndex = cartItems.findIndex(item => item.id === id);
+    const itemToRemove = cartItems[itemIndex];
 
-  if (itemToRemove) {
-    const updatedItems = cartItems.filter(item => item.id !== id);
-    setCartItems(updatedItems);
-    updateTotals(updatedItems);
+    if (itemToRemove) {
+      const updatedItems = cartItems.filter(item => item.id !== id);
+      setCartItems(updatedItems);
+      updateTotals(updatedItems);
 
-    toast(
-      <div className="flex items-center gap-2">
-        <span>Item removed</span>
-        <Button
-          variant="link"
-          className="p-0 h-auto text-blue-500 hover:text-blue-700"
-          onClick={() => {
-            // Insert the item back at its original position
-            const newItems = [...cartItems];
-            newItems.splice(itemIndex, 0, itemToRemove);
-            setCartItems(newItems);
-            updateTotals(newItems);
-          }}
-        >
-          Undo
-        </Button>
-      </div>,
-      {
-        duration: 5000, // Increased duration for better user interaction time
-        position: "top-right",
-      }
-    );
-  } else {
-    // If no item is found, inform the user
-    toast.error("Item not found in the cart.");
-  }
-};
-
-
+      toast(
+        <div className="flex items-center gap-2">
+          <span>Item removed</span>
+          <Button
+            variant="link"
+            className="p-0 h-auto text-blue-500 hover:text-blue-700"
+            onClick={() => {
+              const newItems = [...cartItems];
+              newItems.splice(itemIndex, 0, itemToRemove);
+              setCartItems(newItems);
+              updateTotals(newItems);
+            }}
+          >
+            Undo
+          </Button>
+        </div>,
+        {
+          duration: 5000,
+          position: "top-right",
+        }
+      );
+    } else {
+      toast.error("Item not found in the cart.");
+    }
+  };
 
   const navigateToPaymentPage = async () => {
     setIsProcessing(true);
@@ -136,7 +131,7 @@ const OrderPlacementPage: React.FC = () => {
                 total,
                 cartItems,
                 specialInstructions,
-                tableNumber,  // Pass table number
+                tableNumber,
               },
             });
           }, 500);
