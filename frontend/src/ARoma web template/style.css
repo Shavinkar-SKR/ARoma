@@ -1,0 +1,291 @@
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+:root {
+    --primary-color: green;
+    --secondary-color: red;
+    --dark-color: black;
+    --light-color: #ff9f00;
+    --btn-color: #e58f00;
+}
+
+body {
+    overflow-x: hidden;
+    background-color: white;
+    display: flex;                         
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/*Scroll behaviour*/
+html {
+    font-size: 65%;
+    scroll-behavior: smooth;
+}
+
+.header{
+    background: var(--dark-color) !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+/* Navigation Styles */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    transition: all 0.3s ease;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-brand img {
+    transition: transform 0.3s ease;
+    width: 170px;
+    height: 140px;
+}
+
+.navbar-brand img:hover {
+    transform: scale(1.05);
+}
+
+.nav-link {
+    color: white;
+    font-size: 1.7rem;
+    margin: 1rem;
+    gap: 20px;
+    padding: 0.5rem !important;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: var(--btn-color) !important;
+}
+.nav-link.btn:hover {
+    text-decoration-color: white;
+}
+
+.nav-link.active {
+    color: #c41414!important;
+    font-weight: bold;
+}
+
+/* Buttons */
+.btn {
+    margin-right: 10px;
+    display: none;
+    cursor: pointer;
+    padding: 0.8rem 2rem;
+    border-radius: 50px;
+}
+
+.btn:first-child {
+    background-color: black;
+    border: 1px solid orange;
+    border-radius: 10px;
+    padding: 0.6rem 1.5rem;
+    font-size: 18px;
+    transition: 0.5s;
+    display: inline-block;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.btn:first-child:hover {
+    background-color: #8B0000;
+    color: black;
+    transform:  scale(1.1);
+    border: 1px solid white;
+}    
+
+.content{
+    flex: 1;
+    padding: 200px 0; /* Adjust the padding as needed */
+    background-color: #f8f9fa; /* Light background color */
+}
+
+.content h1{
+    color: #e58f00;
+}
+
+/* Footer */
+footer {
+    background-color: var(--dark-color);
+    transition: all 0.3s ease;
+    min-height: 200px;
+    padding: 20px 0; /* Ensure proper spacing */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+footer h5 {
+    font-weight: 600;
+    margin-bottom: 1.8rem;
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #c41414;
+}
+
+footer a {
+    text-decoration: none;
+    transition: color 0.3s ease;
+    font-size: 15px;
+    display: block;
+    margin-bottom: 10px;
+    color: white;
+}
+
+footer a:hover {
+    color: var(--light-color) !important;
+}
+
+.social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.social-icons i {
+    font-size: 2rem; /* Adjust icon size */
+    color: white;
+    transition: color 0.3s ease;
+}
+
+.social-icons i:hover {
+    color: var(--light-color); /* Change color on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .navbar-nav {
+        text-align: center;
+    }
+
+    .navbar-nav .nav-link {
+        font-size: 1.4rem; /* Adjust nav link font size */
+    }
+
+    .main h1 {
+        font-size: 2rem; /* Adjust heading font size for tablets */
+    }
+
+    footer h5 {
+        font-size: 1rem; /* Adjust footer heading font size */
+    }
+}
+
+@media (max-width: 768px) {
+    /* Navbar adjustments for mobile */
+    .navbar-nav {
+        flex-direction: column; /* Stack nav items vertically */
+        text-align: center;
+    }
+
+    .navbar-toggler {
+        display: block;
+    }
+
+    .navbar-collapse {
+        display: block;
+    }
+
+    .nav-link {
+        font-size: 1.4rem;
+        margin: 0.5rem 0;
+        padding: 0.5rem 0; /* Add padding to nav links for easier clicking */
+    }
+
+    .navbar-brand img {
+        width: 120px; /* Adjust size for better fit */
+        height: auto;
+    }
+
+    .main {
+        padding: 80px 20px; /* Adjust padding on smaller screens */
+    }
+
+    .main h1 {
+        font-size: 1.8rem; /* Adjust h1 font size for smaller screens */
+    }
+
+    footer {
+        padding: 15px 0;
+        min-height: auto;
+    }
+
+    footer h5 {
+        font-size: 18px; /* Adjust footer heading size */
+    }
+
+    footer a {
+        font-size: 14px; /* Make links smaller on mobile */
+    }
+
+    .social-icons {
+        flex-direction: column; /* Stack social icons vertically on mobile */
+        gap: 15px;
+        justify-content: center;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 0.7rem 1.8rem;
+        font-size: 1rem;
+        display: inline-block;
+        margin-top: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Further mobile optimization */
+    .nav-link {
+        font-size: 1.2rem; /* Smaller font size for mobile */
+    }
+
+    .navbar-brand img {
+        width: 100px;
+    }
+
+    .main {
+        padding: 60px 15px; /* Less padding for very small screens */
+    }
+
+    .main h1 {
+        font-size: 1.5rem; /* Smaller heading size for mobile */
+    }
+
+    .btn {
+        font-size: 0.9rem; /* Adjust button text size */
+        display: inline-block;
+    }
+
+    .social-icons {
+        flex-direction: row;
+        gap: 8px;
+        justify-content: center;
+    }
+
+    footer h5 {
+        font-size: 16px;
+    }
+
+    footer a {
+        font-size: 13px;
+    }
+}    
