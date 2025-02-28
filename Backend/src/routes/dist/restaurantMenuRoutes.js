@@ -38,97 +38,122 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var express_1 = require("express");
 var restaurantmenuController_1 = require("../controllers/restaurantmenuController");
-var menuItemController_1 = require("../controllers/menuItemController");
 var router = express_1.Router();
-// Route: GET /api/restaurants to get all restaurants with their menu items
-router.get("/", function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
+// routes/restaurantMenuRoutes.ts
+// Add this new route
+router.get("/menus/:id", function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
     var error_1;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, restaurantmenuController_1.getMenuItemById(req, res)];
+            case 1:
+                _a.sent();
+                return [3 /*break*/, 3];
+            case 2:
+                error_1 = _a.sent();
+                console.error("Error fetching menu item:", error_1);
+                res.status(500).json({ message: 'Error fetching menu item' });
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); });
+// Get all restaurants with their menus
+router.get("/", function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
+    var error_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
                 return [4 /*yield*/, restaurantmenuController_1.getAllRestaurantsWithMenus(req, res)];
             case 1:
-                _a.sent(); // Call the controller function
+                _a.sent();
                 return [3 /*break*/, 3];
             case 2:
-                error_1 = _a.sent();
+                error_2 = _a.sent();
+                console.error("Error fetching restaurants:", error_2);
                 res.status(500).json({ message: 'Internal server error' });
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }
     });
 }); });
-// Route: GET /api/restaurants/:id to get a specific restaurant by ID with its menu items
+// Get single restaurant with its menu
 router.get("/:id", function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
-    var error_2;
+    var error_3;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
                 return [4 /*yield*/, restaurantmenuController_1.getRestaurantWithMenu(req, res)];
             case 1:
-                _a.sent(); // Call the controller function
+                _a.sent();
                 return [3 /*break*/, 3];
             case 2:
-                error_2 = _a.sent();
+                error_3 = _a.sent();
+                console.error("Error fetching restaurant:", error_3);
                 res.status(500).json({ message: 'Internal server error' });
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }
     });
 }); });
-// Route: POST /api/menus to create a new menu item
-router.post("/menus", function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
-    var error_3;
+// Add menu item to specific restaurant
+router.post("/:id/menus", function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
+    var error_4;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, menuItemController_1.createMenuItem(req, res)];
+                return [4 /*yield*/, restaurantmenuController_1.addMenuItemToRestaurant(req, res)];
             case 1:
-                _a.sent(); // Handle creating menu item
+                _a.sent();
                 return [3 /*break*/, 3];
             case 2:
-                error_3 = _a.sent();
+                error_4 = _a.sent();
+                console.error("Error creating menu item:", error_4);
                 res.status(500).json({ message: 'Error creating menu item' });
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }
     });
 }); });
-// Route: PUT /api/menus/:id to update a menu item by ID
+// Update menu item
 router.put("/menus/:id", function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
-    var error_4;
+    var error_5;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, menuItemController_1.updateMenuItem(req, res)];
+                return [4 /*yield*/, restaurantmenuController_1.updateMenuItem(req, res)];
             case 1:
-                _a.sent(); // Handle updating menu item
+                _a.sent();
                 return [3 /*break*/, 3];
             case 2:
-                error_4 = _a.sent();
+                error_5 = _a.sent();
+                console.error("Error updating menu item:", error_5);
                 res.status(500).json({ message: 'Error updating menu item' });
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];
         }
     });
 }); });
-// Route: DELETE /api/menus/:id to delete a menu item by ID
+// Delete menu itema
 router["delete"]("/menus/:id", function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
-    var error_5;
+    var error_6;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 _a.trys.push([0, 2, , 3]);
-                return [4 /*yield*/, menuItemController_1.deleteMenuItem(req, res)];
+                return [4 /*yield*/, restaurantmenuController_1.deleteMenuItem(req, res)];
             case 1:
-                _a.sent(); // Handle deleting menu item
+                _a.sent(); // Call the controller function
                 return [3 /*break*/, 3];
             case 2:
-                error_5 = _a.sent();
+                error_6 = _a.sent();
+                console.error("Error deleting menu item:", error_6);
                 res.status(500).json({ message: 'Error deleting menu item' });
                 return [3 /*break*/, 3];
             case 3: return [2 /*return*/];

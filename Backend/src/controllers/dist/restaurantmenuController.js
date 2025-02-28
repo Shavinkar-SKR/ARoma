@@ -47,7 +47,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.getAllRestaurantsWithMenus = exports.getRestaurantWithMenu = void 0;
+exports.getMenuItemById = exports.deleteMenuItem = exports.updateMenuItem = exports.addMenuItemToRestaurant = exports.addMenuItem = exports.getRestaurantWithMenu = exports.getAllRestaurantsWithMenus = void 0;
 var dbConfig_1 = require("../config/dbConfig"); // Adjust path as needed
 var mongodb_1 = require("mongodb");
 // Fetch all restaurants and their menu items
@@ -70,7 +70,7 @@ var getAllRestaurantsWithMenus = function (req, res) { return __awaiter(void 0, 
                         var menuItems;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
-                                case 0: return [4 /*yield*/, db_1.collection("menus").find({ restaurantId: restaurant._id }).toArray()];
+                                case 0: return [4 /*yield*/, db_1.collection("menus").find({ restaurantId: restaurant._id.toString() }).toArray()];
                                 case 1:
                                     menuItems = _a.sent();
                                     return [2 /*return*/, __assign(__assign({}, restaurant), { menuItems: menuItems })];
@@ -89,9 +89,38 @@ var getAllRestaurantsWithMenus = function (req, res) { return __awaiter(void 0, 
     });
 }); };
 exports.getAllRestaurantsWithMenus = getAllRestaurantsWithMenus;
+// Delete an existing menu item by ID
+var deleteMenuItem = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
+    var id, db, result, error_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                id = req.params.id;
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 4, , 5]);
+                return [4 /*yield*/, dbConfig_1.connectDB()];
+            case 2:
+                db = _a.sent();
+                return [4 /*yield*/, db.collection("menus").deleteOne({ _id: new mongodb_1.ObjectId(id) })];
+            case 3:
+                result = _a.sent();
+                if (result.deletedCount === 0) {
+                    return [2 /*return*/, res.status(404).json({ message: "Menu item not found" })];
+                }
+                return [2 /*return*/, res.status(200).json({ message: "Menu item deleted successfully" })];
+            case 4:
+                error_2 = _a.sent();
+                console.error("Error deleting menu item:", error_2);
+                return [2 /*return*/, res.status(500).json({ message: "Error deleting menu item" })];
+            case 5: return [2 /*return*/];
+        }
+    });
+}); };
+exports.deleteMenuItem = deleteMenuItem;
 // Fetch a specific restaurant by ID and its menu items
 var getRestaurantWithMenu = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
-    var id, db, restaurant, menuItems, error_2;
+    var id, db, restaurant, menuItems, error_3;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -108,7 +137,9 @@ var getRestaurantWithMenu = function (req, res) { return __awaiter(void 0, void 
                 if (!restaurant) {
                     return [2 /*return*/, res.status(404).json({ message: "Restaurant not found" })];
                 }
-                return [4 /*yield*/, db.collection("menus").find({ restaurantId: id }).toArray()];
+                return [4 /*yield*/, db.collection("menus").find({
+                        restaurantId: id // restaurantId is a string
+                    }).toArray()];
             case 4:
                 menuItems = _a.sent();
                 return [2 /*return*/, res.json({
@@ -116,11 +147,173 @@ var getRestaurantWithMenu = function (req, res) { return __awaiter(void 0, void 
                         menuItems: menuItems
                     })];
             case 5:
-                error_2 = _a.sent();
-                console.error("Error fetching restaurant and menu:", error_2);
+                error_3 = _a.sent();
+                console.error("Error fetching restaurant and menu:", error_3);
                 return [2 /*return*/, res.status(500).json({ message: "Error fetching restaurant and menu" })];
             case 6: return [2 /*return*/];
         }
     });
 }); };
 exports.getRestaurantWithMenu = getRestaurantWithMenu;
+// Fetch a specific menu item by ID
+var getMenuItemById = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
+    var id, db, menuItem, error_4;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                id = req.params.id;
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 4, , 5]);
+                return [4 /*yield*/, dbConfig_1.connectDB()];
+            case 2:
+                db = _a.sent();
+                return [4 /*yield*/, db.collection("menus").findOne({ _id: new mongodb_1.ObjectId(id) })];
+            case 3:
+                menuItem = _a.sent();
+                if (!menuItem) {
+                    return [2 /*return*/, res.status(404).json({ message: "Menu item not found" })];
+                }
+                return [2 /*return*/, res.json(menuItem)];
+            case 4:
+                error_4 = _a.sent();
+                console.error("Error fetching menu item:", error_4);
+                return [2 /*return*/, res.status(500).json({ message: "Error fetching menu item" })];
+            case 5: return [2 /*return*/];
+        }
+    });
+}); };
+exports.getMenuItemById = getMenuItemById;
+// Add a new menu item to the system
+var addMenuItem = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
+    var _a, name, description, price, image, category, restaurantId, dietary, hasARPreview, db, newMenuItem, result, error_5;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                _a = req.body, name = _a.name, description = _a.description, price = _a.price, image = _a.image, category = _a.category, restaurantId = _a.restaurantId, dietary = _a.dietary, hasARPreview = _a.hasARPreview;
+                _b.label = 1;
+            case 1:
+                _b.trys.push([1, 4, , 5]);
+                return [4 /*yield*/, dbConfig_1.connectDB()];
+            case 2:
+                db = _b.sent();
+                newMenuItem = {
+                    name: name,
+                    description: description,
+                    price: parseFloat(price),
+                    image: image,
+                    category: category,
+                    restaurantId: restaurantId,
+                    dietary: {
+                        isVegan: dietary.isVegan,
+                        isNutFree: dietary.isNutFree,
+                        isGlutenFree: dietary.isGlutenFree
+                    },
+                    hasARPreview: hasARPreview
+                };
+                return [4 /*yield*/, db.collection("menus").insertOne(newMenuItem)];
+            case 3:
+                result = _b.sent();
+                return [2 /*return*/, res.status(201).json({ message: "Menu item added successfully", menuItem: result.insertedId })];
+            case 4:
+                error_5 = _b.sent();
+                console.error("Error adding menu item:", error_5);
+                return [2 /*return*/, res.status(500).json({ message: "Error adding menu item" })];
+            case 5: return [2 /*return*/];
+        }
+    });
+}); };
+exports.addMenuItem = addMenuItem;
+// Add a new menu item to a specific restaurant by its ID
+var addMenuItemToRestaurant = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
+    var id, _a, name, description, price, image, category, dietary, hasARPreview, db, newMenuItem, result, error_6;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                id = req.params.id;
+                _a = req.body, name = _a.name, description = _a.description, price = _a.price, image = _a.image, category = _a.category, dietary = _a.dietary, hasARPreview = _a.hasARPreview;
+                _b.label = 1;
+            case 1:
+                _b.trys.push([1, 4, , 5]);
+                return [4 /*yield*/, dbConfig_1.connectDB()];
+            case 2:
+                db = _b.sent();
+                newMenuItem = {
+                    name: name,
+                    description: description,
+                    price: parseFloat(price),
+                    image: image,
+                    category: category,
+                    restaurantId: id,
+                    dietary: {
+                        isVegan: dietary.isVegan,
+                        isNutFree: dietary.isNutFree,
+                        isGlutenFree: dietary.isGlutenFree
+                    },
+                    hasARPreview: hasARPreview
+                };
+                return [4 /*yield*/, db.collection("menus").insertOne(newMenuItem)];
+            case 3:
+                result = _b.sent();
+                return [2 /*return*/, res.status(201).json({ message: "Menu item added successfully", menuItem: result.insertedId })];
+            case 4:
+                error_6 = _b.sent();
+                console.error("Error adding menu item:", error_6);
+                return [2 /*return*/, res.status(500).json({ message: "Error adding menu item" })];
+            case 5: return [2 /*return*/];
+        }
+    });
+}); };
+exports.addMenuItemToRestaurant = addMenuItemToRestaurant;
+// Update an existing menu item
+var updateMenuItem = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
+    var id, _a, name, description, price, image, category, dietary, hasARPreview, db, updateFields, result, error_7;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                id = req.params.id;
+                _a = req.body, name = _a.name, description = _a.description, price = _a.price, image = _a.image, category = _a.category, dietary = _a.dietary, hasARPreview = _a.hasARPreview;
+                _b.label = 1;
+            case 1:
+                _b.trys.push([1, 4, , 5]);
+                return [4 /*yield*/, dbConfig_1.connectDB()];
+            case 2:
+                db = _b.sent();
+                updateFields = {};
+                if (name)
+                    updateFields.name = name;
+                if (description)
+                    updateFields.description = description;
+                if (price)
+                    updateFields.price = parseFloat(price); // Ensure price is a double
+                if (image)
+                    updateFields.image = image;
+                if (category)
+                    updateFields.category = category;
+                if (dietary) {
+                    updateFields.dietary = {
+                        isVegan: dietary.isVegan,
+                        isNutFree: dietary.isNutFree,
+                        isGlutenFree: dietary.isGlutenFree
+                    };
+                }
+                if (hasARPreview !== undefined)
+                    updateFields.hasARPreview = hasARPreview; // To handle boolean values correctly
+                return [4 /*yield*/, db.collection("menus").updateOne({ _id: new mongodb_1.ObjectId(id) }, // Find the menu item by ID
+                    { $set: updateFields } // Update only the specified fields
+                    )];
+            case 3:
+                result = _b.sent();
+                if (result.matchedCount === 0) {
+                    return [2 /*return*/, res.status(404).json({ message: "Menu item not found" })];
+                }
+                return [2 /*return*/, res.status(200).json({ message: "Menu item updated successfully" })];
+            case 4:
+                error_7 = _b.sent();
+                console.error("Error updating menu item:", error_7);
+                return [2 /*return*/, res.status(500).json({ message: "Error updating menu item" })];
+            case 5: return [2 /*return*/];
+        }
+    });
+}); };
+exports.updateMenuItem = updateMenuItem;
