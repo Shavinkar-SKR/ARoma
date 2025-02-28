@@ -2,56 +2,72 @@ import { Router, Request, Response } from 'express';
 import {
   getRestaurantWithMenu,
   getAllRestaurantsWithMenus,
-} from '../controllers/restaurantmenuController';
-import {
-  createMenuItem,
+  addMenuItemToRestaurant,
   updateMenuItem,
-  deleteMenuItem,
-} from '../controllers/menuItemController';
+  deleteMenuItem ,
+  getMenuItemById
+} from '../controllers/restaurantmenuController';
 
 const router = Router();
 
-// Route: GET /api/restaurants to get all restaurants with their menu items
+
+// routes/restaurantMenuRoutes.ts
+
+// Add this new route
+router.get("/menus/:id", async (req: Request, res: Response): Promise<void> => {
+  try {
+    await getMenuItemById(req, res);
+  } catch (error) {
+    console.error("Error fetching menu item:", error);
+    res.status(500).json({ message: 'Error fetching menu item' });
+  }
+});
+// Get all restaurants with their menus
 router.get("/", async (req: Request, res: Response): Promise<void> => {
   try {
-    await getAllRestaurantsWithMenus(req, res); // Call the controller function
+    await getAllRestaurantsWithMenus(req, res);
   } catch (error) {
+    console.error("Error fetching restaurants:", error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
 
-// Route: GET /api/restaurants/:id to get a specific restaurant by ID with its menu items
+// Get single restaurant with its menu
 router.get("/:id", async (req: Request, res: Response): Promise<void> => {
   try {
-    await getRestaurantWithMenu(req, res); // Call the controller function
+    await getRestaurantWithMenu(req, res);
   } catch (error) {
+    console.error("Error fetching restaurant:", error);
     res.status(500).json({ message: 'Internal server error' });
   }
 });
 
-// Route: POST /api/menus to create a new menu item
-router.post("/menus", async (req: Request, res: Response): Promise<void> => {
+// Add menu item to specific restaurant
+router.post("/:id/menus", async (req: Request, res: Response): Promise<void> => {
   try {
-    await createMenuItem(req, res); // Handle creating menu item
+    await addMenuItemToRestaurant(req, res);
   } catch (error) {
+    console.error("Error creating menu item:", error);
     res.status(500).json({ message: 'Error creating menu item' });
   }
 });
 
-// Route: PUT /api/menus/:id to update a menu item by ID
+// Update menu item
 router.put("/menus/:id", async (req: Request, res: Response): Promise<void> => {
   try {
-    await updateMenuItem(req, res); // Handle updating menu item
+    await updateMenuItem(req, res);
   } catch (error) {
+    console.error("Error updating menu item:", error);
     res.status(500).json({ message: 'Error updating menu item' });
   }
 });
 
-// Route: DELETE /api/menus/:id to delete a menu item by ID
+// Delete menu itema
 router.delete("/menus/:id", async (req: Request, res: Response): Promise<void> => {
   try {
-    await deleteMenuItem(req, res); // Handle deleting menu item
+    await deleteMenuItem(req, res); // Call the controller function
   } catch (error) {
+    console.error("Error deleting menu item:", error);
     res.status(500).json({ message: 'Error deleting menu item' });
   }
 });
