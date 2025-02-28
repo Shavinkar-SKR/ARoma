@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -58,6 +59,14 @@ type MenuItem = {
   dietary?: string[]; // Array of strings
   hasARPreview?: boolean;
 };
+
+// Type for the form data dietary options
+type DietaryOptions = {
+  isVegan: boolean;
+  isNutFree: boolean;
+  isGlutenFree: boolean;
+};
+
 const CATEGORIES = [
   'Appetizer',
   'Main Course',
@@ -104,7 +113,7 @@ function AdminDashboard() {
       isVegan: false,
       isNutFree: false,
       isGlutenFree: false,
-    },
+    } as DietaryOptions,
     hasARPreview: false
   });
   const [loadingItem, setLoadingItem] = useState(false);
@@ -185,7 +194,7 @@ function AdminDashboard() {
     setFormData(prev => ({ ...prev, [name]: checked }));
   };
 
-  const handleDietaryChange = (diet: keyof typeof formData.dietary) => {
+  const handleDietaryChange = (diet: keyof DietaryOptions) => {
     setFormData(prev => ({
       ...prev,
       dietary: {
@@ -193,6 +202,24 @@ function AdminDashboard() {
         [diet]: !prev.dietary[diet], // Toggle the boolean value
       },
     }));
+  };
+
+  // Convert dietary object to array for API
+  const dietaryObjectToArray = (dietaryObj: DietaryOptions): string[] => {
+    const result: string[] = [];
+    if (dietaryObj.isVegan) result.push('Vegan');
+    if (dietaryObj.isNutFree) result.push('Nut-Free');
+    if (dietaryObj.isGlutenFree) result.push('Gluten-Free');
+    return result;
+  };
+
+  // Convert dietary array from API to object
+  const dietaryArrayToObject = (dietaryArr: string[] = []): DietaryOptions => {
+    return {
+      isVegan: dietaryArr.includes('Vegan'),
+      isNutFree: dietaryArr.includes('Nut-Free'),
+      isGlutenFree: dietaryArr.includes('Gluten-Free'),
+    };
   };
 
   // Load menu item for editing
@@ -208,10 +235,11 @@ function AdminDashboard() {
         price: data.price?.toString() || '',
         image: data.image || '',
         category: data.category || '',
-        dietary: data.dietary || [],
+        dietary: dietaryArrayToObject(data.dietary),
         hasARPreview: data.hasARPreview || false
       });
       setEditingItemId(itemId);
+      setShowAddForm(false);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       toast.error('Failed to load menu item details');
@@ -233,7 +261,7 @@ function AdminDashboard() {
         price: parseFloat(formData.price),
         image: formData.image,
         category: formData.category,
-        dietary: formData.dietary,
+        dietary: dietaryObjectToArray(formData.dietary), // Convert to array for API
         hasARPreview: formData.hasARPreview,
         restaurantId: selectedRestaurant._id
       };
@@ -274,15 +302,19 @@ function AdminDashboard() {
 
     setLoading(true);
     try {
+      // Create the item data with dietary as an array of strings
       const itemData = {
         name: formData.name,
         description: formData.description,
         price: parseFloat(formData.price),
         image: formData.image,
         category: formData.category,
-        dietary: formData.dietary,
-        hasARPreview: formData.hasARPreview
+        dietary: dietaryObjectToArray(formData.dietary), // Convert to array for API
+        hasARPreview: formData.hasARPreview,
+        restaurantId: selectedRestaurant._id
       };
+
+      console.log('Updating menu item with data:', itemData);
 
       const response = await fetch(`http://localhost:5001/api/restaurants/menus/${editingItemId}`, {
         method: 'PUT',
@@ -292,7 +324,11 @@ function AdminDashboard() {
         body: JSON.stringify(itemData),
       });
 
-      if (!response.ok) throw new Error('Failed to update menu item');
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Update failed:', errorData);
+        throw new Error(`Failed to update menu item: ${errorData.message || response.statusText}`);
+      }
 
       const updatedMenuItem = { 
         ...itemData, 
@@ -307,9 +343,9 @@ function AdminDashboard() {
       setEditingItemId(null);
       resetForm();
       toast.success('Menu item updated successfully');
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
-      toast.error('Failed to update menu item');
+      console.error('Update error:', err);
+      toast.error(`Failed to update menu item: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
@@ -344,7 +380,11 @@ function AdminDashboard() {
       price: '',
       image: '',
       category: '',
-      dietary: [],
+      dietary: {
+        isVegan: false,
+        isNutFree: false,
+        isGlutenFree: false,
+      },
       hasARPreview: false
     });
   };
@@ -595,7 +635,11 @@ function AdminDashboard() {
                   <div className="mb-8 flex justify-between items-center">
                     <h2 className="text-2xl font-bold">Menu Items</h2>
                     <button 
-                      onClick={() => setShowAddForm(true)}
+                      onClick={() => {
+                        setShowAddForm(true);
+                        setEditingItemId(null);
+                        resetForm();
+                      }}
                       className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700"
                     >
                       <Plus size={16} className="mr-2" /> Add Menu Item
@@ -684,17 +728,33 @@ function AdminDashboard() {
                         <div>
                           <span className="block text-sm font-medium text-gray-700 mb-2">Dietary Options</span>
                           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                            {DIETARY_OPTIONS.map(diet => (
-                              <label key={diet} className="inline-flex items-center">
-                                <input
-                                  type="checkbox"
-                                  checked={formData.dietary.includes(diet)}
-                                  onChange={() => handleDietaryChange(diet)}
-                                  className="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-500 focus:ring-red-500"
-                                />
-                                <span className="ml-2 text-sm text-gray-700">{diet}</span>
-                              </label>
-                            ))}
+                            <label className="inline-flex items-center">
+                              <input
+                                type="checkbox"
+                                checked={formData.dietary.isVegan}
+                                onChange={() => handleDietaryChange('isVegan')}
+                                className="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-500 focus:ring-red-500"
+                              />
+                              <span className="ml-2 text-sm text-gray-700">Vegan</span>
+                            </label>
+                            <label className="inline-flex items-center">
+                              <input
+                                type="checkbox"
+                                checked={formData.dietary.isNutFree}
+                                onChange={() => handleDietaryChange('isNutFree')}
+                                className="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-500 focus:ring-red-500"
+                              />
+                              <span className="ml-2 text-sm text-gray-700">Nut-Free</span>
+                            </label>
+                            <label className="inline-flex items-center">
+                              <input
+                                type="checkbox"
+                                checked={formData.dietary.isGlutenFree}
+                                onChange={() => handleDietaryChange('isGlutenFree')}
+                                className="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-500 focus:ring-red-500"
+                              />
+                              <span className="ml-2 text-sm text-gray-700">Gluten-Free</span>
+                            </label>
                           </div>
                         </div>
                         
@@ -828,17 +888,33 @@ function AdminDashboard() {
                           <div>
                             <span className="block text-sm font-medium text-gray-700 mb-2">Dietary Options</span>
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                              {DIETARY_OPTIONS.map(diet => (
-                                <label key={diet} className="inline-flex items-center">
-                                  <input
-                                    type="checkbox"
-                                    checked={formData.dietary.includes(diet)}
-                                    onChange={() => handleDietaryChange(diet)}
-                                    className="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-500 focus:ring-red-500"
-                                  />
-                                  <span className="ml-2 text-sm text-gray-700">{diet}</span>
-                                </label>
-                              ))}
+                              <label className="inline-flex items-center">
+                                <input
+                                  type="checkbox"
+                                  checked={formData.dietary.isVegan}
+                                  onChange={() => handleDietaryChange('isVegan')}
+                                  className="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-500 focus:ring-red-500"
+                                />
+                                <span className="ml-2 text-sm text-gray-700">Vegan</span>
+                              </label>
+                              <label className="inline-flex items-center">
+                                <input
+                                  type="checkbox"
+                                  checked={formData.dietary.isNutFree}
+                                  onChange={() => handleDietaryChange('isNutFree')}
+                                  className="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-500 focus:ring-red-500"
+                                />
+                                <span className="ml-2 text-sm text-gray-700">Nut-Free</span>
+                              </label>
+                              <label className="inline-flex items-center">
+                                <input
+                                  type="checkbox"
+                                  checked={formData.dietary.isGlutenFree}
+                                  onChange={() => handleDietaryChange('isGlutenFree')}
+                                  className="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-500 focus:ring-red-500"
+                                />
+                                <span className="ml-2 text-sm text-gray-700">Gluten-Free</span>
+                              </label>
                             </div>
                           </div>
                           
@@ -934,8 +1010,8 @@ function AdminDashboard() {
                               
                               {item.dietary && item.dietary.length > 0 && (
                                 <div className="mb-3">
-                                  {item.dietary.map((diet, index) => (
-                                    <span key={index} className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-2 mb-1">
+                                  {item.dietary.map(diet => (
+                                    <span key={diet} className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-2 mb-1">
                                       {diet}
                                     </span>
                                   ))}
