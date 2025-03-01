@@ -5,11 +5,18 @@
 // } from "../services/paymentService";
 // import Stripe from "stripe";
 // import dotenv from "dotenv";
+/*
+import { Request, Response } from "express";
+import { stripe, processStripePayment } from "../services/paymentService";
+
+const dotenv = require("dotenv");
+
 
 /*
 import { Request, Response } from "express";
 import { stripe, processStripePayment } from "../services/paymentService";
 
+<<<<<<< Updated upstream
 const dotenv = require("dotenv");
 
 // dotenv.config();
@@ -80,6 +87,9 @@ const PaymentService = require("../services/paymentService");
 const Payment = require("../models/paymentModel");
 
 export const processStripePayment = async (req: Request, res: Response) => {
+=======
+export const handleStripePayment = async (req: Request, res: Response) => {
+>>>>>>> Stashed changes
   try {
     const { amount, currency, userId } = req.body;
     const paymentIntent = await stripe.paymentIntents.create({
@@ -98,8 +108,11 @@ export const processStripePayment = async (req: Request, res: Response) => {
     });
     await payment.save();
 
+<<<<<<< Updated upstream
     res.status(200).json({ clientSecret: paymentIntent.client_secret });
 
+=======
+>>>>>>> Stashed changes
 export const createPaymentIntent = async (
   req: Request,
   res: Response
@@ -120,6 +133,7 @@ export const createPaymentIntent = async (
         allow_redirects: "never", // Prevent redirections
       },
       //return_url: "http://localhost:3000/checkout-complete",
+<<<<<<< Updated upstream
     });
 
     return res.json({ clientSecret: paymentIntent.client_secret });
@@ -177,7 +191,6 @@ export const stripeWebhook = async (req: Request, res: Response) => {
       .status(400)
       .send("Webhook Error: Missing stripe-signature header");
   }
-
   let event;
 
   try {
