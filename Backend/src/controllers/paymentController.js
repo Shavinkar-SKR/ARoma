@@ -1,60 +1,11 @@
 "use strict";
-/*
-import { Request, Response } from "express";
-import { stripe, processStripePayment } from "../services/paymentService";
-
-const dotenv = require("dotenv");
-
-dotenv.config();
-
-export const handleStripePayment = async (req: Request, res: Response) => {
-  try {
-    const { amount, currency, paymentMethodId } = req.body;
-    const result = await processStripePayment(
-      amount,
-      currency,
-      paymentMethodId
-    );
-
-    if (result.success) {
-      res.status(200).json(result);
-    } else {
-      res.status(400).json({ error: result.message });
-    }
-  } catch (error) {
-    res.status(500).json({ error: "Payment failed" });
-  }
-};
-
-export const createPaymentIntent = async (
-  req: Request,
-  res: Response
-): Promise<Response | undefined> => {
-  try {
-    const { amount } = req.body; // Amount should be in cents (e.g., $50.00 -> 5000)
-
-    if (!amount) {
-      return res.status(400).json({ error: "Amount is required" });
-    }
-
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount,
-      currency: "usd",
-      
-      automatic_payment_methods: {
-        enabled: true, // Automatically select payment methods available for the user
-        allow_redirects: "never", // Prevent redirections
-      },
-      //return_url: "http://localhost:3000/checkout-complete",
-    });
-
-    return res.json({ clientSecret: paymentIntent.client_secret });
-  } catch (error) {
-    console.error("Error creating payment intent:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
-*/
+// import { Request, Response, NextFunction } from "express";
+// import {
+//   processStripePayment,
+//   createPayPalPayment,
+// } from "../services/paymentService";
+// import Stripe from "stripe";
+// import dotenv from "dotenv";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -92,18 +43,146 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var paymentService_1 = require("../services/paymentService");
+exports.stripeWebhook = exports.processStripePayment = void 0;
+/*
+import { Request, Response } from "express";
+import { stripe, processStripePayment } from "../services/paymentService";
+
+const dotenv = require("dotenv");
+
+// dotenv.config();
+
+<<<<<<< Updated upstream
+// const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+//   apiVersion: "2025-01-27.acacia",
+// });
+
+// export const handleStripePayment = async (req: Request, res: Response) => {
+//   try {
+//     const { amount, currency, paymentMethodId } = req.body;
+//     const result = await processStripePayment(
+//       amount,
+//       currency,
+//       paymentMethodId
+//     );
+
+//     if (result.success) {
+//       res.status(200).json(result);
+//     } else {
+//       res.status(400).json({ error: result.message });
+//     }
+//   } catch (error) {
+//     res.status(500).json({ error: "Payment failed" });
+//   }
+// };
+
+// export const handlePayPalPayment = async (req: Request, res: Response) => {
+//   try {
+//     const { amount, currency } = req.body;
+//     const payment = await createPayPalPayment(amount, currency);
+//     res.status(200).json(payment);
+//   } catch (error) {
+//     res.status(500).json({ error: "PayPal payment failed" });
+//   }
+// };
+
+// export const createPaymentIntent = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ): Promise<Response | undefined> => {
+//   try {
+//     const { amount } = req.body; // Amount should be in cents (e.g., $50.00 -> 5000)
+
+//     if (!amount) {
+//       return res.status(400).json({ error: "Amount is required" });
+//     }
+
+//     const paymentIntent = await stripe.paymentIntents.create({
+//       amount,
+//       currency: "usd",
+//       payment_method_types: ["card"],
+//     });
+
+//     res.json({ clientSecret: paymentIntent.client_secret });
+//   } catch (error) {
+//     console.error("Error creating payment intent:", error);
+//     return res.status(500).json({ error: "Internal Server Error" });
+//   }
+// };
+
 require("dotenv").config();
-//const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+import { Request, Response } from "express";
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const PaymentService = require("../services/paymentService");
+const Payment = require("../models/paymentModel");
+
+export const processStripePayment = async (req: Request, res: Response) => {
+  try {
+    const { amount, currency, userId } = req.body;
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency,
+      payment_method_types: ["card"],
+    });
+
+    const payment = new Payment({
+      userId,
+      amount,
+      currency,
+      status: "Pending",
+      method: "Stripe",
+      transactionId: paymentIntent.id,
+    });
+    await payment.save();
+
+    res.status(200).json({ clientSecret: paymentIntent.client_secret });
+
+export const createPaymentIntent = async (
+  req: Request,
+  res: Response
+): Promise<Response | undefined> => {
+  try {
+    const { amount } = req.body; // Amount should be in cents (e.g., $50.00 -> 5000)
+
+    if (!amount) {
+      return res.status(400).json({ error: "Amount is required" });
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency: "usd",
+      
+      automatic_payment_methods: {
+        enabled: true, // Automatically select payment methods available for the user
+        allow_redirects: "never", // Prevent redirections
+      },
+      //return_url: "http://localhost:3000/checkout-complete",
+    });
+
+    return res.json({ clientSecret: paymentIntent.client_secret });
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+};
+
+export const stripeWebhook = async (req: Request, res: Response) => {
+*/
+require("dotenv").config();
+var paymentService_1 = require("../services/paymentService");
+var dbConfig_1 = require("../config/dbConfig");
+//import Payment from "../models/paymentModel";
 var PaymentService = require("../services/paymentService");
-//const Payment = require("../models/paymentModel");
-exports.processStripePayment = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, amount, currency, userId, paymentIntent, payment, error_1;
+var processStripePayment = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, amount, currency, userId, paymentIntent, db, paymentsCollection, error_1;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                _b.trys.push([0, 3, , 4]);
+                _b.trys.push([0, 4, , 5]);
                 _a = req.body, amount = _a.amount, currency = _a.currency, userId = _a.userId;
+                if (!amount || !currency || !userId) {
+                    return [2 /*return*/, res.status(400).json({ error: "Missing required fields" })];
+                }
                 return [4 /*yield*/, paymentService_1.stripe.paymentIntents.create({
                         amount: amount,
                         currency: currency,
@@ -111,33 +190,42 @@ exports.processStripePayment = function (req, res) { return __awaiter(void 0, vo
                     })];
             case 1:
                 paymentIntent = _b.sent();
-                payment = new paymentService_1.Payment({
-                    userId: userId,
-                    amount: amount,
-                    currency: currency,
-                    status: "Pending",
-                    method: "Stripe",
-                    transactionId: paymentIntent.id,
-                });
-                return [4 /*yield*/, payment.save()];
+                return [4 /*yield*/, (0, dbConfig_1.connectDB)()];
             case 2:
+                db = _b.sent();
+                paymentsCollection = db.collection("payments");
+                return [4 /*yield*/, paymentsCollection.insertOne({
+                        userId: userId,
+                        amount: amount,
+                        currency: currency,
+                        status: "Pending",
+                        method: "Stripe",
+                        transactionId: paymentIntent.id,
+                    })];
+            case 3:
                 _b.sent();
                 res.status(200).json({ clientSecret: paymentIntent.client_secret });
-                return [3 /*break*/, 4];
-            case 3:
+                return [3 /*break*/, 5];
+            case 4:
                 error_1 = _b.sent();
                 res.status(500).json({ error: error_1.message });
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
+                return [3 /*break*/, 5];
+            case 5: return [2 /*return*/];
         }
     });
 }); };
-exports.stripeWebhook = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+exports.processStripePayment = processStripePayment;
+var stripeWebhook = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var sig, event, paymentIntent;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 sig = req.headers["stripe-signature"];
+                if (!sig) {
+                    return [2 /*return*/, res
+                            .status(400)
+                            .send("Webhook Error: Missing stripe-signature header")];
+                }
                 try {
                     event = paymentService_1.stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
                 }
@@ -156,3 +244,4 @@ exports.stripeWebhook = function (req, res) { return __awaiter(void 0, void 0, v
         }
     });
 }); };
+exports.stripeWebhook = stripeWebhook;

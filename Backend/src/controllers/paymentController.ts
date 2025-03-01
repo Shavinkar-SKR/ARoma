@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 // import { Request, Response, NextFunction } from "express";
 // import {
 //   processStripePayment,
@@ -6,13 +5,12 @@
 // } from "../services/paymentService";
 // import Stripe from "stripe";
 // import dotenv from "dotenv";
-=======
+
 /*
 import { Request, Response } from "express";
 import { stripe, processStripePayment } from "../services/paymentService";
 
 const dotenv = require("dotenv");
->>>>>>> Stashed changes
 
 // dotenv.config();
 
@@ -101,25 +99,6 @@ export const processStripePayment = async (req: Request, res: Response) => {
     await payment.save();
 
     res.status(200).json({ clientSecret: paymentIntent.client_secret });
-=======
-export const handleStripePayment = async (req: Request, res: Response) => {
-  try {
-    const { amount, currency, paymentMethodId } = req.body;
-    const result = await processStripePayment(
-      amount,
-      currency,
-      paymentMethodId
-    );
-
-    if (result.success) {
-      res.status(200).json(result);
-    } else {
-      res.status(400).json({ error: result.message });
-    }
-  } catch (error) {
-    res.status(500).json({ error: "Payment failed" });
-  }
-};
 
 export const createPaymentIntent = async (
   req: Request,
@@ -144,34 +123,39 @@ export const createPaymentIntent = async (
     });
 
     return res.json({ clientSecret: paymentIntent.client_secret });
->>>>>>> Stashed changes
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
   }
 };
-<<<<<<< Updated upstream
 
 export const stripeWebhook = async (req: Request, res: Response) => {
-=======
 */
 
+require("dotenv").config();
 import { Response, Request } from "express";
 import { stripe, Payment } from "../services/paymentService";
-require("dotenv").config();
-//const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+import { connectDB } from "../config/dbConfig";
+//import Payment from "../models/paymentModel";
 const PaymentService = require("../services/paymentService");
-//const Payment = require("../models/paymentModel");
 
-exports.processStripePayment = async (req: Request, res: Response) => {
+export const processStripePayment = async (req: Request, res: Response) => {
   try {
     const { amount, currency, userId } = req.body;
+
+    if (!amount || !currency || !userId) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency,
       payment_method_types: ["card"],
     });
 
-    const payment = new Payment({
+    const db = await connectDB();
+    const paymentsCollection = db.collection("payments");
+
+    await paymentsCollection.insertOne({
       userId,
       amount,
       currency,
@@ -179,7 +163,6 @@ exports.processStripePayment = async (req: Request, res: Response) => {
       method: "Stripe",
       transactionId: paymentIntent.id,
     });
-    await payment.save();
 
     res.status(200).json({ clientSecret: paymentIntent.client_secret });
   } catch (error) {
@@ -187,16 +170,21 @@ exports.processStripePayment = async (req: Request, res: Response) => {
   }
 };
 
-exports.stripeWebhook = async (req: Request, res: Response) => {
->>>>>>> Stashed changes
+export const stripeWebhook = async (req: Request, res: Response) => {
   const sig = req.headers["stripe-signature"];
+  if (!sig) {
+    return res
+      .status(400)
+      .send("Webhook Error: Missing stripe-signature header");
+  }
+
   let event;
 
   try {
     event = stripe.webhooks.constructEvent(
       req.body,
       sig,
-      process.env.STRIPE_WEBHOOK_SECRET
+      process.env.STRIPE_WEBHOOK_SECRET as string
     );
   } catch (err) {
     return res.status(400).send(`Webhook Error: ${(err as Error).message}`);

@@ -1,15 +1,15 @@
-import cors from "cors";
-import express from "express";
+const cors = require("cors");
+const express = require("express");
 import { createServer } from "http";
 import { Server } from "socket.io";
-import bodyParser from "body-parser";
+import * as bodyParser from "body-parser";
 import { connectDB } from "./config/dbConfig";
 import cartRoutes from "./routes/cartRoutes";
 import orderRoutes from "./routes/orderRoutes";
 import restaurantRoutes from "./routes/restaurantRoutes";
 import menuRoutes from "./routes/menuRoutes";
-import dotenv from "dotenv";
-//import paymentRoutes from "./routes/paymentRoutes";
+import * as dotenv from "dotenv";
+import paymentRoutes from "./routes/paymentRoutes";
 
 dotenv.config();
 const app = express();
@@ -30,8 +30,6 @@ app.use(
   })
 );
 
-app.use(bodyParser.json());
-
 app.use(cors());
 app.use(express.json());
 
@@ -39,11 +37,8 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/carts", cartRoutes);
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/menus", menuRoutes);
-<<<<<<< Updated upstream
-//app.use("/api/payment", paymentRoutes);
-=======
 app.use("/api", paymentRoutes);
->>>>>>> Stashed changes
+app.use(bodyParser.json());
 
 // WebSocket connection
 io.on("connection", (socket) => {
@@ -74,5 +69,6 @@ const startServer = async () => {
 };
 
 startServer();
+console.log(process.env.STRIPE_SECRET_KEY);
 
 export { emitOrderUpdate }; // Export this to use in your orderRoutes

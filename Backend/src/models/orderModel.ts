@@ -12,4 +12,5 @@ export interface Order {
   specialInstructions: string;
   total: number;
   tableNumber: string;
+  estimatedTime?: number; //New field to store predicted preparation time
 }

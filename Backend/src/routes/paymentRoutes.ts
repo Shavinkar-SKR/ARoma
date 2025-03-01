@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 // import express from "express";
 // import {
 //   handleStripePayment,
@@ -12,19 +11,17 @@
 
 // export default router;
 
-=======
 /*
 import {
   handleStripePayment,
   createPaymentIntent,
 } from "../controllers/paymentController";
 
->>>>>>> Stashed changes
 const express = require("express");
 const router = express.Router();
 const paymentController = require("../controllers/paymentController");
 
-<<<<<<< Updated upstream
+
 router.post("/pay/stripe", paymentController.processStripePayment);
 router.post(
   "/webhook/stripe",
@@ -41,7 +38,7 @@ export default router;
 
 const express = require("express");
 const router = express.Router();
-const paymentController = require("../controllers/paymentController");
+import * as paymentController from "../controllers/paymentController";
 
 router.post("/pay/stripe", paymentController.processStripePayment);
 router.post(

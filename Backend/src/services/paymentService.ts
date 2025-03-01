@@ -1,13 +1,10 @@
 /*
-<<<<<<< Updated upstream
 import Stripe from "stripe"; // imports the stripe SDK
 import dotenv from "dotenv"; //Loads API keys from the .env file
 
-=======
 // imports the stripe SDK
 const dotenv = require("dotenv"); //Loads API keys from the .env file
 console.log("STRIPE_SECRET_KEY:", process.env.STRIPE_SECRET_KEY);
->>>>>>> Stashed changes
 dotenv.config();
 
 import Stripe from "stripe";
@@ -37,13 +34,11 @@ export const processStripePayment = async (
 };
 */
 
-<<<<<<< Updated upstream
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-const Payment = require("../models/paymentModel");
-=======
-export const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-export const Payment = require("../models/paymentModel");
->>>>>>> Stashed changes
+import stripePackage from "stripe";
+import Payment from "../models/paymentModel";
+import { connectDB } from "../config/dbConfig";
+
+const stripe = new stripePackage(process.env.STRIPE_SECRET_KEY!);
 
 export const createStripePayment = async (
   amount: number,
@@ -56,7 +51,10 @@ export const createStripePayment = async (
     payment_method_types: ["card"],
   });
 
-  const payment = new Payment({
+  const db = await connectDB();
+  const paymentsCollection = db.collection("payments");
+
+  await paymentsCollection.insertOne({
     userId,
     amount,
     currency,
@@ -64,7 +62,8 @@ export const createStripePayment = async (
     method: "Stripe",
     transactionId: paymentIntent.id,
   });
-  await payment.save();
 
   return paymentIntent.client_secret;
 };
+
+export { stripe, Payment };

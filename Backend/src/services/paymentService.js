@@ -1,5 +1,8 @@
 "use strict";
 /*
+import Stripe from "stripe"; // imports the stripe SDK
+import dotenv from "dotenv"; //Loads API keys from the .env file
+
 // imports the stripe SDK
 const dotenv = require("dotenv"); //Loads API keys from the .env file
 console.log("STRIPE_SECRET_KEY:", process.env.STRIPE_SECRET_KEY);
@@ -68,30 +71,37 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createStripePayment = exports.Payment = exports.stripe = void 0;
-exports.stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-exports.Payment = require("../models/paymentModel");
+exports.Payment = exports.stripe = exports.createStripePayment = void 0;
+var stripe_1 = require("stripe");
+var paymentModel_1 = require("../models/paymentModel");
+exports.Payment = paymentModel_1.default;
+var dbConfig_1 = require("../config/dbConfig");
+var stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY);
+exports.stripe = stripe;
 var createStripePayment = function (amount, currency, userId) { return __awaiter(void 0, void 0, void 0, function () {
-    var paymentIntent, payment;
+    var paymentIntent, db, paymentsCollection;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, exports.stripe.paymentIntents.create({
+            case 0: return [4 /*yield*/, stripe.paymentIntents.create({
                     amount: amount,
                     currency: currency,
                     payment_method_types: ["card"],
                 })];
             case 1:
                 paymentIntent = _a.sent();
-                payment = new exports.Payment({
-                    userId: userId,
-                    amount: amount,
-                    currency: currency,
-                    status: "Pending",
-                    method: "Stripe",
-                    transactionId: paymentIntent.id,
-                });
-                return [4 /*yield*/, payment.save()];
+                return [4 /*yield*/, (0, dbConfig_1.connectDB)()];
             case 2:
+                db = _a.sent();
+                paymentsCollection = db.collection("payments");
+                return [4 /*yield*/, paymentsCollection.insertOne({
+                        userId: userId,
+                        amount: amount,
+                        currency: currency,
+                        status: "Pending",
+                        method: "Stripe",
+                        transactionId: paymentIntent.id,
+                    })];
+            case 3:
                 _a.sent();
                 return [2 /*return*/, paymentIntent.client_secret];
         }

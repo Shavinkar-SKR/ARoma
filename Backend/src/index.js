@@ -37,20 +37,20 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.emitOrderUpdate = void 0;
-var cors_1 = require("cors");
-var express_1 = require("express");
+var cors = require("cors");
+var express = require("express");
 var http_1 = require("http");
 var socket_io_1 = require("socket.io");
-var body_parser_1 = require("body-parser");
+var bodyParser = require("body-parser");
 var dbConfig_1 = require("./config/dbConfig");
 var cartRoutes_1 = require("./routes/cartRoutes");
 var orderRoutes_1 = require("./routes/orderRoutes");
 var restaurantRoutes_1 = require("./routes/restaurantRoutes");
 var menuRoutes_1 = require("./routes/menuRoutes");
-var dotenv_1 = require("dotenv");
+var dotenv = require("dotenv");
 var paymentRoutes_1 = require("./routes/paymentRoutes");
-dotenv_1.default.config();
-var app = (0, express_1.default)();
+dotenv.config();
+var app = express();
 var PORT = process.env.PORT || 5001;
 var httpServer = (0, http_1.createServer)(app);
 var io = new socket_io_1.Server(httpServer, {
@@ -59,19 +59,20 @@ var io = new socket_io_1.Server(httpServer, {
         methods: ["GET", "POST", "PATCH", "DELETE"],
     },
 });
-app.use((0, cors_1.default)({
+app.use(cors({
     origin: "http://localhost:5173",
     methods: ["GET", "POST", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type"],
 }));
-app.use(body_parser_1.default.json());
-app.use((0, cors_1.default)());
-app.use(express_1.default.json());
+app.use(cors());
+app.use(express.json());
 app.use("/api/orders", orderRoutes_1.default);
 app.use("/api/carts", cartRoutes_1.default);
 app.use("/api/restaurants", restaurantRoutes_1.default);
 app.use("/api/menus", menuRoutes_1.default);
+//app.use("/api/payment", paymentRoutes);
 app.use("/api", paymentRoutes_1.default);
+app.use(bodyParser.json());
 // WebSocket connection
 io.on("connection", function (socket) {
     console.log("Client connected:", socket.id);
@@ -108,3 +109,4 @@ var startServer = function () { return __awaiter(void 0, void 0, void 0, functio
     });
 }); };
 startServer();
+console.log(process.env.STRIPE_SECRET_KEY);

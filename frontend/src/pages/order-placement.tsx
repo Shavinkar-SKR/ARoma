@@ -11,7 +11,16 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ShoppingCart, Minus, Plus, Trash2, ChefHat, Store, CheckCircle2, DollarSign } from "lucide-react";
+import {
+  ShoppingCart,
+  Minus,
+  Plus,
+  Trash2,
+  ChefHat,
+  Store,
+  CheckCircle2,
+  DollarSign,
+} from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast, Toaster } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -28,16 +37,16 @@ interface CartItem {
 }
 
 const OrderPlacementPage: React.FC = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]); 
-  const [specialInstructions, setSpecialInstructions] = useState<string>(""); 
-  const [subtotal, setSubtotal] = useState<number>(0); 
-  const [isProcessing, setIsProcessing] = useState(false); 
-  const serviceFee: number = 3.0; 
-  const [total, setTotal] = useState<number>(0); 
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [specialInstructions, setSpecialInstructions] = useState<string>("");
+  const [subtotal, setSubtotal] = useState<number>(0);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const serviceFee: number = 3.0;
+  const [total, setTotal] = useState<number>(0);
   const navigate = useNavigate();
-  const location = useLocation(); 
+  const location = useLocation();
 
-  const [tableNumber, setTableNumber] = useState<string>("");  // Table number state
+  const [tableNumber, setTableNumber] = useState<string>(""); // Table number state
 
   // Use data passed from CartPage using react-router state
   useEffect(() => {
@@ -45,6 +54,22 @@ const OrderPlacementPage: React.FC = () => {
     setCartItems(data);
     updateTotals(data);
   }, [location.state?.cartItems]);
+
+  const getOrderPrediction = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/predict-time", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cartItems, tableNumber }),
+      });
+
+      const data = await response.json();
+      return data.estimated_time; // Assuming the response contains { estimated_time: "20 mins" }
+    } catch (error) {
+      console.error("Prediction error:", error);
+      return "Unknown"; // Fallback in case of error
+    }
+  };
 
   const updateTotals = (items: CartItem[]) => {
     const newSubtotal = items.reduce(
@@ -67,50 +92,48 @@ const OrderPlacementPage: React.FC = () => {
 
     toast.success("Quantity updated", {
       duration: 1000,
-      position: "top-right", 
+      position: "top-right",
       style: { background: "#f3f4f6", color: "#1f2937" },
     });
   };
 
   const handleRemoveItem = (id: number) => {
-  // Find the item and its index for accurate reinsertion
-  const itemIndex = cartItems.findIndex(item => item.id === id);
-  const itemToRemove = cartItems[itemIndex];
+    // Find the item and its index for accurate reinsertion
+    const itemIndex = cartItems.findIndex((item) => item.id === id);
+    const itemToRemove = cartItems[itemIndex];
 
-  if (itemToRemove) {
-    const updatedItems = cartItems.filter(item => item.id !== id);
-    setCartItems(updatedItems);
-    updateTotals(updatedItems);
+    if (itemToRemove) {
+      const updatedItems = cartItems.filter((item) => item.id !== id);
+      setCartItems(updatedItems);
+      updateTotals(updatedItems);
 
-    toast(
-      <div className="flex items-center gap-2">
-        <span>Item removed</span>
-        <Button
-          variant="link"
-          className="p-0 h-auto text-blue-500 hover:text-blue-700"
-          onClick={() => {
-            // Insert the item back at its original position
-            const newItems = [...cartItems];
-            newItems.splice(itemIndex, 0, itemToRemove);
-            setCartItems(newItems);
-            updateTotals(newItems);
-          }}
-        >
-          Undo
-        </Button>
-      </div>,
-      {
-        duration: 5000, // Increased duration for better user interaction time
-        position: "top-right",
-      }
-    );
-  } else {
-    // If no item is found, inform the user
-    toast.error("Item not found in the cart.");
-  }
-};
-
-
+      toast(
+        <div className="flex items-center gap-2">
+          <span>Item removed</span>
+          <Button
+            variant="link"
+            className="p-0 h-auto text-blue-500 hover:text-blue-700"
+            onClick={() => {
+              // Insert the item back at its original position
+              const newItems = [...cartItems];
+              newItems.splice(itemIndex, 0, itemToRemove);
+              setCartItems(newItems);
+              updateTotals(newItems);
+            }}
+          >
+            Undo
+          </Button>
+        </div>,
+        {
+          duration: 5000, // Increased duration for better user interaction time
+          position: "top-right",
+        }
+      );
+    } else {
+      // If no item is found, inform the user
+      toast.error("Item not found in the cart.");
+    }
+  };
 
   const navigateToPaymentPage = async () => {
     setIsProcessing(true);
@@ -120,53 +143,59 @@ const OrderPlacementPage: React.FC = () => {
       return;
     }
 
-    toast.promise(
-      new Promise((resolve) => setTimeout(resolve, 1000)),
-      {
-        loading: (
-          <div className="flex items-center gap-3">
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
-            <span>Processing your order...</span>
-          </div>
-        ),
-        success: () => {
-          setTimeout(() => {
-            navigate("/payments", {
-              state: {
-                total,
-                cartItems,
-                specialInstructions,
-                tableNumber,  // Pass table number
-              },
-            });
-          }, 500);
+    const estimatedTime = await getOrderPrediction();
 
-          return (
-            <div className="flex items-center gap-3 p-2">
-              <div className="flex items-center justify-center bg-green-100 rounded-full p-1">
-                <CheckCircle2 className="h-5 w-5 text-green-600" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-semibold text-green-900">Order Confirmed!</span>
-                <span className="text-sm text-gray-600">Redirecting to payment...</span>
-              </div>
-            </div>
-          );
-        },
-        error: (
+    toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
+      loading: (
+        <div className="flex items-center gap-3">
+          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+          <span>Processing your order...</span>
+        </div>
+      ),
+      success: () => {
+        setTimeout(() => {
+          navigate("/payments", {
+            state: {
+              total,
+              cartItems,
+              specialInstructions,
+              tableNumber, // Pass table number
+              estimatedTime,
+            },
+          });
+        }, 500);
+
+        return (
           <div className="flex items-center gap-3 p-2">
-            <div className="flex items-center justify-center bg-red-100 rounded-full p-1">
-              <span className="h-5 w-5 text-red-600">×</span>
+            <div className="flex items-center justify-center bg-green-100 rounded-full p-1">
+              <CheckCircle2 className="h-5 w-5 text-green-600" />
             </div>
             <div className="flex flex-col">
-              <span className="font-semibold text-red-900">Failed to process order</span>
-              <span className="text-sm text-gray-600">Please try again</span>
+              <span className="font-semibold text-green-900">
+                Order Confirmed!
+              </span>
+              <span className="text-sm text-gray-600">
+                Redirecting to payment...
+              </span>
             </div>
           </div>
-        ),
-        position: "top-right",
-      }
-    );
+        );
+      },
+      error: (
+        <div className="flex items-center gap-3 p-2">
+          <div className="flex items-center justify-center bg-red-100 rounded-full p-1">
+            <span className="h-5 w-5 text-red-600">×</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="font-semibold text-red-900">
+              Failed to process order
+            </span>
+            <span className="text-sm text-gray-600">Please try again</span>
+          </div>
+        </div>
+      ),
+      position: "top-right",
+    });
   };
 
   return (
@@ -183,8 +212,12 @@ const OrderPlacementPage: React.FC = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <h1 className="text-3xl font-bold tracking-tight text-gray-900">Order Summary</h1>
-              <p className="mt-2 text-sm text-gray-500">Review your order before checkout</p>
+              <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+                Order Summary
+              </h1>
+              <p className="mt-2 text-sm text-gray-500">
+                Review your order before checkout
+              </p>
             </motion.div>
             <motion.div
               initial={{ scale: 0 }}
@@ -201,7 +234,9 @@ const OrderPlacementPage: React.FC = () => {
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
                   <div className="space-y-1">
                     <CardTitle>Your Cart</CardTitle>
-                    <CardDescription>Review and adjust your items</CardDescription>
+                    <CardDescription>
+                      Review and adjust your items
+                    </CardDescription>
                   </div>
                   <ShoppingCart className="h-5 w-5 text-red-500 animate-bounce" />
                 </CardHeader>
@@ -223,7 +258,9 @@ const OrderPlacementPage: React.FC = () => {
                           />
                           <div className="flex-1 space-y-1">
                             <h4 className="font-medium">{item.name}</h4>
-                            <p className="text-sm text-muted-foreground">€{item.price.toFixed(2)} each</p>
+                            <p className="text-sm text-muted-foreground">
+                              €{item.price.toFixed(2)} each
+                            </p>
                           </div>
                           <div className="flex items-center space-x-2">
                             <Button
@@ -234,7 +271,9 @@ const OrderPlacementPage: React.FC = () => {
                             >
                               <Minus className="h-4 w-4" />
                             </Button>
-                            <span className="w-8 text-center font-medium">{item.quantity}</span>
+                            <span className="w-8 text-center font-medium">
+                              {item.quantity}
+                            </span>
                             <Button
                               size="icon"
                               variant="outline"
@@ -252,13 +291,21 @@ const OrderPlacementPage: React.FC = () => {
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
-                          <div className="w-24 text-right font-medium">€{(item.price * item.quantity).toFixed(2)}</div>
+                          <div className="w-24 text-right font-medium">
+                            €{(item.price * item.quantity).toFixed(2)}
+                          </div>
                         </motion.div>
                       ))
                     ) : (
-                      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                      >
                         <Alert>
-                          <AlertDescription>Your cart is empty. Add some items to proceed with checkout.</AlertDescription>
+                          <AlertDescription>
+                            Your cart is empty. Add some items to proceed with
+                            checkout.
+                          </AlertDescription>
                         </Alert>
                       </motion.div>
                     )}
@@ -267,7 +314,10 @@ const OrderPlacementPage: React.FC = () => {
               </Card>
 
               {/* Table Number Input */}
-              <TableNumberInput tableNumber={tableNumber} setTableNumber={setTableNumber} />
+              <TableNumberInput
+                tableNumber={tableNumber}
+                setTableNumber={setTableNumber}
+              />
               {/* Special instructions */}
               <Card className="hover:shadow-md transition-shadow duration-200">
                 <CardHeader>
@@ -275,7 +325,9 @@ const OrderPlacementPage: React.FC = () => {
                     <ChefHat className="h-5 w-5 text-red-500" />
                     Special Instructions
                   </CardTitle>
-                  <CardDescription>Add any dietary preferences or special requests</CardDescription>
+                  <CardDescription>
+                    Add any dietary preferences or special requests
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Textarea
@@ -300,7 +352,11 @@ const OrderPlacementPage: React.FC = () => {
                 <CardContent>
                   <div className="space-y-4">
                     {/* Display subtotal, service fee, and total */}
-                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex justify-between text-sm">
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex justify-between text-sm"
+                    >
                       <span className="text-muted-foreground">Subtotal</span>
                       <span>€{subtotal.toFixed(2)}</span>
                     </motion.div>
