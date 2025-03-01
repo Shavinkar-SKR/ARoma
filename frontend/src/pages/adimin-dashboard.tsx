@@ -11,13 +11,13 @@ import {
   Utensils,
   Menu as MenuIcon,
   Plus,
-  Edit,
   Trash2,
   ArrowLeft,
   Save,
   X,
   ChefHat,
   Sparkles,
+  Edit,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -102,6 +102,7 @@ function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -116,7 +117,6 @@ function AdminDashboard() {
     } as DietaryOptions,
     hasARPreview: false
   });
-  const [loadingItem, setLoadingItem] = useState(false);
 
   // Fetch Orders from API on component mount
   useEffect(() => {
@@ -213,39 +213,16 @@ function AdminDashboard() {
     return result;
   };
 
-  // Convert dietary array from API to object
-  const dietaryArrayToObject = (dietaryArr: string[] = []): DietaryOptions => {
+  // Convert dietary array to object for form
+  const dietaryArrayToObject = (dietaryArr: string[] | undefined): DietaryOptions => {
+    // Ensure dietaryArr is an array, if not, use an empty array
+    const safeArray = Array.isArray(dietaryArr) ? dietaryArr : [];
+    
     return {
-      isVegan: dietaryArr.includes('Vegan'),
-      isNutFree: dietaryArr.includes('Nut-Free'),
-      isGlutenFree: dietaryArr.includes('Gluten-Free'),
+      isVegan: safeArray.includes('Vegan'),
+      isNutFree: safeArray.includes('Nut-Free'),
+      isGlutenFree: safeArray.includes('Gluten-Free'),
     };
-  };
-
-  // Load menu item for editing
-  const handleEdit = async (itemId: string) => {
-    setLoadingItem(true);
-    try {
-      const response = await fetch(`http://localhost:5001/api/restaurants/menus/${itemId}`);
-      if (!response.ok) throw new Error('Failed to fetch menu item');
-      const data = await response.json();
-      setFormData({
-        name: data.name || '',
-        description: data.description || '',
-        price: data.price?.toString() || '',
-        image: data.image || '',
-        category: data.category || '',
-        dietary: dietaryArrayToObject(data.dietary),
-        hasARPreview: data.hasARPreview || false
-      });
-      setEditingItemId(itemId);
-      setShowAddForm(false);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
-      toast.error('Failed to load menu item details');
-    } finally {
-      setLoadingItem(false);
-    }
   };
 
   // Add a new menu item to a specific restaurant
@@ -298,23 +275,23 @@ function AdminDashboard() {
   // Update an existing menu item
   const handleUpdateMenuItem = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingItemId || !selectedRestaurant) return;
+    if (!editingItemId) return;
 
     setLoading(true);
     try {
-      // Create the item data with dietary as an array of strings
       const itemData = {
         name: formData.name,
         description: formData.description,
         price: parseFloat(formData.price),
         image: formData.image,
         category: formData.category,
-        dietary: dietaryObjectToArray(formData.dietary), // Convert to array for API
-        hasARPreview: formData.hasARPreview,
-        restaurantId: selectedRestaurant._id
+        dietary: {
+          isVegan: formData.dietary.isVegan,
+          isNutFree: formData.dietary.isNutFree,
+          isGlutenFree: formData.dietary.isGlutenFree
+        },
+        hasARPreview: formData.hasARPreview
       };
-
-      console.log('Updating menu item with data:', itemData);
 
       const response = await fetch(`http://localhost:5001/api/restaurants/menus/${editingItemId}`, {
         method: 'PUT',
@@ -324,28 +301,28 @@ function AdminDashboard() {
         body: JSON.stringify(itemData),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('Update failed:', errorData);
-        throw new Error(`Failed to update menu item: ${errorData.message || response.statusText}`);
-      }
+      if (!response.ok) throw new Error('Failed to update menu item');
 
-      const updatedMenuItem = { 
-        ...itemData, 
-        _id: editingItemId,
-        restaurantId: selectedRestaurant._id
-      };
-      
+      // Update the menu items list with the updated item
       setMenuItems(menuItems.map(item => 
-        item._id === editingItemId ? updatedMenuItem as MenuItem : item
+        item._id === editingItemId 
+          ? { 
+              ...item, 
+              ...itemData, 
+              price: parseFloat(formData.price),
+              dietary: dietaryObjectToArray(formData.dietary)
+            } 
+          : item
       ));
-      
+
+      setIsEditing(false);
       setEditingItemId(null);
+      setShowAddForm(false);
       resetForm();
       toast.success('Menu item updated successfully');
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
-      console.error('Update error:', err);
-      toast.error(`Failed to update menu item: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      toast.error('Failed to update menu item');
     } finally {
       setLoading(false);
     }
@@ -373,6 +350,22 @@ function AdminDashboard() {
     }
   };
 
+  // Handle edit button click
+  const handleEditMenuItem = (item: MenuItem) => {
+    setFormData({
+      name: item.name,
+      description: item.description || '',
+      price: item.price.toString(),
+      image: item.image || '',
+      category: item.category || '',
+      dietary: dietaryArrayToObject(item.dietary),
+      hasARPreview: item.hasARPreview || false
+    });
+    setIsEditing(true);
+    setEditingItemId(item._id);
+    setShowAddForm(true);
+  };
+
   const resetForm = () => {
     setFormData({
       name: '',
@@ -387,10 +380,11 @@ function AdminDashboard() {
       },
       hasARPreview: false
     });
+    setIsEditing(false);
+    setEditingItemId(null);
   };
 
   const handleCancel = () => {
-    setEditingItemId(null);
     setShowAddForm(false);
     resetForm();
   };
@@ -637,7 +631,6 @@ function AdminDashboard() {
                     <button 
                       onClick={() => {
                         setShowAddForm(true);
-                        setEditingItemId(null);
                         resetForm();
                       }}
                       className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700"
@@ -648,8 +641,10 @@ function AdminDashboard() {
                   
                   {showAddForm && (
                     <div className="mb-8 bg-white rounded-lg shadow-md p-6">
-                      <h3 className="text-xl font-semibold mb-4">Add New Menu Item</h3>
-                      <form onSubmit={handleAddMenuItem} className="space-y-4">
+                      <h3 className="text-xl font-semibold mb-4">
+                        {isEditing ? 'Edit Menu Item' : 'Add New Menu Item'}
+                      </h3>
+                      <form onSubmit={isEditing ? handleUpdateMenuItem : handleAddMenuItem} className="space-y-4">
                         <div>
                           <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name *</label>
                           <input
@@ -788,11 +783,11 @@ function AdminDashboard() {
                             {loading ? (
                               <>
                                 <div className="w-4 h-4 mr-2 border-2 border-t-white border-r-white border-b-transparent border-l-transparent rounded-full animate-spin"></div>
-                                Saving...
+                                {isEditing ? 'Updating...' : 'Saving...'}
                               </>
                             ) : (
                               <>
-                                <Save size={16} className="mr-2" /> Save
+                                <Save size={16} className="mr-2" /> {isEditing ? 'Update' : 'Save'}
                               </>
                             )}
                           </button>
@@ -801,169 +796,8 @@ function AdminDashboard() {
                     </div>
                   )}
                   
-                  {editingItemId && (
-                    <div className="mb-8 bg-white rounded-lg shadow-md p-6">
-                      <h3 className="text-xl font-semibold mb-4">Edit Menu Item</h3>
-                      {loadingItem ? (
-                        <div className="flex justify-center items-center h-40">
-                          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-red-500"></div>
-                        </div>
-                      ) : (
-                        <form onSubmit={handleUpdateMenuItem} className="space-y-4">
-                          <div>
-                            <label htmlFor="edit-name" className="block text-sm font-medium text-gray-700">Name *</label>
-                            <input
-                              type="text"
-                              id="edit-name"
-                              name="name"
-                              value={formData.name}
-                              onChange={handleChange}
-                              required
-                              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
-                            />
-                          </div>
-                          
-                          <div>
-                            <label htmlFor="edit-description" className="block text-sm font-medium text-gray-700">Description</label>
-                            <textarea
-                              id="edit-description"
-                              name="description"
-                              rows={3}
-                              value={formData.description}
-                              onChange={handleChange}
-                              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
-                            />
-                          </div>
-                          
-                          <div>
-                            <label htmlFor="edit-price" className="block text-sm font-medium text-gray-700">Price *</label>
-                            <div className="mt-1 relative rounded-md shadow-sm">
-                              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <span className="text-gray-500 sm:text-sm">$</span>
-                              </div>
-                              <input
-                                type="number"
-                                id="edit-price"
-                                name="price"
-                                min="0"
-                                step="0.01"
-                                value={formData.price}
-                                onChange={handleChange}
-                                required
-                                className="block w-full pl-7 pr-12 rounded-md border-gray-300 focus:border-red-500 focus:ring-red-500 sm:text-sm"
-                                placeholder="0.00"
-                              />
-                            </div>
-                          </div>
-                          
-                          <div>
-                            <label htmlFor="edit-image" className="block text-sm font-medium text-gray-700">Image URL</label>
-                            <input
-                              type="url"
-                              id="edit-image"
-                              name="image"
-                              value={formData.image}
-                              onChange={handleChange}
-                              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
-                              placeholder="https://example.com/image.jpg"
-                            />
-                          </div>
-                          
-                          <div>
-                            <label htmlFor="edit-category" className="block text-sm font-medium text-gray-700">Category</label>
-                            <select
-                              id="edit-category"
-                              name="category"
-                              value={formData.category}
-                              onChange={handleChange}
-                              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
-                            >
-                              <option value="">Select a category</option>
-                              {CATEGORIES.map(category => (
-                                <option key={category} value={category}>{category}</option>
-                              ))}
-                            </select>
-                          </div>
-                          
-                          <div>
-                            <span className="block text-sm font-medium text-gray-700 mb-2">Dietary Options</span>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                              <label className="inline-flex items-center">
-                                <input
-                                  type="checkbox"
-                                  checked={formData.dietary.isVegan}
-                                  onChange={() => handleDietaryChange('isVegan')}
-                                  className="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-500 focus:ring-red-500"
-                                />
-                                <span className="ml-2 text-sm text-gray-700">Vegan</span>
-                              </label>
-                              <label className="inline-flex items-center">
-                                <input
-                                  type="checkbox"
-                                  checked={formData.dietary.isNutFree}
-                                  onChange={() => handleDietaryChange('isNutFree')}
-                                  className="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-500 focus:ring-red-500"
-                                />
-                                <span className="ml-2 text-sm text-gray-700">Nut-Free</span>
-                              </label>
-                              <label className="inline-flex items-center">
-                                <input
-                                  type="checkbox"
-                                  checked={formData.dietary.isGlutenFree}
-                                  onChange={() => handleDietaryChange('isGlutenFree')}
-                                  className="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-500 focus:ring-red-500"
-                                />
-                                <span className="ml-2 text-sm text-gray-700">Gluten-Free</span>
-                              </label>
-                            </div>
-                          </div>
-                          
-                          <div>
-                            <label className="inline-flex items-center">
-                              <input
-                                type="checkbox"
-                                name="hasARPreview"
-                                checked={formData.hasARPreview}
-                                onChange={handleCheckboxChange}
-                                className="rounded border-gray-300 text-red-600 shadow-sm focus:border-red-500 focus:ring-red-500"
-                              />
-                              <span className="ml-2 text-sm text-gray-700">Has AR Preview</span>
-                            </label>
-                          </div>
-                          
-                          <div className="flex justify-end space-x-3 pt-4">
-                            <button
-                              type="button"
-                              onClick={handleCancel}
-                              className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                              disabled={loading}
-                            >
-                              <X size={16} className="mr-2" /> Cancel
-                            </button>
-                            <button
-                              type="submit"
-                              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                              disabled={loading}
-                            >
-                              {loading ? (
-                                <>
-                                  <div className="w-4 h-4 mr-2 border-2 border-t-white border-r-white border-b-transparent border-l-transparent rounded-full animate-spin"></div>
-                                  Updating...
-                                </>
-                              ) : (
-                                <>
-                                  <Save size={16} className="mr-2" /> Update
-                                </>
-                              )}
-                            </button>
-                          </div>
-                        </form>
-                      )}
-                    </div>
-                  )}
-                  
                   <div>
-                    {loading && !showAddForm && !editingItemId ? (
+                    {loading ? (
                       <div className="flex justify-center items-center h-64">
                         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500"></div>
                       </div>
@@ -1020,7 +854,7 @@ function AdminDashboard() {
                               
                               <div className="flex justify-end mt-2 space-x-2">
                                 <button 
-                                  onClick={() => handleEdit(item._id)}
+                                  onClick={() => handleEditMenuItem(item)}
                                   className="p-2 text-blue-600 hover:bg-blue-50 rounded-full"
                                   title="Edit"
                                 >
