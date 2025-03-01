@@ -54,20 +54,23 @@ dotenv.config();
 var app = express();
 var PORT = process.env.PORT || 5001;
 var httpServer = http_1.createServer(app);
+// Configure CORS for Socket.IO
 var io = new socket_io_1.Server(httpServer, {
     cors: {
         origin: ["http://localhost:5173", "http://localhost:3000"],
-        methods: ["GET", "POST", "PATCH", "DELETE"]
+        methods: ["GET", "POST", "PATCH", "DELETE", "PUT"]
     }
 });
+// Configure CORS for Express
 app.use(cors({
     origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PATCH", "DELETE"],
+    methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
     allowedHeaders: ["Content-Type"]
 }));
+// Middleware to parse JSON bodies
 app.use(bodyParser.json());
-app.use(cors());
 app.use(express.json());
+// Routes
 app.use("/api/orders", orderRoutes_1["default"]);
 app.use("/api/carts", cartRoutes_1["default"]);
 app.use("/api/restaurants", restaurantRoutes_1["default"]);
@@ -81,11 +84,12 @@ io.on("connection", function (socket) {
         console.log("Client disconnected:", socket.id);
     });
 });
-// Add to your order routes when updating status
+// Function to emit order updates via WebSocket
 var emitOrderUpdate = function (updatedOrder) {
     io.emit("orderUpdated", updatedOrder);
 };
 exports.emitOrderUpdate = emitOrderUpdate;
+// Start the server
 var startServer = function () { return __awaiter(void 0, void 0, void 0, function () {
     var error_1;
     return __generator(this, function (_a) {

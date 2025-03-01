@@ -1,5 +1,5 @@
-const cors = require("cors")
-const express = require("express")
+const cors = require("cors");
+const express = require("express");
 import { createServer } from "http";
 import { Server } from "socket.io";
 import * as bodyParser from "body-parser";
@@ -8,33 +8,38 @@ import cartRoutes from "./routes/cartRoutes";
 import orderRoutes from "./routes/orderRoutes";
 import restaurantRoutes from "./routes/restaurantRoutes";
 import menuRoutes from "./routes/menuRoutes";
-import * as  dotenv from "dotenv";
+import * as dotenv from "dotenv";
 //import paymentRoutes from "./routes/paymentRoutes";
 import restaurantMenuRoutes from './routes/restaurantMenuRoutes';
+
 dotenv.config();
+
 const app = express();
 const PORT = process.env.PORT || 5001;
 const httpServer = createServer(app);
+
+// Configure CORS for Socket.IO
 const io = new Server(httpServer, {
   cors: {
     origin: ["http://localhost:5173", "http://localhost:3000"], // Add all client origins
-    methods: ["GET", "POST", "PATCH", "DELETE"],
+    methods: ["GET", "POST", "PATCH", "DELETE", "PUT"], // Include PUT method
   },
 });
 
+// Configure CORS for Express
 app.use(
   cors({
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PATCH", "DELETE"],
-    allowedHeaders: ["Content-Type"],
+    origin: "http://localhost:5173", // Allow requests from this origin
+    methods: ["GET", "POST", "PATCH", "DELETE", "PUT"], // Include PUT method
+    allowedHeaders: ["Content-Type"], // Allow necessary headers
   })
 );
 
+// Middleware to parse JSON bodies
 app.use(bodyParser.json());
-
-app.use(cors());
 app.use(express.json());
 
+// Routes
 app.use("/api/orders", orderRoutes);
 app.use("/api/carts", cartRoutes);
 app.use("/api/restaurants", restaurantRoutes);
@@ -51,11 +56,12 @@ io.on("connection", (socket) => {
   });
 });
 
-// Add to your order routes when updating status
+// Function to emit order updates via WebSocket
 const emitOrderUpdate = (updatedOrder: any) => {
   io.emit("orderUpdated", updatedOrder);
 };
 
+// Start the server
 const startServer = async () => {
   try {
     await connectDB();
@@ -72,4 +78,5 @@ const startServer = async () => {
 
 startServer();
 
-export { emitOrderUpdate }; // Export this to use in your orderRoutes
+// Export the emitOrderUpdate function for use in orderRoutes
+export { emitOrderUpdate };
