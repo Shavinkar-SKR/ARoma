@@ -36,7 +36,6 @@ app.use(
 );
 
 // Middleware to parse JSON bodies
-app.use(bodyParser.json());
 app.use(express.json());
 
 // Routes
@@ -46,7 +45,7 @@ app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/menus", menuRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/restaurants", restaurantMenuRoutes);
-
+app.use(bodyParser.json());
 // WebSocket connection
 io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);
