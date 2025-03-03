@@ -52,7 +52,6 @@ const DigitalMenuPage: React.FC = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   const addToCart = (item: MenuItem) => {
-    // Gotta add the carts via the api later as well And use that as the id later
     setCartItems((prev) => {
       const existingItem = prev.find(
         (cartItem) => cartItem.menuId === item._id,
@@ -67,7 +66,7 @@ const DigitalMenuPage: React.FC = () => {
       return [
         ...prev,
         {
-          _id: cartItems.length.toString(),
+          _id: new Date().toISOString(), // Generate a unique ID using current timestamp
           menuId: item._id,
           name: item.name,
           price: item.price,
@@ -80,6 +79,7 @@ const DigitalMenuPage: React.FC = () => {
       description: `Added ${item.name} to your cart`,
     });
   };
+  
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 

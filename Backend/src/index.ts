@@ -9,36 +9,43 @@ import orderRoutes from "./routes/orderRoutes";
 import restaurantRoutes from "./routes/restaurantRoutes";
 import menuRoutes from "./routes/menuRoutes";
 import * as dotenv from "dotenv";
-import paymentRoutes from "./routes/paymentRoutes";
+//import paymentRoutes from "./routes/paymentRoutes";
+import restaurantMenuRoutes from "./routes/restaurantMenuRoutes";
 
 dotenv.config();
+
 const app = express();
 const PORT = process.env.PORT || 5001;
 const httpServer = createServer(app);
+
+// Configure CORS for Socket.IO
 const io = new Server(httpServer, {
   cors: {
     origin: ["http://localhost:5173", "http://localhost:3000"], // Add all client origins
-    methods: ["GET", "POST", "PATCH", "DELETE"],
+    methods: ["GET", "POST", "PATCH", "DELETE", "PUT"], // Include PUT method
   },
 });
 
+// Configure CORS for Express
 app.use(
   cors({
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PATCH", "DELETE"],
-    allowedHeaders: ["Content-Type"],
+    origin: "http://localhost:5173", // Allow requests from this origin
+    methods: ["GET", "POST", "PATCH", "DELETE", "PUT"], // Include PUT method
+    allowedHeaders: ["Content-Type"], // Allow necessary headers
   })
 );
 
-app.use(cors());
+// Middleware to parse JSON bodies
+app.use(bodyParser.json());
 app.use(express.json());
 
+// Routes
 app.use("/api/orders", orderRoutes);
 app.use("/api/carts", cartRoutes);
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/menus", menuRoutes);
-app.use("/api", paymentRoutes);
-app.use(bodyParser.json());
+//app.use("/api/payment", paymentRoutes);
+app.use("/api/restaurants", restaurantMenuRoutes);
 
 // WebSocket connection
 io.on("connection", (socket) => {
@@ -49,11 +56,12 @@ io.on("connection", (socket) => {
   });
 });
 
-// Add to your order routes when updating status
+// Function to emit order updates via WebSocket
 const emitOrderUpdate = (updatedOrder: any) => {
   io.emit("orderUpdated", updatedOrder);
 };
 
+// Start the server
 const startServer = async () => {
   try {
     await connectDB();
@@ -71,4 +79,5 @@ const startServer = async () => {
 startServer();
 console.log(process.env.STRIPE_SECRET_KEY);
 
-export { emitOrderUpdate }; // Export this to use in your orderRoutes
+// Export the emitOrderUpdate function for use in orderRoutes
+export { emitOrderUpdate };

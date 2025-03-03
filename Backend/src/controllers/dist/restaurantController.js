@@ -36,81 +36,56 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.emitOrderUpdate = void 0;
-var cors = require("cors");
-var express = require("express");
-var http_1 = require("http");
-var socket_io_1 = require("socket.io");
-var bodyParser = require("body-parser");
-var dbConfig_1 = require("./config/dbConfig");
-var cartRoutes_1 = require("./routes/cartRoutes");
-var orderRoutes_1 = require("./routes/orderRoutes");
-var restaurantRoutes_1 = require("./routes/restaurantRoutes");
-var menuRoutes_1 = require("./routes/menuRoutes");
-var dotenv = require("dotenv");
-//import paymentRoutes from "./routes/paymentRoutes";
-var restaurantMenuRoutes_1 = require("./routes/restaurantMenuRoutes");
-dotenv.config();
-var app = express();
-var PORT = process.env.PORT || 5001;
-var httpServer = http_1.createServer(app);
-// Configure CORS for Socket.IO
-var io = new socket_io_1.Server(httpServer, {
-    cors: {
-        origin: ["http://localhost:5173", "http://localhost:3000"],
-        methods: ["GET", "POST", "PATCH", "DELETE", "PUT"]
-    }
-});
-// Configure CORS for Express
-app.use(cors({
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
-    allowedHeaders: ["Content-Type"]
-}));
-// Middleware to parse JSON bodies
-app.use(bodyParser.json());
-app.use(express.json());
-// Routes
-app.use("/api/orders", orderRoutes_1["default"]);
-app.use("/api/carts", cartRoutes_1["default"]);
-app.use("/api/restaurants", restaurantRoutes_1["default"]);
-app.use("/api/menus", menuRoutes_1["default"]);
-//app.use("/api/payment", paymentRoutes);
-app.use('/api/restaurants', restaurantMenuRoutes_1["default"]);
-// WebSocket connection
-io.on("connection", function (socket) {
-    console.log("Client connected:", socket.id);
-    socket.on("disconnect", function () {
-        console.log("Client disconnected:", socket.id);
-    });
-});
-// Function to emit order updates via WebSocket
-var emitOrderUpdate = function (updatedOrder) {
-    io.emit("orderUpdated", updatedOrder);
-};
-exports.emitOrderUpdate = emitOrderUpdate;
-// Start the server
-var startServer = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var error_1;
+exports.searchRestaurants = exports.getAllRestaurants = void 0;
+var dbConfig_1 = require("../config/dbConfig");
+exports.getAllRestaurants = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
+    var db, restaurantsCollection, restaurants, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                _a.trys.push([0, 2, , 3]);
+                _a.trys.push([0, 3, , 4]);
                 return [4 /*yield*/, dbConfig_1.connectDB()];
             case 1:
-                _a.sent();
-                console.log("Connected to the database");
-                httpServer.listen(PORT, function () {
-                    console.log("Server is running on port " + PORT);
-                });
-                return [3 /*break*/, 3];
+                db = _a.sent();
+                restaurantsCollection = db.collection("restaurants");
+                return [4 /*yield*/, restaurantsCollection.find({}).toArray()];
             case 2:
+                restaurants = _a.sent();
+                res.status(200).json(restaurants);
+                return [3 /*break*/, 4];
+            case 3:
                 error_1 = _a.sent();
-                console.error("Failed to connect to the database:", error_1);
-                process.exit(1);
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
+                res.status(500).json({ error: "Failed to fetch restaurants" });
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
         }
     });
 }); };
-startServer();
+exports.searchRestaurants = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
+    var query, db, restaurantsCollection, restaurants, error_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 3, , 4]);
+                query = req.query.query;
+                return [4 /*yield*/, dbConfig_1.connectDB()];
+            case 1:
+                db = _a.sent();
+                restaurantsCollection = db.collection("restaurants");
+                return [4 /*yield*/, restaurantsCollection
+                        .find({
+                        name: { $regex: query, $options: "i" }
+                    })
+                        .toArray()];
+            case 2:
+                restaurants = _a.sent();
+                res.status(200).json(restaurants);
+                return [3 /*break*/, 4];
+            case 3:
+                error_2 = _a.sent();
+                res.status(500).json({ error: "Failed to search restaurants" });
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); };
