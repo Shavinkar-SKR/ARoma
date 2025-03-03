@@ -19,13 +19,17 @@ import {
   Sparkles,
   Edit,
   CheckCircle,
+  Clock,
+  CookingPot,
+  Bell,
 } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast, Toaster } from 'sonner';
+import socket from '../socket'; // Relative path
 
 type Order = {
   _id: string;
   cartItems: {
-    id: string;
+    id: string | number;
     name: string;
     price: number;
     quantity: number;
@@ -80,6 +84,13 @@ const CATEGORIES = [
   'Special'
 ];
 
+// Status options for order status dropdown
+const STATUS_OPTIONS = [
+  { value: 'received', label: 'Received', icon: Clock, color: 'blue' },
+  { value: 'preparing', label: 'Preparing', icon: CookingPot, color: 'yellow' },
+  { value: 'ready', label: 'Ready', icon: Bell, color: 'green' },
+  { value: 'complete', label: 'Complete', icon: CheckCircle, color: 'gray' }
+];
 
 function AdminDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -88,6 +99,7 @@ function AdminDashboard() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [statusLoading, setStatusLoading] = useState<{[key: string]: boolean}>({});
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
@@ -117,8 +129,8 @@ function AdminDashboard() {
         if (!response.ok) throw new Error('Failed to fetch orders');
         const data = await response.json();
         setOrders(data);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
+        console.error("Error fetching orders:", err);
         setError('Error fetching orders');
         toast.error('Failed to fetch orders.');
       } finally {
@@ -131,6 +143,41 @@ function AdminDashboard() {
     }
   }, [activeTab]);
 
+  // Set up WebSocket listeners for real-time order updates
+  useEffect(() => {
+    // Listen for order updates
+    socket.on('orderUpdated', (updatedOrder: Order) => {
+      setOrders(prevOrders => 
+        prevOrders.map(order => 
+          order._id === updatedOrder._id ? updatedOrder : order
+        )
+      );
+      
+      // Show toast notification for status change
+      const statusLabel = STATUS_OPTIONS.find(option => option.value === updatedOrder.status)?.label || updatedOrder.status;
+      toast.success(`Order #${updatedOrder._id.substring(updatedOrder._id.length - 6)} status updated to ${statusLabel}`);
+    });
+
+    // Listen for new orders
+    socket.on('newOrder', (newOrder: Order) => {
+      setOrders(prevOrders => [newOrder, ...prevOrders]);
+      toast.success(`New order received: #${newOrder._id.substring(newOrder._id.length - 6)}`);
+    });
+
+    // Listen for deleted orders
+    socket.on('orderDeleted', (deletedOrderId: string) => {
+      setOrders(prevOrders => prevOrders.filter(order => order._id !== deletedOrderId));
+      toast.info(`Order #${deletedOrderId.substring(deletedOrderId.length - 6)} has been removed`);
+    });
+
+    // Cleanup function to remove event listeners
+    return () => {
+      socket.off('orderUpdated');
+      socket.off('newOrder');
+      socket.off('orderDeleted');
+    };
+  }, []);
+
   // Fetch Restaurants from API
   useEffect(() => {
     const fetchRestaurants = async () => {
@@ -140,8 +187,8 @@ function AdminDashboard() {
         if (!response.ok) throw new Error('Failed to fetch restaurants');
         const data = await response.json();
         setRestaurants(data);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
+        console.error("Error fetching restaurants:", err);
         setError('Error fetching restaurants');
         toast.error('Failed to fetch restaurants.');
       } finally {
@@ -165,8 +212,8 @@ function AdminDashboard() {
       const data = await response.json();
       setSelectedRestaurant(data.restaurant);
       setMenuItems(data.menuItems);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
+      console.error("Error fetching menu items:", err);
       setError('Error fetching menu items');
       toast.error('Failed to fetch menu items.');
     } finally {
@@ -254,8 +301,8 @@ function AdminDashboard() {
       setShowAddForm(false);
       resetForm();
       toast.success('Menu item added successfully');
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
+      console.error("Error adding menu item:", err);
       toast.error('Failed to add menu item');
     } finally {
       setLoading(false);
@@ -275,11 +322,7 @@ function AdminDashboard() {
         price: parseFloat(formData.price),
         image: formData.image,
         category: formData.category,
-        dietary: {
-          isVegan: formData.dietary.isVegan,
-          isNutFree: formData.dietary.isNutFree,
-          isGlutenFree: formData.dietary.isGlutenFree
-        },
+        dietary: dietaryObjectToArray(formData.dietary),
         hasARPreview: formData.hasARPreview
       };
 
@@ -310,8 +353,8 @@ function AdminDashboard() {
       setShowAddForm(false);
       resetForm();
       toast.success('Menu item updated successfully');
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
+      console.error("Error updating menu item:", err);
       toast.error('Failed to update menu item');
     } finally {
       setLoading(false);
@@ -332,8 +375,8 @@ function AdminDashboard() {
 
       setMenuItems(menuItems.filter(item => item._id !== menuItemId));
       toast.success('Menu item deleted successfully');
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
+      console.error("Error deleting menu item:", err);
       toast.error('Failed to delete menu item');
     } finally {
       setLoading(false);
@@ -360,6 +403,42 @@ function AdminDashboard() {
       toast.error('Failed to complete order');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle updating order status
+  const handleUpdateOrderStatus = async (orderId: string, newStatus: string) => {
+    // Set loading state for this specific order
+    setStatusLoading(prev => ({ ...prev, [orderId]: true }));
+    
+    try {
+      const response = await fetch(`http://localhost:5001/api/orders/update-order-status/${orderId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!response.ok) throw new Error('Failed to update order status');
+
+      // No need to update state manually as the WebSocket will handle it
+      toast.success(`Order status updated to ${newStatus}`);
+    } catch (err) {
+      console.error('Error updating order status:', err);
+      toast.error('Failed to update order status');
+      
+      // If there's an error, we need to refresh the orders to ensure consistency
+      if (activeTab === 'orders') {
+        const response = await fetch('http://localhost:5001/api/orders');
+        if (response.ok) {
+          const data = await response.json();
+          setOrders(data);
+        }
+      }
+    } finally {
+      // Clear loading state for this specific order
+      setStatusLoading(prev => ({ ...prev, [orderId]: false }));
     }
   };
 
@@ -418,8 +497,27 @@ function AdminDashboard() {
       )
   ));
 
+  // Get status badge color based on status
+  const getStatusBadgeClass = (status: string) => {
+    switch (status) {
+      case 'received':
+        return 'bg-blue-100 text-blue-800';
+      case 'preparing':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'ready':
+        return 'bg-green-100 text-green-800';
+      case 'complete':
+        return 'bg-gray-100 text-gray-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   return (
     <div className="flex h-screen bg-gray-50">
+      {/* Toast container for notifications */}
+      <Toaster position="top-right" />
+      
       {/* Sidebar Toggle Button */}
       <motion.button
         onClick={toggleSidebar}
@@ -506,7 +604,10 @@ function AdminDashboard() {
                 </div>
               </div>
               {loading ? (
-                <div className="text-center py-6">Loading Orders...</div>
+                <div className="text-center py-6">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500 mx-auto"></div>
+                  <p className="mt-4 text-gray-600">Loading Orders...</p>
+                </div>
               ) : error ? (
                 <div className="text-center py-6 text-red-600">{error}</div>
               ) : filteredOrders.length === 0 ? (
@@ -522,20 +623,24 @@ function AdminDashboard() {
                       key={order._id}
                       className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
                       whileHover={{ y: -5 }}
+                      layout
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{ duration: 0.3 }}
                     >
                       <div className="p-6">
                         <div className="flex justify-between items-start mb-4">
                           <h3 className="font-semibold text-lg text-gray-800">
                             Order #{order._id.substring(order._id.length - 6)}
                           </h3>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            order.status === 'received' ? 'bg-blue-100 text-blue-800' :
-                            order.status === 'preparing' ? 'bg-yellow-100 text-yellow-800' :
-                            order.status === 'ready' ? 'bg-green-100 text-green-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}>
-                            {order.status ? order.status.charAt(0).toUpperCase() + order.status.slice(1) : 'Received'}
-                          </span>
+                          <div className="flex items-center">
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium mr-2 ${
+                              getStatusBadgeClass(order.status)
+                            }`}>
+                              {order.status ? order.status.charAt(0).toUpperCase() + order.status.slice(1) : 'Received'}
+                            </span>
+                          </div>
                         </div>
                         <div className="text-sm text-gray-600">
                           <p>Table: {order.tableNumber}</p>
@@ -553,14 +658,39 @@ function AdminDashboard() {
                             </ul>
                           </div>
                         </div>
-                        <div className="mt-4 pt-4 border-t border-gray-100 flex justify-end">
-                          <button
-                            onClick={() => handleCompleteOrder(order._id)}
-                            className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
-                          >
-                            <CheckCircle className="w-4 h-4 mr-2" />
-                            Mark Completed
-                          </button>
+                        <div className="mt-4 pt-4 border-t border-gray-100">
+                          <div className="flex flex-col space-y-3">
+                            <div className="flex justify-between items-center">
+                              <label htmlFor={`status-${order._id}`} className="block text-sm font-medium text-gray-700">
+                                Update Status:
+                              </label>
+                              <select
+                                id={`status-${order._id}`}
+                                value={order.status}
+                                onChange={(e) => handleUpdateOrderStatus(order._id, e.target.value)}
+                                className="ml-2 block w-2/3 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm rounded-md"
+                                disabled={statusLoading[order._id]}
+                              >
+                                {STATUS_OPTIONS.map((option) => (
+                                  <option key={option.value} value={option.value}>
+                                    {option.label}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                            <button
+                              onClick={() => handleCompleteOrder(order._id)}
+                              className="inline-flex items-center justify-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+                              disabled={loading || statusLoading[order._id]}
+                            >
+                              {statusLoading[order._id] ? (
+                                <div className="w-4 h-4 mr-2 border-2 border-t-white border-r-white border-b-transparent border-l-transparent rounded-full animate-spin"></div>
+                              ) : (
+                                <CheckCircle className="w-4 h-4 mr-2" />
+                              )}
+                              Mark Completed
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </motion.div>
