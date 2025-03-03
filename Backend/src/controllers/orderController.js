@@ -38,38 +38,48 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getOrders = exports.placeOrder = void 0;
 var dbConfig_1 = require("../config/dbConfig"); // Import the connectDB utility
+var mlService_1 = require("../ml/mlService");
 // Function to place an order
 var placeOrder = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, cartItems, specialInstructions, total, tableNumber, db, ordersCollection, newOrder, result, error_1;
+    var _a, cartItems, specialInstructions, total, tableNumber, db, ordersCollection, estimatedTime, newOrder, result, error_1;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                _b.trys.push([0, 3, , 4]);
+                _b.trys.push([0, 4, , 5]);
                 _a = req.body, cartItems = _a.cartItems, specialInstructions = _a.specialInstructions, total = _a.total, tableNumber = _a.tableNumber;
                 return [4 /*yield*/, (0, dbConfig_1.connectDB)()];
             case 1:
                 db = _b.sent();
-                ordersCollection = db.collection('orders');
+                ordersCollection = db.collection("orders");
+                return [4 /*yield*/, (0, mlService_1.predictOrderTime)({
+                        cartItems: cartItems,
+                        specialInstructions: specialInstructions,
+                        total: total,
+                    })];
+            case 2:
+                estimatedTime = _b.sent();
                 newOrder = {
                     cartItems: cartItems,
                     specialInstructions: specialInstructions,
                     total: total,
                     tableNumber: tableNumber,
+                    estimatedTime: estimatedTime,
                 };
                 return [4 /*yield*/, ordersCollection.insertOne(newOrder)];
-            case 2:
+            case 3:
                 result = _b.sent();
                 res.status(201).json({
                     message: "Order placed successfully",
-                    orderId: result.insertedId
+                    orderId: result.insertedId,
+                    estimatedTime: estimatedTime,
                 });
-                return [3 /*break*/, 4];
-            case 3:
+                return [3 /*break*/, 5];
+            case 4:
                 error_1 = _b.sent();
                 console.error("Error placing order:", error_1);
                 res.status(500).json({ error: "Internal server error" });
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
+                return [3 /*break*/, 5];
+            case 5: return [2 /*return*/];
         }
     });
 }); };
@@ -84,7 +94,7 @@ var getOrders = function (req, res) { return __awaiter(void 0, void 0, void 0, f
                 return [4 /*yield*/, (0, dbConfig_1.connectDB)()];
             case 1:
                 db = _a.sent();
-                ordersCollection = db.collection('orders');
+                ordersCollection = db.collection("orders");
                 return [4 /*yield*/, ordersCollection.find().toArray()];
             case 2:
                 orders = _a.sent();

@@ -1,39 +1,4 @@
 "use strict";
-/*
-import Stripe from "stripe"; // imports the stripe SDK
-import dotenv from "dotenv"; //Loads API keys from the .env file
-
-// imports the stripe SDK
-const dotenv = require("dotenv"); //Loads API keys from the .env file
-console.log("STRIPE_SECRET_KEY:", process.env.STRIPE_SECRET_KEY);
-dotenv.config();
-
-import Stripe from "stripe";
-//Initializing stripe
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: "2025-01-27.acacia", //current Stripe API version
-});
-
-//Stripe Payment Function
-export const processStripePayment = async (
-  amount: number,
-  currency: string,
-  paymentMethodId: string
-) => {
-  try {
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount * 100, //convert to cents
-      currency,
-      payment_method: paymentMethodId,
-      confirm: true,
-    });
-    return { success: true, client_secret: paymentIntent.client_secret };
-  } catch (error) {
-    console.error("Stripe Payment Error:", error);
-    return { success: false, message: (error as Error).message };
-  }
-};
-*/
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -71,40 +36,25 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Payment = exports.stripe = exports.createStripePayment = void 0;
-var stripe_1 = require("stripe");
-var paymentModel_1 = require("../models/paymentModel");
-exports.Payment = paymentModel_1.default;
-var dbConfig_1 = require("../config/dbConfig");
-var stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY);
-exports.stripe = stripe;
-var createStripePayment = function (amount, currency, userId) { return __awaiter(void 0, void 0, void 0, function () {
-    var paymentIntent, db, paymentsCollection;
+exports.predictOrderTime = void 0;
+var axios_1 = require("axios");
+var ML_SERVICE_URL = "http://localhost:5001/predict"; // Flask API URL
+var predictOrderTime = function (orderData) { return __awaiter(void 0, void 0, void 0, function () {
+    var response, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, stripe.paymentIntents.create({
-                    amount: amount,
-                    currency: currency,
-                    payment_method_types: ["card"],
-                })];
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, axios_1.default.post(ML_SERVICE_URL, orderData)];
             case 1:
-                paymentIntent = _a.sent();
-                return [4 /*yield*/, (0, dbConfig_1.connectDB)()];
+                response = _a.sent();
+                return [2 /*return*/, response.data.predicted_time]; // Extract predicted time
             case 2:
-                db = _a.sent();
-                paymentsCollection = db.collection("payments");
-                return [4 /*yield*/, paymentsCollection.insertOne({
-                        userId: userId,
-                        amount: amount,
-                        currency: currency,
-                        status: "Pending",
-                        method: "Stripe",
-                        transactionId: paymentIntent.id,
-                    })];
-            case 3:
-                _a.sent();
-                return [2 /*return*/, paymentIntent.client_secret];
+                error_1 = _a.sent();
+                console.error("Error predicting order time:", error_1);
+                return [2 /*return*/, null]; // Handle errors gracefully
+            case 3: return [2 /*return*/];
         }
     });
 }); };
-exports.createStripePayment = createStripePayment;
+exports.predictOrderTime = predictOrderTime;

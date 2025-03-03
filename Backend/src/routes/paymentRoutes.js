@@ -37,9 +37,5 @@ var express = require("express");
 var router = express.Router();
 var paymentController = require("../controllers/paymentController");
 router.post("/pay/stripe", paymentController.processStripePayment);
-router.post(
-  "/webhook/stripe",
-  express.raw({ type: "application/json" }),
-  paymentController.stripeWebhook
-);
+router.post("/webhook/stripe", express.raw({ type: "application/json" }), paymentController.stripeWebhook);
 exports.default = router;

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { ObjectId } from "mongodb";
 import { Order } from "../models/orderModel";
 import { connectDB } from "../config/dbConfig"; // Import the connectDB utility
-import { predictOrderTime } from "../ml/orderTimePredictor";
+import { predictOrderTime } from "../ml/mlService";
 
 // Function to place an order
 export const placeOrder = async (
