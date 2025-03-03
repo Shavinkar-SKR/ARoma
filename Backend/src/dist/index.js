@@ -48,8 +48,8 @@ var orderRoutes_1 = require("./routes/orderRoutes");
 var restaurantRoutes_1 = require("./routes/restaurantRoutes");
 var menuRoutes_1 = require("./routes/menuRoutes");
 var dotenv = require("dotenv");
-//import paymentRoutes from "./routes/paymentRoutes";
 var restaurantMenuRoutes_1 = require("./routes/restaurantMenuRoutes");
+// import paymentRoutes from "./routes/paymentRoutes";
 dotenv.config();
 var app = express();
 var PORT = process.env.PORT || 5001;
@@ -68,15 +68,15 @@ app.use(cors({
     allowedHeaders: ["Content-Type"]
 }));
 // Middleware to parse JSON bodies
-app.use(bodyParser.json());
 app.use(express.json());
 // Routes
 app.use("/api/orders", orderRoutes_1["default"]);
 app.use("/api/carts", cartRoutes_1["default"]);
 app.use("/api/restaurants", restaurantRoutes_1["default"]);
 app.use("/api/menus", menuRoutes_1["default"]);
-//app.use("/api/payment", paymentRoutes);
+// app.use("/api/payment", paymentRoutes);
 app.use('/api/restaurants', restaurantMenuRoutes_1["default"]);
+app.use(bodyParser.json());
 // WebSocket connection
 io.on("connection", function (socket) {
     console.log("Client connected:", socket.id);
