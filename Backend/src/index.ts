@@ -9,8 +9,8 @@ import orderRoutes from "./routes/orderRoutes";
 import restaurantRoutes from "./routes/restaurantRoutes";
 import menuRoutes from "./routes/menuRoutes";
 import * as dotenv from "dotenv";
-//import paymentRoutes from "./routes/paymentRoutes";
 import restaurantMenuRoutes from './routes/restaurantMenuRoutes';
+// import paymentRoutes from "./routes/paymentRoutes";
 
 dotenv.config();
 
@@ -36,7 +36,7 @@ app.use(
 );
 
 // Middleware to parse JSON bodies
-app.use(bodyParser.json());
+
 app.use(express.json());
 
 // Routes
@@ -44,8 +44,9 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/carts", cartRoutes);
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/menus", menuRoutes);
-//app.use("/api/payment", paymentRoutes);
+// app.use("/api/payment", paymentRoutes);
 app.use('/api/restaurants', restaurantMenuRoutes);
+app.use(bodyParser.json());
 
 // WebSocket connection
 io.on("connection", (socket) => {
