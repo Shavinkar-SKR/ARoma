@@ -9,65 +9,66 @@ import {
 } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
-const location = useLocation();
-const estimatedTime = location.state?.estimatedTime || "Calculating...";
-
-const steps = [
-  {
-    id: 1,
-    name: "Order Received",
-    icon: Package,
-    completed: true,
-    current: false,
-  },
-  {
-    id: 2,
-    name: "Food Being Prepared",
-    icon: ChefHat,
-    completed: true,
-    current: true,
-  },
-  {
-    id: 3,
-    name: "Ready for Pickup",
-    icon: Truck,
-    completed: false,
-    current: false,
-  },
-  {
-    id: 4,
-    name: "Order Complete",
-    icon: ShoppingBag,
-    completed: false,
-    current: false,
-  },
-];
-
-// Sample random restaurant-related messages with images
-const randomMessages = [
-  {
-    id: 1,
-    title: "A classic combo that never goes out of style!",
-    image: "/images/img2.jpg",
-  },
-  {
-    id: 2,
-    title: "Indulge in a slice of happiness with every bite of this cake!",
-    image: "/images/img4.jpg",
-  },
-  {
-    id: 3,
-    title: "Satisfy your cravings—one burger at a time!",
-    image: "/images/img3.jpg",
-  },
-  {
-    id: 4,
-    title: "Donut worry, be happy!",
-    image: "/images/img1.jpg",
-  },
-];
-
 function App() {
+  // Using useLocation inside the component
+  const location = useLocation();
+  const estimatedTime = location.state?.estimatedTime || "Calculating...";
+
+  const steps = [
+    {
+      id: 1,
+      name: "Order Received",
+      icon: Package,
+      completed: true,
+      current: false,
+    },
+    {
+      id: 2,
+      name: "Food Being Prepared",
+      icon: ChefHat,
+      completed: true,
+      current: true,
+    },
+    {
+      id: 3,
+      name: "Ready for Pickup",
+      icon: Truck,
+      completed: false,
+      current: false,
+    },
+    {
+      id: 4,
+      name: "Order Complete",
+      icon: ShoppingBag,
+      completed: false,
+      current: false,
+    },
+  ];
+
+  // Sample random restaurant-related messages with images
+  const randomMessages = [
+    {
+      id: 1,
+      title: "A classic combo that never goes out of style!",
+      image: "/images/img2.jpg",
+    },
+    {
+      id: 2,
+      title: "Indulge in a slice of happiness with every bite of this cake!",
+      image: "/images/img4.jpg",
+    },
+    {
+      id: 3,
+      title: "Satisfy your cravings—one burger at a time!",
+      image: "/images/img3.jpg",
+    },
+    {
+      id: 4,
+      title: "Donut worry, be happy!",
+      image: "/images/img1.jpg",
+    },
+  ];
+
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [isContactOpen, setIsContactOpen] = useState(false);
 
@@ -79,7 +80,7 @@ function App() {
     }, 5000); // 5000ms = 5 seconds
 
     return () => clearInterval(interval); // Clean up the interval on component unmount
-  }, []);
+  }, [randomMessages.length]);
 
   const currentMessage = randomMessages[currentMessageIndex];
 
@@ -180,19 +181,6 @@ function App() {
 
           {/* Preparation Time */}
           <div className="mb-8 bg-white p-6 rounded-2xl shadow-lg transform hover:scale-[1.02] transition-all duration-300">
-            {/*
-            <div className="flex items-center">
-              <Clock className="h-8 w-8 text-red-600 mr-4 animate-pulse" />
-              <div>
-                <h3 className="text-xl font-medium text-gray-900">
-                  Preparation Time
-                </h3>
-                <p className="text-sm text-gray-500 mt-1">
-                  20 minutes • Our chefs are preparing your meal
-                </p>
-              </div>
-            </div>
-            */}
             <div className="flex items-center gap-2 text-lg font-semibold">
               <Clock className="h-5 w-5 text-red-500" />
               Estimated Time:{" "}
