@@ -6,4 +6,6 @@ var orderRetrievalController_1 = require("../controllers/orderRetrievalControlle
 var router = express.Router();
 router.post("/place-order", orderController_1.placeOrder);
 router.get("/", orderRetrievalController_1.getOrders);
+router.put("/update-order-status/:id", orderController_1.updateOrderStatus);
+router["delete"]("/:id", orderController_1.deleteOrder);
 exports["default"] = router;
