@@ -54,7 +54,7 @@ const RestaurantSelectionPage: React.FC = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5001/api/restaurants/search?query=${query}`,
+        `http://localhost:5001/api/restaurants/search?query=${query}`
       );
       if (!response.ok) throw new Error("Search failed");
       const data = await response.json();
@@ -79,14 +79,14 @@ const RestaurantSelectionPage: React.FC = () => {
   const filteredRestaurants = restaurants.filter(
     (restaurant) =>
       selectedCuisine === "all" ||
-      restaurant.cuisine.toLowerCase() === selectedCuisine.toLowerCase(),
+      restaurant.cuisine.toLowerCase() === selectedCuisine.toLowerCase()
   );
 
   const uniqueCuisines = [...new Set(restaurants.map((r) => r.cuisine))];
   const totalPages = Math.ceil(filteredRestaurants.length / restaurantsPerPage);
   const currentRestaurants = filteredRestaurants.slice(
     (currentPage - 1) * restaurantsPerPage,
-    currentPage * restaurantsPerPage,
+    currentPage * restaurantsPerPage
   );
 
   if (loading) {
