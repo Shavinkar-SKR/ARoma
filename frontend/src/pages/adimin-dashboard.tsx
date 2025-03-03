@@ -18,6 +18,7 @@ import {
   ChefHat,
   Sparkles,
   Edit,
+  CheckCircle,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -79,17 +80,6 @@ const CATEGORIES = [
   'Special'
 ];
 
-const DIETARY_OPTIONS = [
-  'Vegetarian',
-  'Vegan',
-  'Gluten-Free',
-  'Dairy-Free',
-  'Nut-Free',
-  'Keto',
-  'Paleo',
-  'Low Carb',
-  'Organic'
-];
 
 function AdminDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -350,6 +340,29 @@ function AdminDashboard() {
     }
   };
 
+  // Handle marking an order as completed (delete the order)
+  const handleCompleteOrder = async (orderId: string) => {
+    if (!window.confirm('Mark this order as completed? This will remove it from the system.')) return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch(`http://localhost:5001/api/orders/${orderId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) throw new Error('Failed to complete order');
+
+      // Remove the order from the state
+      setOrders(orders.filter(order => order._id !== orderId));
+      toast.success('Order marked as completed');
+    } catch (err) {
+      console.error('Error completing order:', err);
+      toast.error('Failed to complete order');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Handle edit button click
   const handleEditMenuItem = (item: MenuItem) => {
     setFormData({
@@ -496,31 +509,58 @@ function AdminDashboard() {
                 <div className="text-center py-6">Loading Orders...</div>
               ) : error ? (
                 <div className="text-center py-6 text-red-600">{error}</div>
+              ) : filteredOrders.length === 0 ? (
+                <div className="text-center py-12 bg-white rounded-lg shadow-md">
+                  <ClipboardList size={48} className="mx-auto text-gray-400 mb-4" />
+                  <p className="text-xl text-gray-600">No orders available</p>
+                  <p className="text-gray-500 mt-2">All orders have been completed</p>
+                </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredOrders.map((order) => (
                     <motion.div
                       key={order._id}
                       className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+                      whileHover={{ y: -5 }}
                     >
                       <div className="p-6">
                         <div className="flex justify-between items-start mb-4">
                           <h3 className="font-semibold text-lg text-gray-800">
-                            Order #{order._id}
+                            Order #{order._id.substring(order._id.length - 6)}
                           </h3>
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            order.status === 'received' ? 'bg-blue-100 text-blue-800' :
+                            order.status === 'preparing' ? 'bg-yellow-100 text-yellow-800' :
+                            order.status === 'ready' ? 'bg-green-100 text-green-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {order.status ? order.status.charAt(0).toUpperCase() + order.status.slice(1) : 'Received'}
+                          </span>
                         </div>
                         <div className="text-sm text-gray-600">
                           <p>Table: {order.tableNumber}</p>
                           <p>Special Instructions: {order.specialInstructions || 'None'}</p>
-                          <p>Total: ${order.total}</p>
-                          <div>
-                            <h4>Items:</h4>
-                            {order.cartItems.map((item, index) => (
-                              <p key={index}>
-                                {item.name} x {item.quantity}
-                              </p>
-                            ))}
+                          <p className="font-medium text-gray-800 mt-2">Total: ${order.total.toFixed(2)}</p>
+                          <div className="mt-3">
+                            <h4 className="font-medium mb-2">Items:</h4>
+                            <ul className="space-y-1">
+                              {order.cartItems.map((item, index) => (
+                                <li key={index} className="flex justify-between">
+                                  <span>{item.name}</span>
+                                  <span className="text-gray-500">x {item.quantity}</span>
+                                </li>
+                              ))}
+                            </ul>
                           </div>
+                        </div>
+                        <div className="mt-4 pt-4 border-t border-gray-100 flex justify-end">
+                          <button
+                            onClick={() => handleCompleteOrder(order._id)}
+                            className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-2" />
+                            Mark Completed
+                          </button>
                         </div>
                       </div>
                     </motion.div>

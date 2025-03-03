@@ -11,6 +11,7 @@ interface LocationState {
   cartItems: any[]; // You can further define the shape of cartItems if needed
   specialInstructions: string;
   tableNumber: string;
+  orderStatus: string;
 }
 
 const PaymentsPage: React.FC = () => {
@@ -23,7 +24,7 @@ const PaymentsPage: React.FC = () => {
     return <Navigate to="/" />;
   }
 
-  const { total, cartItems, specialInstructions, tableNumber } = state;
+  const { total, cartItems, specialInstructions, tableNumber, orderStatus } = state;
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -33,9 +34,10 @@ const PaymentsPage: React.FC = () => {
 
     const orderDetails = {
       cartItems,
-      specialInstructions,  // Pass specialInstructions without the table number
+      specialInstructions,
       total,
-      tableNumber,  // Pass tableNumber as a separate field
+      tableNumber,
+      orderStatus: orderStatus || "Order Received"  // Ensure orderStatus is included with a fallback
     };
 
     console.log("Sending order details to backend:", orderDetails);
