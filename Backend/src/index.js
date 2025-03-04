@@ -68,7 +68,6 @@ app.use(cors({
     allowedHeaders: ["Content-Type"], // Allow necessary headers
 }));
 // Middleware to parse JSON bodies
-app.use(bodyParser.json());
 app.use(express.json());
 // Routes
 app.use("/api/orders", orderRoutes_1.default);
@@ -77,6 +76,7 @@ app.use("/api/restaurants", restaurantRoutes_1.default);
 app.use("/api/menus", menuRoutes_1.default);
 app.use("/api/payment", paymentRoutes_1.default);
 app.use("/api/restaurants", restaurantMenuRoutes_1.default);
+app.use(bodyParser.json());
 // WebSocket connection
 io.on("connection", function (socket) {
     console.log("Client connected:", socket.id);
