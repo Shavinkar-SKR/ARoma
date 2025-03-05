@@ -11,6 +11,8 @@ import menuRoutes from "./routes/menuRoutes";
 import * as dotenv from "dotenv";
 import restaurantMenuRoutes from './routes/restaurantMenuRoutes';
 import paymentRoutes from "./routes/paymentRoutes";
+import mongoose from "mongoose";  // c.d.
+import feedbackRoutes from "./routes/feedbackRoutes";  //c.d.
 
 dotenv.config();
 
@@ -38,7 +40,16 @@ app.use(
 // Middleware to parse JSON bodies
 
 app.use(express.json());
-
+//c.d
+const MONGO_URI = process.env.MONGO_URI || "";
+mongoose
+  .connect(MONGO_URI)
+  .then(() => console.log("✅ MongoDB Atlas Connected"))
+  .catch((err) => {
+    console.error("❌ MongoDB Connection Error:", err);
+    process.exit(1);
+  });
+//c.d
 // Routes
 app.use("/api/orders", orderRoutes);
 app.use("/api/carts", cartRoutes);
@@ -47,6 +58,7 @@ app.use("/api/menus", menuRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use('/api/restaurants', restaurantMenuRoutes);
 app.use(bodyParser.json());
+app.use("/api/feedback", feedbackRoutes);//c.d
 
 // WebSocket connection
 io.on("connection", (socket) => {
