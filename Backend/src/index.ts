@@ -10,7 +10,7 @@ import restaurantRoutes from "./routes/restaurantRoutes";
 import menuRoutes from "./routes/menuRoutes";
 import * as dotenv from "dotenv";
 import restaurantMenuRoutes from './routes/restaurantMenuRoutes';
-//import paymentRoutes from "./routes/paymentRoutes";
+// import paymentRoutes from "./routes/paymentRoutes";
 
 dotenv.config();
 
@@ -44,7 +44,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/carts", cartRoutes);
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/menus", menuRoutes);
-//app.use("/api/payment", paymentRoutes);
+// app.use("/api/payment", paymentRoutes);
 app.use('/api/restaurants', restaurantMenuRoutes);
 app.use(bodyParser.json());
 
