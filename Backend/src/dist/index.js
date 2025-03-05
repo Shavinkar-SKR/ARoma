@@ -49,7 +49,7 @@ var restaurantRoutes_1 = require("./routes/restaurantRoutes");
 var menuRoutes_1 = require("./routes/menuRoutes");
 var dotenv = require("dotenv");
 var restaurantMenuRoutes_1 = require("./routes/restaurantMenuRoutes");
-var paymentRoutes_1 = require("./routes/paymentRoutes");
+//import paymentRoutes from "./routes/paymentRoutes";
 dotenv.config();
 var app = express();
 var PORT = process.env.PORT || 5001;
@@ -74,7 +74,7 @@ app.use("/api/orders", orderRoutes_1["default"]);
 app.use("/api/carts", cartRoutes_1["default"]);
 app.use("/api/restaurants", restaurantRoutes_1["default"]);
 app.use("/api/menus", menuRoutes_1["default"]);
-app.use("/api/payment", paymentRoutes_1["default"]);
+//app.use("/api/payment", paymentRoutes);
 app.use('/api/restaurants', restaurantMenuRoutes_1["default"]);
 app.use(bodyParser.json());
 // WebSocket connection
