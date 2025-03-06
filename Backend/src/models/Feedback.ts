@@ -1,10 +1,9 @@
-import mongoose from "mongoose";
+import { ObjectId } from "mongodb";
 
-const FeedbackSchema = new mongoose.Schema({
-  username: { type: String, required: true },
-  rating: { type: Number, required: true },
-  comment: { type: String, required: true }
-}, { collection: "feedback" });
+export interface Feedback {
+  _id?: ObjectId;
+  comment: string;
+  rating: number;
+  createdAt?: Date;
+}
 
-const Feedback = mongoose.model("Feedback", FeedbackSchema);
-export default Feedback;
