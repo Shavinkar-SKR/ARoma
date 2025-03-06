@@ -74,7 +74,9 @@ app.use("/api/orders", orderRoutes_1["default"]);
 app.use("/api/carts", cartRoutes_1["default"]);
 app.use("/api/restaurants", restaurantRoutes_1["default"]);
 app.use("/api/menus", menuRoutes_1["default"]);
+
 // app.use("/api/payment", paymentRoutes);
+
 app.use('/api/restaurants', restaurantMenuRoutes_1["default"]);
 app.use(bodyParser.json());
 // WebSocket connection
