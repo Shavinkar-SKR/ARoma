@@ -10,6 +10,7 @@ import restaurantRoutes from "./routes/restaurantRoutes";
 import menuRoutes from "./routes/menuRoutes";
 import * as dotenv from "dotenv";
 import restaurantMenuRoutes from './routes/restaurantMenuRoutes';
+import feedbackRoutes from "./routes/feedbackRoutes";
 // import paymentRoutes from "./routes/paymentRoutes";
 
 dotenv.config();
@@ -40,6 +41,7 @@ app.use(
 app.use(express.json());
 
 // Routes
+app.use("/api/feedback", feedbackRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/carts", cartRoutes);
 app.use("/api/restaurants", restaurantRoutes);
