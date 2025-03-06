@@ -1,27 +1,28 @@
-import express from "express";
-import Feedback from "../models/Feedback";
+import { Router, Request, Response } from "express";
+import {
+  getAllFeedback,
+  submitFeedback
+} from "../controllers/feedbackController"; // Controller for feedback logic
 
-const router = express.Router();
+const router = Router();
 
-// Submit Feedback
-router.post("/", async (req, res) => {
-  const { username, rating, comment } = req.body;
+// Get all feedback
+router.get("/", async (req: Request, res: Response): Promise<void> => {
   try {
-    const newFeedback = new Feedback({ username, rating, comment });
-    await newFeedback.save();
-    res.status(201).json({ message: "✅ Feedback submitted!" });
+    await getAllFeedback(req, res);
   } catch (error) {
-    res.status(500).json({ error: "❌ Something went wrong" });
+    console.error("Error fetching feedback:", error);
+    res.status(500).json({ message: "Error fetching feedback" });
   }
 });
 
-// Get All Feedback
-router.get("/", async (_, res) => {
+// Submit new feedback
+router.post("/", async (req: Request, res: Response): Promise<void> => {
   try {
-    const feedbacks = await Feedback.find();
-    res.json(feedbacks);
+    await submitFeedback(req, res);
   } catch (error) {
-    res.status(500).json({ error: "❌ Something went wrong" });
+    console.error("Error submitting feedback:", error);
+    res.status(500).json({ message: "Error submitting feedback" });
   }
 });
 
