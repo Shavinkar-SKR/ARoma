@@ -4,6 +4,7 @@ var express = require("express");
 var orderController_1 = require("../controllers/orderController");
 var orderRetrievalController_1 = require("../controllers/orderRetrievalController");
 var router = express.Router();
+router.get('/:id', orderRetrievalController_1.getOrderById);
 router.post("/place-order", orderController_1.placeOrder);
 router.get("/", orderRetrievalController_1.getOrders);
 router.put("/update-order-status/:id", orderController_1.updateOrderStatus);

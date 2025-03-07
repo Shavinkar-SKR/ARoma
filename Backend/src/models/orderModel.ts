@@ -13,7 +13,7 @@ export interface Order {
   specialInstructions: string;
   total: number;
   tableNumber: string;
-  status?: "received" | "preparing" | "ready" | "complete"; // Optional status field
+  status?: "received" | "preparing" | "ready" | "complete";
 }
 
 const orderSchema = new Schema<Order & Document>({

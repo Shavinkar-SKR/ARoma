@@ -36,12 +36,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.emitOrderUpdate = void 0;
-var cors = require("cors");
-var express = require("express");
+var cors_1 = require("cors");
+var express_1 = require("express");
 var http_1 = require("http");
 var socket_io_1 = require("socket.io");
-var bodyParser = require("body-parser");
 var dbConfig_1 = require("./config/dbConfig");
 var cartRoutes_1 = require("./routes/cartRoutes");
 var orderRoutes_1 = require("./routes/orderRoutes");
@@ -49,9 +47,9 @@ var restaurantRoutes_1 = require("./routes/restaurantRoutes");
 var menuRoutes_1 = require("./routes/menuRoutes");
 var dotenv = require("dotenv");
 var restaurantMenuRoutes_1 = require("./routes/restaurantMenuRoutes");
-// import paymentRoutes from "./routes/paymentRoutes";
+var feedbackRoutes_1 = require("./routes/feedbackRoutes");
 dotenv.config();
-var app = express();
+var app = express_1["default"]();
 var PORT = process.env.PORT || 5001;
 var httpServer = http_1.createServer(app);
 // Configure CORS for Socket.IO
@@ -62,36 +60,22 @@ var io = new socket_io_1.Server(httpServer, {
     }
 });
 // Configure CORS for Express
-app.use(cors({
+app.use(cors_1["default"]({
     origin: "http://localhost:5173",
     methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
     allowedHeaders: ["Content-Type"]
 }));
-// Middleware to parse JSON bodies
-app.use(express.json());
+// Middleware
+app.use(express_1["default"].json());
+app.use(express_1["default"].urlencoded({ extended: true }));
 // Routes
+app.use("/api/feedback", feedbackRoutes_1["default"]);
 app.use("/api/orders", orderRoutes_1["default"]);
 app.use("/api/carts", cartRoutes_1["default"]);
 app.use("/api/restaurants", restaurantRoutes_1["default"]);
 app.use("/api/menus", menuRoutes_1["default"]);
-
-// app.use("/api/payment", paymentRoutes);
-
 app.use('/api/restaurants', restaurantMenuRoutes_1["default"]);
-app.use(bodyParser.json());
-// WebSocket connection
-io.on("connection", function (socket) {
-    console.log("Client connected:", socket.id);
-    socket.on("disconnect", function () {
-        console.log("Client disconnected:", socket.id);
-    });
-});
-// Function to emit order updates via WebSocket
-var emitOrderUpdate = function (updatedOrder) {
-    io.emit("orderUpdated", updatedOrder);
-};
-exports.emitOrderUpdate = emitOrderUpdate;
-// Start the server
+// Database connection and server start
 var startServer = function () { return __awaiter(void 0, void 0, void 0, function () {
     var error_1;
     return __generator(this, function (_a) {

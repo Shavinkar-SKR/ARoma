@@ -4,11 +4,9 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 
-// Define the type for the state from the Location object
 interface LocationState {
   total: number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  cartItems: any[]; // You can further define the shape of cartItems if needed
+  cartItems: unknown[];
   specialInstructions: string;
   tableNumber: string;
   orderStatus: string;
@@ -17,7 +15,6 @@ interface LocationState {
 const PaymentsPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-
   const state = location.state as LocationState | null;
 
   if (!state) {
@@ -25,22 +22,19 @@ const PaymentsPage: React.FC = () => {
   }
 
   const { total, cartItems, specialInstructions, tableNumber, orderStatus } = state;
-
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleProceedToPayment = async () => {
-    setIsLoading(true); 
+    setIsLoading(true);
 
     const orderDetails = {
       cartItems,
       specialInstructions,
       total,
       tableNumber,
-      orderStatus: orderStatus || "Order Received"  // Ensure orderStatus is included with a fallback
+      orderStatus: orderStatus || "received"
     };
-
-    console.log("Sending order details to backend:", orderDetails);
 
     try {
       const response = await fetch("http://localhost:5001/api/orders/place-order", {
@@ -52,15 +46,16 @@ const PaymentsPage: React.FC = () => {
       });
 
       if (response.ok) {
-        console.log("Order placed and saved to DB:", orderDetails);
-        navigate("/order-status");
+        const data = await response.json();
+        // Navigate to the order status page with the specific order ID
+        navigate(`/order-status/${data._id}`);
       } else {
         console.error("Error saving order:", response.statusText);
       }
     } catch (error) {
       console.error("Error:", error);
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
 
@@ -86,7 +81,7 @@ const PaymentsPage: React.FC = () => {
                   size="lg"
                   className="w-full bg-blue-600 hover:bg-blue-700"
                   onClick={handleProceedToPayment}
-                  disabled={isLoading} // Disable button while loading
+                  disabled={isLoading}
                 >
                   {isLoading ? (
                     <>

@@ -122,8 +122,10 @@ function AdminDashboard() {
 
   // Fetch Orders from API on component mount
   useEffect(() => {
+    
+    let intervalId: NodeJS.Timeout
     const fetchOrders = async () => {
-      setLoading(true);
+      
       try {
         const response = await fetch('http://localhost:5001/api/orders');
         if (!response.ok) throw new Error('Failed to fetch orders');
@@ -140,7 +142,13 @@ function AdminDashboard() {
 
     if (activeTab === 'orders') {
       fetchOrders();
+      intervalId = setInterval(fetchOrders,10000)
     }
+    return()=>{
+      if(intervalId){
+        clearInterval(intervalId)
+      }
+    };
   }, [activeTab]);
 
   // Set up WebSocket listeners for real-time order updates

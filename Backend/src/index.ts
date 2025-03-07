@@ -1,8 +1,7 @@
-const cors = require("cors");
-const express = require("express");
+import cors from "cors";
+import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import * as bodyParser from "body-parser";
 import { connectDB } from "./config/dbConfig";
 import cartRoutes from "./routes/cartRoutes";
 import orderRoutes from "./routes/orderRoutes";
@@ -11,7 +10,7 @@ import menuRoutes from "./routes/menuRoutes";
 import * as dotenv from "dotenv";
 import restaurantMenuRoutes from './routes/restaurantMenuRoutes';
 import feedbackRoutes from "./routes/feedbackRoutes";
-// import paymentRoutes from "./routes/paymentRoutes";
+import { Order } from "./models/orderModel"; // Import Order interface
 
 dotenv.config();
 
@@ -22,23 +21,23 @@ const httpServer = createServer(app);
 // Configure CORS for Socket.IO
 const io = new Server(httpServer, {
   cors: {
-    origin: ["http://localhost:5173", "http://localhost:3000"], // Add all client origins
-    methods: ["GET", "POST", "PATCH", "DELETE", "PUT"], // Include PUT method
+    origin: ["http://localhost:5173", "http://localhost:3000"],
+    methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
   },
 });
 
 // Configure CORS for Express
 app.use(
   cors({
-    origin: "http://localhost:5173", // Allow requests from this origin
-    methods: ["GET", "POST", "PATCH", "DELETE", "PUT"], // Include PUT method
-    allowedHeaders: ["Content-Type"], // Allow necessary headers
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
+    allowedHeaders: ["Content-Type"],
   })
 );
 
-// Middleware to parse JSON bodies
-
+// Middleware
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use("/api/feedback", feedbackRoutes);
@@ -46,25 +45,11 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/carts", cartRoutes);
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/menus", menuRoutes);
-// app.use("/api/payment", paymentRoutes);
 app.use('/api/restaurants', restaurantMenuRoutes);
-app.use(bodyParser.json());
 
-// WebSocket connection
-io.on("connection", (socket) => {
-  console.log("Client connected:", socket.id);
 
-  socket.on("disconnect", () => {
-    console.log("Client disconnected:", socket.id);
-  });
-});
 
-// Function to emit order updates via WebSocket
-const emitOrderUpdate = (updatedOrder: any) => {
-  io.emit("orderUpdated", updatedOrder);
-};
-
-// Start the server
+// Database connection and server start
 const startServer = async () => {
   try {
     await connectDB();
@@ -80,6 +65,3 @@ const startServer = async () => {
 };
 
 startServer();
-
-// Export the emitOrderUpdate function for use in orderRoutes
-export { emitOrderUpdate };
