@@ -36,24 +36,67 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.connectDB = void 0;
-var mongodb_1 = require("mongodb");
-var config_1 = require("../../config");
-var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017";
-var DB_NAME = process.env.DB_NAME || "ARoma";
-var connectDB = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var client, db;
+exports.searchMenuItems = exports.getMenuByRestaurant = void 0;
+var dbConfig_1 = require("../config/dbConfig");
+var getMenuByRestaurant = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var restaurantId, db, menuCollection, menuItems, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                console.log("Connecting to MongoDB with URI:", config_1.config.MONGODB_URI);
-                client = new mongodb_1.MongoClient(config_1.config.MONGODB_URI);
-                return [4 /*yield*/, client.connect()];
+                _a.trys.push([0, 3, , 4]);
+                restaurantId = req.params.restaurantId;
+                return [4 /*yield*/, (0, dbConfig_1.connectDB)()];
             case 1:
-                _a.sent();
-                db = client.db(config_1.config.DB_NAME);
-                return [2 /*return*/, db];
+                db = _a.sent();
+                menuCollection = db.collection("menus");
+                return [4 /*yield*/, menuCollection
+                        .find({
+                        restaurantId: restaurantId,
+                    })
+                        .toArray()];
+            case 2:
+                menuItems = _a.sent();
+                res.status(200).json(menuItems);
+                return [3 /*break*/, 4];
+            case 3:
+                error_1 = _a.sent();
+                res.status(500).json({ error: "Failed to fetch menu items" });
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
         }
     });
 }); };
-exports.connectDB = connectDB;
+exports.getMenuByRestaurant = getMenuByRestaurant;
+var searchMenuItems = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, query, restaurantId, db, menuCollection, filter, menuItems, error_2;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                _b.trys.push([0, 3, , 4]);
+                _a = req.query, query = _a.query, restaurantId = _a.restaurantId;
+                return [4 /*yield*/, (0, dbConfig_1.connectDB)()];
+            case 1:
+                db = _b.sent();
+                menuCollection = db.collection("menus");
+                filter = { restaurantId: restaurantId };
+                if (query) {
+                    filter.$or = [
+                        { name: { $regex: query, $options: "i" } },
+                        { description: { $regex: query, $options: "i" } },
+                        { category: { $regex: query, $options: "i" } },
+                    ];
+                }
+                return [4 /*yield*/, menuCollection.find(filter).toArray()];
+            case 2:
+                menuItems = _b.sent();
+                res.status(200).json(menuItems);
+                return [3 /*break*/, 4];
+            case 3:
+                error_2 = _b.sent();
+                res.status(500).json({ error: "Failed to search menu items" });
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); };
+exports.searchMenuItems = searchMenuItems;

@@ -26,7 +26,6 @@ export const createStripePayment = async (
     method: "Stripe",
     transactionId: paymentIntent.id,
   });
-
   return paymentIntent.client_secret;
 };
 

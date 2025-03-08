@@ -36,24 +36,25 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.connectDB = void 0;
-var mongodb_1 = require("mongodb");
-var config_1 = require("../../config");
-var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017";
-var DB_NAME = process.env.DB_NAME || "ARoma";
-var connectDB = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var client, db;
+exports.predictOrderTime = void 0;
+var axios_1 = require("axios");
+var ML_SERVICE_URL = "http://127.0.0.1:5001/predict"; // Flask API URL
+var predictOrderTime = function (orderData) { return __awaiter(void 0, void 0, void 0, function () {
+    var response, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                console.log("Connecting to MongoDB with URI:", config_1.config.MONGODB_URI);
-                client = new mongodb_1.MongoClient(config_1.config.MONGODB_URI);
-                return [4 /*yield*/, client.connect()];
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, axios_1.default.post(ML_SERVICE_URL, orderData)];
             case 1:
-                _a.sent();
-                db = client.db(config_1.config.DB_NAME);
-                return [2 /*return*/, db];
+                response = _a.sent();
+                return [2 /*return*/, response.data.predicted_time]; // Extract predicted time
+            case 2:
+                error_1 = _a.sent();
+                console.error("Error predicting order time:", error_1);
+                return [2 /*return*/, null]; // Handle errors gracefully
+            case 3: return [2 /*return*/];
         }
     });
 }); };
-exports.connectDB = connectDB;
+exports.predictOrderTime = predictOrderTime;

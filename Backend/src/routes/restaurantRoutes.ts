@@ -2,8 +2,9 @@ import * as express from "express";
 import {
   getAllRestaurants,
   searchRestaurants,
-} from "../controllers/restaurantController";
+} from "../controllers/restaurantController.js";
 
+//const express = require("express");
 const router = express.Router();
 
 router.get("/", getAllRestaurants);
