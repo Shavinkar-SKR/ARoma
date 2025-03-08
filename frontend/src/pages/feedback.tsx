@@ -91,7 +91,7 @@ const FeedbackPage: React.FC = () => {
                   </option>
                 ))}
               </select>
-              <Button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white">
+              <Button type="submit" className="bg-red-500 hover:bg-red-600 text-white">
                 Submit Feedback
               </Button>
             </form>
