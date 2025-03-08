@@ -1,12 +1,21 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CdButton from "@/components/cd/CdButton";
-import { FaBars, FaTimes, FaQuestionCircle, FaInstagram, FaTiktok, FaEnvelope, FaLinkedin, FaFacebook } from "react-icons/fa";
+import { 
+  FaBars, 
+  FaTimes, 
+  FaQuestionCircle, 
+  FaInstagram, 
+  FaTiktok, 
+  FaEnvelope, 
+  FaLinkedin, 
+  FaFacebook 
+} from "react-icons/fa";
 
 const staticFAQs = [
   {
     section: "Navigating Home Page",
-    video: "https://www.example.com/video-homepage", // Replace with actual video URL
+    video: "https://www.example.com/video-homepage",
     description: "Learn how to navigate the home page and find key features."
   },
   {
@@ -51,9 +60,7 @@ const FAQPage: React.FC = () => {
       <nav className="bg-gray-900 text-white p-4 flex justify-between items-center">
         {/* Logo Section */}
         <div className="flex items-center gap-3">
-          {/* Logo Image */}
           <img src="/cd/logo.gif" alt="Aroma Logo" className="h-10 w-auto" />
-          {/* App Name */}
           <span className="text-xl font-bold">Aroma</span> 
         </div>
 
@@ -118,6 +125,25 @@ const FAQPage: React.FC = () => {
           </Card>
         ))}
       </div>
+
+      {/* Floating FAQ Button */}
+      <CdButton 
+        onClick={() => setFaqOpen(!faqOpen)}
+        className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition duration-300"
+      >
+        <FaQuestionCircle size={24} />
+      </CdButton>
+
+      {/* FAQ Sidebar */}
+      {faqOpen && (
+        <div className="fixed top-0 right-0 h-full w-80 bg-white shadow-lg p-4 overflow-y-auto">
+          <button onClick={() => setFaqOpen(false)} className="text-2xl float-right">
+            <FaTimes />
+          </button>
+          <h2 className="text-xl font-bold mb-4">Live FAQ</h2>
+          <p className="text-gray-600">Ask a question or browse previous FAQs.</p>
+        </div>
+      )}
 
       {/* Footer Section */}
       <footer className="bg-gray-900 text-white text-center p-6 mt-8">
