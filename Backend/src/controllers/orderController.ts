@@ -130,7 +130,7 @@ export const updateOrderStatus = async (req: Request, res: Response): Promise<vo
     }
 
     // Emit the updated order to all connected clients (real-time update)
-    emitOrderUpdate(result.value);
+    //emitOrderUpdate(result.value);
 
     // Respond with the updated order
     res.status(200).json(result.value);

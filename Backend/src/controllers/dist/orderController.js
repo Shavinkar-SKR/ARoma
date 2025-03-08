@@ -39,7 +39,6 @@ exports.__esModule = true;
 exports.updateOrderStatus = exports.getOrders = exports.deleteOrder = exports.placeOrder = void 0;
 var mongodb_1 = require("mongodb");
 var dbConfig_1 = require("../config/dbConfig"); // Import the connectDB utility
-var realtimeUpdates_1 = require("../realTimeUpdates/realtimeUpdates"); // Import the emitOrderUpdate function
 // Function to place an order
 exports.placeOrder = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
     var _a, cartItems, specialInstructions, total, tableNumber, db, ordersCollection, newOrder, result, error_1;
@@ -186,7 +185,7 @@ exports.updateOrderStatus = function (req, res) { return __awaiter(void 0, void 
                     return [2 /*return*/];
                 }
                 // Emit the updated order to all connected clients (real-time update)
-                realtimeUpdates_1.emitOrderUpdate(result.value);
+                //emitOrderUpdate(result.value);
                 // Respond with the updated order
                 res.status(200).json(result.value);
                 return [3 /*break*/, 5];
