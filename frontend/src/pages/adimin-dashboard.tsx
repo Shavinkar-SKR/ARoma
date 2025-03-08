@@ -24,7 +24,6 @@ import {
   Bell,
 } from 'lucide-react';
 import { toast, Toaster } from 'sonner';
-import socket from '../socket'; // Relative path
 
 type Order = {
   _id: string;
@@ -123,7 +122,6 @@ function AdminDashboard() {
   // Fetch Orders from API on component mount
   useEffect(() => {
     
-    let intervalId: NodeJS.Timeout
     const fetchOrders = async () => {
       
       try {
@@ -142,49 +140,44 @@ function AdminDashboard() {
 
     if (activeTab === 'orders') {
       fetchOrders();
-      intervalId = setInterval(fetchOrders,10000)
     }
-    return()=>{
-      if(intervalId){
-        clearInterval(intervalId)
-      }
-    };
+    
   }, [activeTab]);
 
-  // Set up WebSocket listeners for real-time order updates
-  useEffect(() => {
-    // Listen for order updates
-    socket.on('orderUpdated', (updatedOrder: Order) => {
-      setOrders(prevOrders => 
-        prevOrders.map(order => 
-          order._id === updatedOrder._id ? updatedOrder : order
-        )
-      );
+
+  // useEffect(() => {
+  //   // Listen for order updates
+  //   socket.on('orderUpdated', (updatedOrder: Order) => {
+  //     setOrders(prevOrders => 
+  //       prevOrders.map(order => 
+  //         order._id === updatedOrder._id ? updatedOrder : order
+  //       )
+  //     );
       
-      // Show toast notification for status change
-      const statusLabel = STATUS_OPTIONS.find(option => option.value === updatedOrder.status)?.label || updatedOrder.status;
-      toast.success(`Order #${updatedOrder._id.substring(updatedOrder._id.length - 6)} status updated to ${statusLabel}`);
-    });
+  //     // Show toast notification for status change
+  //     const statusLabel = STATUS_OPTIONS.find(option => option.value === updatedOrder.status)?.label || updatedOrder.status;
+  //     toast.success(`Order #${updatedOrder._id.substring(updatedOrder._id.length - 6)} status updated to ${statusLabel}`);
+  //   });
 
-    // Listen for new orders
-    socket.on('newOrder', (newOrder: Order) => {
-      setOrders(prevOrders => [newOrder, ...prevOrders]);
-      toast.success(`New order received: #${newOrder._id.substring(newOrder._id.length - 6)}`);
-    });
+  //   // Listen for new orders
+  //   socket.on('newOrder', (newOrder: Order) => {
+  //     setOrders(prevOrders => [newOrder, ...prevOrders]);
+  //     toast.success(`New order received: #${newOrder._id.substring(newOrder._id.length - 6)}`);
+  //   });
 
-    // Listen for deleted orders
-    socket.on('orderDeleted', (deletedOrderId: string) => {
-      setOrders(prevOrders => prevOrders.filter(order => order._id !== deletedOrderId));
-      toast.info(`Order #${deletedOrderId.substring(deletedOrderId.length - 6)} has been removed`);
-    });
+  //   // Listen for deleted orders
+  //   socket.on('orderDeleted', (deletedOrderId: string) => {
+  //     setOrders(prevOrders => prevOrders.filter(order => order._id !== deletedOrderId));
+  //     toast.info(`Order #${deletedOrderId.substring(deletedOrderId.length - 6)} has been removed`);
+  //   });
 
-    // Cleanup function to remove event listeners
-    return () => {
-      socket.off('orderUpdated');
-      socket.off('newOrder');
-      socket.off('orderDeleted');
-    };
-  }, []);
+  //   // Cleanup function to remove event listeners
+  //   return () => {
+  //     socket.off('orderUpdated');
+  //     socket.off('newOrder');
+  //     socket.off('orderDeleted');
+  //   };
+  // }, []);
 
   // Fetch Restaurants from API
   useEffect(() => {

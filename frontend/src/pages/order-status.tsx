@@ -1,6 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ClipboardList, CheckCircle2, ChefHat, Timer } from 'lucide-react';
+import { 
+  CheckCircle2, 
+  ChefHat, 
+  Timer, 
+  Package, 
+  PhoneCall, 
+  Clock,
+  CalendarClock
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -25,13 +33,14 @@ type StatusKey = keyof typeof statusConfig;
 
 const statusConfig = {
   received: {
-    icon: ClipboardList,
+    icon: Package,
     color: 'text-red-600',
     bgColor: 'bg-red-50',
     borderColor: 'border-red-200',
     label: 'Order Received',
     progress: 25,
     description: 'Your order has been received and is being processed',
+    estimatedTime: '5-10 minutes'
   },
   preparing: {
     icon: ChefHat,
@@ -41,6 +50,7 @@ const statusConfig = {
     label: 'Preparing',
     progress: 50,
     description: 'Our chefs are preparing your delicious meal',
+    estimatedTime: '15-20 minutes'
   },
   ready: {
     icon: Timer,
@@ -50,6 +60,7 @@ const statusConfig = {
     label: 'Ready for Pickup',
     progress: 75,
     description: 'Your order is ready to be served',
+    estimatedTime: '2-5 minutes'
   },
   complete: {
     icon: CheckCircle2,
@@ -59,59 +70,116 @@ const statusConfig = {
     label: 'Completed',
     progress: 100,
     description: 'Enjoy your meal!',
+    estimatedTime: 'Completed'
   },
 };
+
+// Sample random restaurant-related messages
+const randomMessages = [
+  {
+    id: 1,
+    title: "A classic combo that never goes out of style!",
+    image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1000&q=80"
+  },
+  {
+    id: 2,
+    title: "Indulge in a slice of happiness with every bite!",
+    image: "https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&w=1000&q=80"
+  },
+  {
+    id: 3,
+    title: "Satisfy your cravings—one bite at a time!",
+    image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=1000&q=80"
+  },
+  {
+    id: 4,
+    title: "Fresh ingredients, amazing flavors!",
+    image: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=1000&q=80"
+  }
+];
 
 const OrderStatus: React.FC = () => {
   const navigate = useNavigate();
   const { orderId } = useParams<{ orderId: string }>();
   const [order, setOrder] = useState<OrderDetails | null>(null);
   const [error, setError] = useState<string>('');
-  const [previousStatus, setPreviousStatus] = useState<StatusKey | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<string>('');
-
-  const fetchOrderStatus = async () => {
-    try {
-      const response = await fetch(`http://localhost:5001/api/orders/${orderId}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch order status');
-      }
-      const data: OrderDetails = await response.json();
-
-      if (previousStatus && previousStatus !== data.status) {
-        const statusKey = data.status as StatusKey;
-        toast.success(`Order status updated to ${statusConfig[statusKey].label}`, {
-          duration: 3000,
-          icon: React.createElement(statusConfig[statusKey].icon, {
-            className: statusConfig[statusKey].color,
-          }),
-        });
-
-        if (data.status === 'complete') {
-          setTimeout(() => {
-            navigate('/restaurant-selection');
-          }, 3000);
-        }
-      }
-
-      setPreviousStatus(data.status as StatusKey);
-      setOrder(data);
-      setLastUpdated(new Date().toLocaleTimeString());
-    } catch (err) {
-      setError('Failed to fetch order status');
-      toast.error('Failed to fetch order status', {
-        duration: 3000,
-      });
-      console.error('Error fetching order status:', err);
-    }
-  };
+  const [, setIsConnected] = useState(true);
+  const [isContactOpen, setIsContactOpen] = useState(false);
+  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+  const eventSourceRef = useRef<EventSource | null>(null);
 
   useEffect(() => {
-    fetchOrderStatus();
-    const interval = setInterval(fetchOrderStatus, 3000);
+    const interval = setInterval(() => {
+      setCurrentMessageIndex((prevIndex) => (prevIndex + 1) % randomMessages.length);
+    }, 5000);
+
     return () => clearInterval(interval);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderId]);
+  }, []);
+
+  useEffect(() => {
+    if (!orderId) return;
+
+    const setupEventSource = () => {
+      eventSourceRef.current = new EventSource(
+        `http://localhost:5001/order-events/${orderId}`
+      );
+
+      eventSourceRef.current.onopen = () => {
+        setIsConnected(true);
+        setError('');
+      };
+
+      eventSourceRef.current.addEventListener('initial', (event) => {
+        const data = JSON.parse((event as MessageEvent).data);
+        setOrder(data);
+      });
+
+      eventSourceRef.current.addEventListener('update', (event) => {
+        const data = JSON.parse((event as MessageEvent).data);
+        setOrder(prev => {
+          if (!prev) return data;
+          
+          const newStatus = data.status;
+          if (prev.status !== newStatus) {
+            const statusKey = newStatus as StatusKey;
+            toast.success(`Order status updated to ${statusConfig[statusKey].label}`, {
+              icon: React.createElement(statusConfig[statusKey].icon, {
+                className: statusConfig[statusKey].color,
+              }),
+            });
+
+            if (newStatus === 'complete') {
+              setTimeout(() => navigate('/restaurant-selection'), 3000);
+            }
+          }
+          return data;
+        });
+      });
+
+      eventSourceRef.current.addEventListener('error', (event) => {
+        console.error('SSE Error:', event);
+        setIsConnected(false);
+        setError('Connection lost - reconnecting...');
+        eventSourceRef.current?.close();
+        setTimeout(setupEventSource, 3000);
+      });
+    };
+
+    setupEventSource();
+
+    return () => {
+      eventSourceRef.current?.close();
+    };
+  }, [orderId, navigate]);
+
+  const handleRetry = () => {
+    setError('');
+    eventSourceRef.current?.close();
+    const newEventSource = new EventSource(
+      `http://localhost:5001/order-events/${orderId}`
+    );
+    eventSourceRef.current = newEventSource;
+  };
 
   if (error) {
     return (
@@ -125,10 +193,10 @@ const OrderStatus: React.FC = () => {
           <h2 className="text-2xl font-bold mb-4">Error</h2>
           <p className="text-lg">{error}</p>
           <button
-            onClick={fetchOrderStatus}
+            onClick={handleRetry}
             className="mt-6 w-full px-6 py-3 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-2xl hover:from-red-700 hover:to-red-600 transition-all duration-300 shadow-lg hover:shadow-xl font-semibold"
           >
-            Retry
+            Reconnect
           </button>
         </div>
       </motion.div>
@@ -152,7 +220,7 @@ const OrderStatus: React.FC = () => {
             transition={{ delay: 0.2 }}
             className="mt-8 text-xl text-red-600 font-semibold"
           >
-            Loading order details...
+            Connecting to order updates...
           </motion.p>
         </motion.div>
       </div>
@@ -160,151 +228,158 @@ const OrderStatus: React.FC = () => {
   }
 
   const statusKey = order.status as StatusKey;
-  const StatusIcon = statusConfig[statusKey].icon;
   const progress = statusConfig[statusKey].progress;
+  const currentMessage = randomMessages[currentMessageIndex];
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="min-h-screen bg-gradient-to-br from-red-50 to-white py-6 md:py-12 px-4 md:px-8 relative overflow-hidden"
-    >
-      <div className="absolute inset-0 z-0 opacity-10">
-        <div className="absolute top-0 left-0 w-64 md:w-96 h-64 md:h-96 bg-red-400 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
-        <div className="absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 bg-red-300 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
-        <div className="absolute bottom-0 left-0 w-64 md:w-96 h-64 md:h-96 bg-red-200 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
-      </div>
-
-      <motion.div
-        initial={{ y: 20 }}
-        animate={{ y: 0 }}
-        className="w-full max-w-4xl mx-auto relative z-10"
-      >
-        <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-red-100 overflow-hidden">
-          <div className="p-6 md:p-10">
-            <motion.div
-              initial={{ y: -20 }}
-              animate={{ y: 0 }}
-              className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 md:mb-12"
+    <div className="flex min-h-screen bg-gradient-to-br from-red-50 to-white">
+      <div className="flex-1 p-8">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-red-600 mb-2">Aroma</h1>
+              <h2 className="text-2xl font-bold text-gray-900">Order Status</h2>
+              <p className="mt-1 text-sm text-gray-500">Track your order preparation in real-time</p>
+            </div>
+            <button
+              onClick={() => setIsContactOpen(!isContactOpen)}
+              className="group flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-full hover:bg-red-700 transition-all duration-300 ease-in-out transform hover:scale-105"
             >
-              <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-900 to-red-600">
-                Order Status
-              </h1>
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-3">
-                <motion.span
-                  className="text-sm md:text-base bg-red-900 text-white px-6 py-2.5 rounded-2xl font-medium inline-block"
-                  whileHover={{ scale: 1.05 }}
-                >
-                  Order #{order._id}
-                </motion.span>
-                <span className="text-sm text-red-600">
-                  Last updated: {lastUpdated}
-                </span>
-              </div>
-            </motion.div>
+              <PhoneCall className="mr-2 h-5 w-5" />
+              Contact Staff
+            </button>
+          </div>
 
-            <motion.div
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
-              className="relative mb-8 md:mb-12"
-            >
-              <div className="h-3 bg-red-100 rounded-full mb-6">
-                <motion.div
-                  className="h-full bg-gradient-to-r from-red-500 to-red-700 rounded-full"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progress}%` }}
-                  transition={{ duration: 0.8, ease: 'easeOut' }}
-                />
-              </div>
-              <div
-                className={`${statusConfig[statusKey].bgColor} border ${statusConfig[statusKey].borderColor} p-6 md:p-8 rounded-3xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg`}
-              >
-                <div className="flex items-center gap-6">
-                  <div className={`${statusConfig[statusKey].bgColor} p-4 rounded-2xl`}>
-                    <StatusIcon className={`h-8 w-8 md:h-10 md:w-10 ${statusConfig[statusKey].color}`} />
-                  </div>
-                  <div>
-                    <span className={`font-bold ${statusConfig[statusKey].color} text-xl md:text-2xl block mb-2`}>
-                      {statusConfig[statusKey].label}
-                    </span>
-                    <motion.p
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="text-base md:text-lg text-gray-600"
-                    >
-                      {statusConfig[statusKey].description}
-                    </motion.p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="space-y-6"
-              >
-                <div>
-                  <h2 className="text-2xl font-bold mb-4 text-red-900">Order Details</h2>
-                  <motion.div
-                    className="bg-red-50/80 backdrop-blur-sm rounded-2xl p-6 hover:bg-red-50 transition-colors shadow-lg"
-                    whileHover={{ scale: 1.02 }}
+          {/* Contact Staff Modal */}
+          {isContactOpen && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn">
+              <div className="bg-white rounded-lg p-6 max-w-md w-full m-4 transform transition-all duration-300 animate-slideIn">
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Contact Restaurant Staff</h3>
+                <p className="text-gray-600 mb-4">Our staff is here to help you with your order.</p>
+                <div className="space-y-4">
+                  <button className="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-all duration-300">
+                    <PhoneCall className="mr-2 h-5 w-5" />
+                    Call Restaurant
+                  </button>
+                  <button
+                    onClick={() => setIsContactOpen(false)}
+                    className="w-full px-4 py-3 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-all duration-300"
                   >
-                    <p className="text-lg text-red-700 mb-3">
-                      Table Number: <span className="font-bold text-red-900">{order.tableNumber}</span>
-                    </p>
-                    <p className="text-lg text-red-700">
-                      Total: <span className="font-bold text-red-900">€{order.total.toFixed(2)}</span>
-                    </p>
-                  </motion.div>
+                    Close
+                  </button>
                 </div>
+              </div>
+            </div>
+          )}
 
-                {order.specialInstructions && (
-                  <motion.div layout>
-                    <h2 className="text-2xl font-bold mb-4 text-red-900">Special Instructions</h2>
-                    <motion.div
-                      className="bg-red-50/80 backdrop-blur-sm rounded-2xl p-6 hover:bg-red-50 transition-colors shadow-lg"
-                      whileHover={{ scale: 1.02 }}
-                    >
-                      <p className="text-lg text-red-800 italic">"{order.specialInstructions}"</p>
-                    </motion.div>
-                  </motion.div>
-                )}
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-              >
-                <h2 className="text-2xl font-bold mb-4 text-red-900">Items</h2>
-                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                  {order.cartItems.map((item, index) => (
-                    <motion.div
-                      key={item.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="bg-red-50/80 backdrop-blur-sm rounded-2xl p-6 flex justify-between items-center gap-4 hover:bg-red-50 transition-all duration-300 transform hover:scale-[1.02] shadow-lg border border-red-100"
-                    >
-                      <div>
-                        <p className="font-semibold text-lg text-red-900">{item.name}</p>
-                        <p className="text-base text-red-700 mt-2">Quantity: {item.quantity}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-lg text-red-900">€{(item.price * item.quantity).toFixed(2)}</p>
-                        <p className="text-sm text-red-600 mt-2">€{item.price.toFixed(2)} each</p>
-                      </div>
-                    </motion.div>
-                  ))}
+          {/* Progress */}
+          <div className="mb-8 bg-white p-6 rounded-2xl shadow-lg transform hover:scale-[1.02] transition-all duration-300">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                <div className="h-1 w-full bg-gray-200 rounded-full">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progress}%` }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    className="h-1 bg-red-600 rounded-full"
+                  ></motion.div>
                 </div>
-              </motion.div>
+              </div>
+              <div className="relative flex justify-between">
+                {Object.entries(statusConfig).map(([key, value]) => (
+                  <div key={key} className="flex flex-col items-center group">
+                    <motion.div 
+                      className={`relative flex h-14 w-14 items-center justify-center rounded-full transition-all duration-300
+                        ${order.status === key ? 'bg-red-600' : 
+                          progress >= statusConfig[key as StatusKey].progress ? 'bg-red-600' : 'bg-gray-200'}`}
+                      whileHover={{ scale: 1.1 }}
+                      animate={order.status === key ? {
+                        scale: [1, 1.1, 1],
+                        transition: { 
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "easeInOut"
+                        }
+                      } : {}}
+                    >
+                      {React.createElement(value.icon, {
+                        className: `h-7 w-7 ${progress >= statusConfig[key as StatusKey].progress ? 'text-white' : 'text-gray-500'}`
+                      })}
+                    </motion.div>
+                    <p className="mt-3 text-sm font-medium text-gray-900 group-hover:text-red-600 transition-colors duration-300">
+                      {value.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
+
+          {/* Order Details and Estimated Time */}
+          <div className="grid md:grid-cols-2 gap-8 mb-8">
+            <div className="bg-white p-6 rounded-2xl shadow-lg">
+              <div className="flex items-center mb-4">
+                <Clock className="h-8 w-8 text-red-600 mr-4" />
+                <div>
+                  <h3 className="text-xl font-medium text-gray-900">Order Details</h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Table {order.tableNumber} • Total: €{order.total.toFixed(2)}
+                  </p>
+                </div>
+              </div>
+              {order.specialInstructions && (
+                <div className="mt-4 p-4 bg-red-50 rounded-lg">
+                  <p className="text-red-700 font-medium">Special Instructions:</p>
+                  <p className="mt-2 text-gray-700">{order.specialInstructions}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white p-6 rounded-2xl shadow-lg">
+              <div className="flex items-center mb-4">
+                <CalendarClock className="h-8 w-8 text-red-600 mr-4" />
+                <div>
+                  <h3 className="text-xl font-medium text-gray-900">Estimated Time</h3>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {statusConfig[statusKey].estimatedTime}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 p-4 bg-red-50 rounded-lg">
+                <p className="text-red-700">{statusConfig[statusKey].description}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Random Recommendation */}
+          {currentMessage && (
+            <motion.div 
+              className="bg-white p-6 rounded-2xl shadow-lg overflow-hidden h-64 relative"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <img
+                src={currentMessage.image}
+                alt={currentMessage.title}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="relative z-10 h-full flex items-center justify-center">
+                <motion.h3 
+                  className="text-white text-2xl font-bold text-center px-4 py-2 bg-black bg-opacity-50 rounded-lg"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  {currentMessage.title}
+                </motion.h3>
+              </div>
+            </motion.div>
+          )}
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 };
 
