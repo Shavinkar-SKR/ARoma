@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CdButton from "@/components/cd/CdButton";
-import { FaBars, FaTimes, FaQuestionCircle } from "react-icons/fa";
+import { FaBars, FaTimes, FaQuestionCircle, FaInstagram, FaTiktok, FaEnvelope, FaLinkedin, FaFacebook } from "react-icons/fa";
 
 const staticFAQs = [
   {
@@ -119,25 +119,19 @@ const FAQPage: React.FC = () => {
         ))}
       </div>
 
-      {/* Floating FAQ Button */}
-      <CdButton 
-        onClick={() => setFaqOpen(!faqOpen)}
-        className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition duration-300"
-      >
-        <FaQuestionCircle size={24} />
-      </CdButton>
-
-      {/* FAQ Sidebar */}
-      {faqOpen && (
-        <div className="fixed top-0 right-0 h-full w-80 bg-white shadow-lg p-4 overflow-y-auto">
-          <button onClick={() => setFaqOpen(false)} className="text-2xl float-right">
-            <FaTimes />
-          </button>
-          <h2 className="text-xl font-bold mb-4">Live FAQ</h2>
-          <p className="text-gray-600">Ask a question or browse previous FAQs.</p>
-          {/* Dynamic Q&A (to be implemented later) */}
+      {/* Footer Section */}
+      <footer className="bg-gray-900 text-white text-center p-6 mt-8">
+        <h2 className="text-xl font-semibold mb-2">About Us</h2>
+        <p className="text-gray-400 text-sm mb-4">We provide digitalized solutions to enhance your dining experience.</p>
+        <div className="flex justify-center gap-6">
+          <FaInstagram size={24} className="cursor-pointer hover:text-gray-400" />
+          <FaTiktok size={24} className="cursor-pointer hover:text-gray-400" />
+          <FaEnvelope size={24} className="cursor-pointer hover:text-gray-400" />
+          <FaLinkedin size={24} className="cursor-pointer hover:text-gray-400" />
+          <FaFacebook size={24} className="cursor-pointer hover:text-gray-400" />
         </div>
-      )}
+      </footer>
+
     </div>
   );
 };
