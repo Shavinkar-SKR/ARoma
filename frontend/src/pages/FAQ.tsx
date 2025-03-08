@@ -146,17 +146,36 @@ const FAQPage: React.FC = () => {
       )}
 
       {/* Footer Section */}
-      <footer className="bg-gray-900 text-white text-center p-6 mt-8">
-        <h2 className="text-xl font-semibold mb-2">About Us</h2>
-        <p className="text-gray-400 text-sm mb-4">We provide digitalized solutions to enhance your dining experience.</p>
-        <div className="flex justify-center gap-6">
-          <FaInstagram size={24} className="cursor-pointer hover:text-gray-400" />
-          <FaTiktok size={24} className="cursor-pointer hover:text-gray-400" />
-          <FaEnvelope size={24} className="cursor-pointer hover:text-gray-400" />
-          <FaLinkedin size={24} className="cursor-pointer hover:text-gray-400" />
-          <FaFacebook size={24} className="cursor-pointer hover:text-gray-400" />
-        </div>
-      </footer>
+	  <footer className="bg-gray-900 text-white text-center p-6 mt-8">
+		<h2 className="text-xl font-semibold mb-2">About Us</h2>
+		<p className="text-gray-400 text-sm mb-4">
+			We provide digitalized solutions to enhance your dining experience.
+		</p>
+
+		{/* Social Media Links */}
+		<div className="flex justify-center gap-6">
+			<a href="#" target="_blank" rel="noopener noreferrer">
+				<FaInstagram size={24} className="cursor-pointer hover:text-gray-400 transition duration-300" />
+			</a>
+
+			<a href="#" target="_blank" rel="noopener noreferrer">
+				<FaTiktok size={24} className="cursor-pointer hover:text-gray-400 transition duration-300" />
+			</a>
+
+			<a href="#">
+				<FaEnvelope size={24} className="cursor-pointer hover:text-gray-400 transition duration-300" />
+			</a>
+
+			<a href="#" target="_blank" rel="noopener noreferrer">
+				<FaLinkedin size={24} className="cursor-pointer hover:text-gray-400 transition duration-300" />
+			</a>
+
+			<a href="#" target="_blank" rel="noopener noreferrer">
+				<FaFacebook size={24} className="cursor-pointer hover:text-gray-400 transition duration-300" />
+			</a>
+		</div>
+	  </footer>
+
 
     </div>
   );
