@@ -154,7 +154,7 @@ const FAQPage: React.FC = () => {
 
 		{/* Social Media Links */}
 		<div className="flex justify-center gap-6">
-			<a href="#" target="_blank" rel="noopener noreferrer">
+			<a href="https://www.instagram.com/aroma_offcial/?igsh=YzljYTk1ODg3Zg%3D%3D#" target="_blank" rel="noopener noreferrer">
 				<FaInstagram size={24} className="cursor-pointer hover:text-gray-400 transition duration-300" />
 			</a>
 
