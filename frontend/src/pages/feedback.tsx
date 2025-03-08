@@ -6,6 +6,8 @@ import { toast, Toaster } from "sonner";
 
 interface Feedback {
   _id: string;
+  username: string;
+  restaurant: string;
   comment: string;
   rating: number;
 }
@@ -13,8 +15,19 @@ interface Feedback {
 const FeedbackPage: React.FC = () => {
   const navigate = useNavigate();
   const [feedbackList, setFeedbackList] = useState<Feedback[]>([]);
+  const [username, setUsername] = useState("");
+  const [restaurant, setRestaurant] = useState("Ramen House");
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(5);
+
+  const restaurants = [
+    "Ramen House",
+    "Spice Island",
+    "Dragon Wok",
+    "La Pizzeria",
+    "Sushi Delight",
+    "Pasta Paradise"
+  ];
 
   // Fetch existing feedback (if needed)
   useEffect(() => {
@@ -34,7 +47,7 @@ const FeedbackPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newFeedback = { comment, rating };
+    const newFeedback = { username, restaurant, comment, rating };
 
     try {
       const response = await fetch("http://localhost:5001/api/feedback", {
@@ -46,6 +59,8 @@ const FeedbackPage: React.FC = () => {
       if (!response.ok) throw new Error("Failed to submit feedback");
 
       toast.success("Feedback submitted!");
+      setUsername("");
+      setRestaurant("Ramen House");
       setComment("");
       setRating(5);
       fetchFeedback(); // Refresh feedback list
@@ -73,6 +88,23 @@ const FeedbackPage: React.FC = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter your name"
+                required
+                className="w-full p-2 border rounded"
+              />
+              <select
+                value={restaurant}
+                onChange={(e) => setRestaurant(e.target.value)}
+                className="p-2 border rounded"
+              >
+                {restaurants.map((rest) => (
+                  <option key={rest} value={rest}>{rest}</option>
+                ))}
+              </select>
               <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
@@ -105,6 +137,7 @@ const FeedbackPage: React.FC = () => {
             feedbackList.map((fb) => (
               <Card key={fb._id} className="mb-2">
                 <CardContent>
+                  <p><strong>{fb.username}</strong> - {fb.restaurant}</p>
                   <p>{fb.comment}</p>
                   <p className="text-sm text-gray-600">Rating: {fb.rating} ⭐</p>
                 </CardContent>
