@@ -15,6 +15,7 @@ interface LocationState {
   cartItems: unknown[];
   specialInstructions: string;
   tableNumber: string;
+  orderStatus: string;
   estimatedTime: number; // Add this line
 }
 
