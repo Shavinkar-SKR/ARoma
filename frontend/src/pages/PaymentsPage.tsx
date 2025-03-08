@@ -17,11 +17,15 @@ interface LocationState {
   cartItems: any[]; // You can further define the shape of cartItems if needed
   specialInstructions: string;
   tableNumber: string;
+  estimatedTime: number; // Add this line
 }
 
 const PaymentsPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+
+  const estimatedTime = location.state?.estimatedTime || "Calculating...";
+  console.log("Estimated Time in Payments Page:", estimatedTime); // Log the estimated time
 
   const state = location.state as LocationState | null;
 

@@ -12,19 +12,35 @@ model = joblib.load("model/recipe_time_predictor.pkl")
 
 @app.route("/predict", methods=["POST"])
 def predict():
+    print("Request received at /predict")  # Add this line
     data = request.json  # Get JSON data from request
     print("Received Input Data:", data)
 
-    # Extract relevant fields from the request (assuming input format)
-    features = pd.DataFrame([data])  # Convert input to DataFrame
-    
-    # Ensure features match the model's expected input format
-    prediction = model.predict(features)[0]
+    try:
+        # Extract cart items from the request
+        cart_items = data.get("cartItems", [])
 
-     # **Convert to standard Python float**
-    prediction = float(prediction)  # Convert `np.float32` → `float`
-    
-    return jsonify({"predicted_time": round(prediction, 2)})
+        # Prepare input data for the model
+        input_data = []
+        for item in cart_items:
+            input_data.append({
+                "name": item["name"],
+                "quantity": item["quantity"]
+            })
+
+        # Convert input data to DataFrame
+        features = pd.DataFrame(input_data)
+
+        # Ensure features match the model's expected input format
+        prediction = model.predict(features)
+
+        # Sum the predicted times for all items in the order
+        total_time = float(prediction.sum())  # Convert to standard Python float
+
+        return jsonify({"predicted_time": round(total_time, 2)})
+    except Exception as e:
+        print("Error during prediction:", e)
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001)  # Run on port 5001

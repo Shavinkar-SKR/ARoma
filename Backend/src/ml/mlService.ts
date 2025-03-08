@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const ML_SERVICE_URL = "http://localhost:5001/predict"; // Flask API URL
+const ML_SERVICE_URL = "http://127.0.0.1:5001/predict"; // Flask API URL
 
 export const predictOrderTime = async (orderData: any) => {
   try {

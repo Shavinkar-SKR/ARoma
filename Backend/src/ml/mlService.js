@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.predictOrderTime = void 0;
 var axios_1 = require("axios");
-var ML_SERVICE_URL = "http://localhost:5001/predict"; // Flask API URL
+var ML_SERVICE_URL = "http://127.0.0.1:5001/predict"; // Flask API URL
 var predictOrderTime = function (orderData) { return __awaiter(void 0, void 0, void 0, function () {
     var response, error_1;
     return __generator(this, function (_a) {

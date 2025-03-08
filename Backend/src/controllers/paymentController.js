@@ -1,150 +1,4 @@
 "use strict";
-// import { Request, Response, NextFunction } from "express";
-// import {
-//   processStripePayment,
-//   createPayPalPayment,
-// } from "../services/paymentService";
-// import Stripe from "stripe";
-// import dotenv from "dotenv";
-/*
-import { Request, Response } from "express";
-import { stripe, processStripePayment } from "../services/paymentService";
-
-const dotenv = require("dotenv");
-
-
-/*
-import { Request, Response } from "express";
-import { stripe, processStripePayment } from "../services/paymentService";
-
-<<<<<<< Updated upstream
-const dotenv = require("dotenv");
-
-// dotenv.config();
-
-<<<<<<< Updated upstream
-// const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-//   apiVersion: "2025-01-27.acacia",
-// });
-
-// export const handleStripePayment = async (req: Request, res: Response) => {
-//   try {
-//     const { amount, currency, paymentMethodId } = req.body;
-//     const result = await processStripePayment(
-//       amount,
-//       currency,
-//       paymentMethodId
-//     );
-
-//     if (result.success) {
-//       res.status(200).json(result);
-//     } else {
-//       res.status(400).json({ error: result.message });
-//     }
-//   } catch (error) {
-//     res.status(500).json({ error: "Payment failed" });
-//   }
-// };
-
-// export const handlePayPalPayment = async (req: Request, res: Response) => {
-//   try {
-//     const { amount, currency } = req.body;
-//     const payment = await createPayPalPayment(amount, currency);
-//     res.status(200).json(payment);
-//   } catch (error) {
-//     res.status(500).json({ error: "PayPal payment failed" });
-//   }
-// };
-
-// export const createPaymentIntent = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ): Promise<Response | undefined> => {
-//   try {
-//     const { amount } = req.body; // Amount should be in cents (e.g., $50.00 -> 5000)
-
-//     if (!amount) {
-//       return res.status(400).json({ error: "Amount is required" });
-//     }
-
-//     const paymentIntent = await stripe.paymentIntents.create({
-//       amount,
-//       currency: "usd",
-//       payment_method_types: ["card"],
-//     });
-
-//     res.json({ clientSecret: paymentIntent.client_secret });
-//   } catch (error) {
-//     console.error("Error creating payment intent:", error);
-//     return res.status(500).json({ error: "Internal Server Error" });
-//   }
-// };
-
-require("dotenv").config();
-import { Request, Response } from "express";
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-const PaymentService = require("../services/paymentService");
-const Payment = require("../models/paymentModel");
-
-export const processStripePayment = async (req: Request, res: Response) => {
-=======
-export const handleStripePayment = async (req: Request, res: Response) => {
->>>>>>> Stashed changes
-  try {
-    const { amount, currency, userId } = req.body;
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount,
-      currency,
-      payment_method_types: ["card"],
-    });
-
-    const payment = new Payment({
-      userId,
-      amount,
-      currency,
-      status: "Pending",
-      method: "Stripe",
-      transactionId: paymentIntent.id,
-    });
-    await payment.save();
-
-<<<<<<< Updated upstream
-    res.status(200).json({ clientSecret: paymentIntent.client_secret });
-
-=======
->>>>>>> Stashed changes
-export const createPaymentIntent = async (
-  req: Request,
-  res: Response
-): Promise<Response | undefined> => {
-  try {
-    const { amount } = req.body; // Amount should be in cents (e.g., $50.00 -> 5000)
-
-    if (!amount) {
-      return res.status(400).json({ error: "Amount is required" });
-    }
-
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount,
-      currency: "usd",
-      
-      automatic_payment_methods: {
-        enabled: true, // Automatically select payment methods available for the user
-        allow_redirects: "never", // Prevent redirections
-      },
-      //return_url: "http://localhost:3000/checkout-complete",
-<<<<<<< Updated upstream
-    });
-
-    return res.json({ clientSecret: paymentIntent.client_secret });
-  } catch (error) {
-    res.status(500).json({ error: (error as Error).message });
-  }
-};
-
-export const stripeWebhook = async (req: Request, res: Response) => {
-*/
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -182,56 +36,38 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.stripeWebhook = exports.processStripePayment = void 0;
+exports.processSplitBillPayment = exports.stripeWebhook = exports.processStripePayment = void 0;
 require("dotenv").config();
 var paymentService_1 = require("../services/paymentService");
 var dbConfig_1 = require("../config/dbConfig");
 //import Payment from "../models/paymentModel";
 var PaymentService = require("../services/paymentService");
 var processStripePayment = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, amount, currency, userId, paymentIntent, db, paymentsCollection, error_1;
+    var _a, amount, currency, userId, clientSecret, error_1;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                _b.trys.push([0, 4, , 5]);
+                _b.trys.push([0, 2, , 3]);
                 _a = req.body, amount = _a.amount, currency = _a.currency, userId = _a.userId;
                 if (!amount || !currency || !userId) {
                     return [2 /*return*/, res.status(400).json({ error: "Missing required fields" })];
                 }
-                return [4 /*yield*/, paymentService_1.stripe.paymentIntents.create({
-                        amount: amount,
-                        currency: currency,
-                        payment_method_types: ["card"],
-                    })];
+                return [4 /*yield*/, PaymentService.createStripePayment(amount, currency, userId)];
             case 1:
-                paymentIntent = _b.sent();
-                return [4 /*yield*/, (0, dbConfig_1.connectDB)()];
+                clientSecret = _b.sent();
+                res.status(200).json({ clientSecret: clientSecret });
+                return [3 /*break*/, 3];
             case 2:
-                db = _b.sent();
-                paymentsCollection = db.collection("payments");
-                return [4 /*yield*/, paymentsCollection.insertOne({
-                        userId: userId,
-                        amount: amount,
-                        currency: currency,
-                        status: "Pending",
-                        method: "Stripe",
-                        transactionId: paymentIntent.id,
-                    })];
-            case 3:
-                _b.sent();
-                res.status(200).json({ clientSecret: paymentIntent.client_secret });
-                return [3 /*break*/, 5];
-            case 4:
                 error_1 = _b.sent();
                 res.status(500).json({ error: error_1.message });
-                return [3 /*break*/, 5];
-            case 5: return [2 /*return*/];
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
         }
     });
 }); };
 exports.processStripePayment = processStripePayment;
 var stripeWebhook = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var sig, event, paymentIntent;
+    var sig, event, paymentIntent, err_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -247,16 +83,93 @@ var stripeWebhook = function (req, res) { return __awaiter(void 0, void 0, void 
                 catch (err) {
                     return [2 /*return*/, res.status(400).send("Webhook Error: ".concat(err.message))];
                 }
-                if (!(event.type === "payment_intent.succeeded")) return [3 /*break*/, 2];
+                if (!(event.type === "payment_intent.succeeded")) return [3 /*break*/, 4];
                 paymentIntent = event.data.object;
-                return [4 /*yield*/, paymentService_1.Payment.findOneAndUpdate({ transactionId: paymentIntent.id }, { status: "Completed" })];
+                _a.label = 1;
             case 1:
-                _a.sent();
-                _a.label = 2;
+                _a.trys.push([1, 3, , 4]);
+                return [4 /*yield*/, paymentService_1.Payment.findOneAndUpdate({ transactionId: paymentIntent.id }, { status: "Completed" })];
             case 2:
+                _a.sent();
+                return [3 /*break*/, 4];
+            case 3:
+                err_1 = _a.sent();
+                console.error("Failed to update payment status:", err_1);
+                return [3 /*break*/, 4];
+            case 4:
                 res.json({ received: true });
                 return [2 /*return*/];
         }
     });
 }); };
 exports.stripeWebhook = stripeWebhook;
+var processSplitBillPayment = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, totalAmount, currency, userId, splitDetails, paymentIntents, _i, splitDetails_1, split, payerId, amount, paymentIntent, db, paymentsCollection, error_2;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                _b.trys.push([0, 7, , 8]);
+                _a = req.body, totalAmount = _a.totalAmount, currency = _a.currency, userId = _a.userId, splitDetails = _a.splitDetails;
+                if (!totalAmount ||
+                    !currency ||
+                    !userId ||
+                    !Array.isArray(splitDetails) ||
+                    splitDetails.length === 0) {
+                    return [2 /*return*/, res
+                            .status(400)
+                            .json({ error: "Missing required fields or invalid split details" })];
+                }
+                paymentIntents = [];
+                _i = 0, splitDetails_1 = splitDetails;
+                _b.label = 1;
+            case 1:
+                if (!(_i < splitDetails_1.length)) return [3 /*break*/, 6];
+                split = splitDetails_1[_i];
+                payerId = split.payerId, amount = split.amount;
+                if (!payerId || !amount) {
+                    return [2 /*return*/, res.status(400).json({ error: "Invalid split detail format" })];
+                }
+                return [4 /*yield*/, paymentService_1.stripe.paymentIntents.create({
+                        amount: amount,
+                        currency: currency,
+                        payment_method_types: ["card"],
+                    })];
+            case 2:
+                paymentIntent = _b.sent();
+                return [4 /*yield*/, (0, dbConfig_1.connectDB)()];
+            case 3:
+                db = _b.sent();
+                paymentsCollection = db.collection("payments");
+                return [4 /*yield*/, paymentsCollection.insertOne({
+                        userId: payerId,
+                        amount: amount,
+                        currency: currency,
+                        status: "Pending",
+                        method: "Stripe",
+                        transactionId: paymentIntent.id,
+                    })];
+            case 4:
+                _b.sent();
+                paymentIntents.push({
+                    payerId: payerId,
+                    clientSecret: paymentIntent.client_secret,
+                });
+                _b.label = 5;
+            case 5:
+                _i++;
+                return [3 /*break*/, 1];
+            case 6:
+                res.status(200).json({
+                    message: "Split payments initialized",
+                    splitPayments: paymentIntents,
+                });
+                return [3 /*break*/, 8];
+            case 7:
+                error_2 = _b.sent();
+                res.status(500).json({ error: error_2.message });
+                return [3 /*break*/, 8];
+            case 8: return [2 /*return*/];
+        }
+    });
+}); };
+exports.processSplitBillPayment = processSplitBillPayment;
