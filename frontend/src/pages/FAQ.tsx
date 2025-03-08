@@ -3,8 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CdButton from "@/components/cd/CdButton";
 import { FaBars, FaTimes, FaQuestionCircle } from "react-icons/fa";
 
-
-
 const staticFAQs = [
   {
     section: "Navigating Home Page",
@@ -65,7 +63,6 @@ const FAQPage: React.FC = () => {
         </button>
       </nav>
 
-
       {/* Dropdown Menu */}
       {menuOpen && (
         <div className="bg-gray-800 text-white p-4 absolute top-16 left-0 w-full shadow-lg">
@@ -80,6 +77,20 @@ const FAQPage: React.FC = () => {
       {/* Red Bar */}
       <div className="bg-red-600 text-white text-center py-2 font-semibold">
         Learn How to Use Our App
+      </div>
+
+      {/* Branding Section */}
+      <div className="text-center p-6">
+        <div className="flex justify-center items-center gap-2">
+          <img src="/cd/logo.gif" alt="Aroma Logo" className="h-12 w-auto" />
+          <h1 className="text-4xl font-bold">Aroma</h1>
+        </div>
+        <p className="text-gray-700 mt-2 text-lg font-semibold">
+          Bringing Digitalized Solutions to Your Dining Experience
+        </p>
+        <p className="text-gray-600 mt-2">
+          {/* Add detailed explanation about the app here later */}
+        </p>
       </div>
 
       {/* Intro Section */}
@@ -115,8 +126,6 @@ const FAQPage: React.FC = () => {
       >
         <FaQuestionCircle size={24} />
       </CdButton>
-
-
 
       {/* FAQ Sidebar */}
       {faqOpen && (
