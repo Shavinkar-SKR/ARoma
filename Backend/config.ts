@@ -1,10 +1,10 @@
-import dotenv from 'dotenv';
-import path from 'path';
+import * as dotenv from "dotenv";
+import * as path from "path";
 
-// Load env variables form .env file
-dotenv.config({ path: path.resolve(__dirname, ".env")})
+
+dotenv.config({ path: path.resolve(__dirname, ".env") });
 
 export const config = {
-    DB_NAME: process.env.DB_NAME || "",
-    MONGODB_URI: process.env.MONGODB_CONNECTION_STRING || "",
-}
+  DB_NAME: process.env.DB_NAME || "ARoma",
+  MONGODB_URI: process.env.MONGODB_CONNECTION_STRING || "",
+};

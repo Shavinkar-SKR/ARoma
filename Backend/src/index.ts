@@ -1,4 +1,4 @@
-import cors from "cors";
+const cors = require("cors");
 import express, { Request, Response, NextFunction } from "express";
 import { createServer } from "http";
 import { MongoClient, ObjectId, ChangeStreamDocument, MongoClientOptions, Db } from "mongodb";
@@ -10,6 +10,8 @@ import * as dotenv from "dotenv";
 import restaurantMenuRoutes from './routes/restaurantMenuRoutes';
 import feedbackRoutes from "./routes/feedbackRoutes";
 import { Order } from "./models/orderModel";
+import payment from './routes/paymentRoutes'
+
 
 dotenv.config();
 
@@ -75,6 +77,8 @@ app.use("/api/carts", cartRoutes);
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/menus", menuRoutes);
 app.use('/api/restaurants', restaurantMenuRoutes);
+app.use('/api/payment', payment);
+
 
 const activeConnections = new Set();
 
