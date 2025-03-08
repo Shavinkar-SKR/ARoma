@@ -6,11 +6,11 @@ import {
   Timer, 
   Package, 
   PhoneCall, 
-  Clock,
-  CalendarClock
-} from 'lucide-react';
+  Clock} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import { useLocation } from 'react-router-dom';
+
 
 interface CartItem {
   id: number;
@@ -107,6 +107,8 @@ const OrderStatus: React.FC = () => {
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const eventSourceRef = useRef<EventSource | null>(null);
+  const location = useLocation();
+  const estimatedTime = location.state?.estimatedTime || "Calculating...";
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -272,6 +274,14 @@ const OrderStatus: React.FC = () => {
               </div>
             </div>
           )}
+          {/* Preparation Time */}
+          <div className="mb-8 bg-white p-6 rounded-2xl shadow-lg transform hover:scale-[1.02] transition-all duration-300">
+            <div className="flex items-center gap-2 text-lg font-semibold">
+              <Clock className="h-5 w-5 text-red-500" />
+              Estimated Time:{" "}
+              <span className="text-red-600">{estimatedTime}</span>
+            </div>
+          </div>
 
           {/* Progress */}
           <div className="mb-8 bg-white p-6 rounded-2xl shadow-lg transform hover:scale-[1.02] transition-all duration-300">
@@ -336,20 +346,7 @@ const OrderStatus: React.FC = () => {
               )}
             </div>
 
-            <div className="bg-white p-6 rounded-2xl shadow-lg">
-              <div className="flex items-center mb-4">
-                <CalendarClock className="h-8 w-8 text-red-600 mr-4" />
-                <div>
-                  <h3 className="text-xl font-medium text-gray-900">Estimated Time</h3>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {statusConfig[statusKey].estimatedTime}
-                  </p>
-                </div>
-              </div>
-              <div className="mt-4 p-4 bg-red-50 rounded-lg">
-                <p className="text-red-700">{statusConfig[statusKey].description}</p>
-              </div>
-            </div>
+
           </div>
 
           {/* Random Recommendation */}

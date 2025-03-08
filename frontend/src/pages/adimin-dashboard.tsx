@@ -4,8 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ClipboardList,
   UtensilsCrossed,
-  BarChart3,
-  Settings,
+  // Settings,
   LogOut,
   Search,
   Utensils,
@@ -120,29 +119,80 @@ function AdminDashboard() {
   });
 
   // Fetch Orders from API on component mount
-  useEffect(() => {
-    
-    const fetchOrders = async () => {
-      
-      try {
-        const response = await fetch('http://localhost:5001/api/orders');
-        if (!response.ok) throw new Error('Failed to fetch orders');
-        const data = await response.json();
-        setOrders(data);
-      } catch (err) {
-        console.error("Error fetching orders:", err);
+// Fetch Orders from API on component mount
+useEffect(() => {
+  const fetchOrders = async () => {
+    try {
+      const response = await fetch('http://localhost:5001/api/orders');
+      if (!response.ok) throw new Error('Failed to fetch orders');
+      const data = await response.json();
+      setOrders(data);
+    } catch (err) {
+      // Handle the error properly since 'err' is of type 'unknown'
+      if (err instanceof Error) {
+        console.error("Error fetching orders:", err.message);
         setError('Error fetching orders');
         toast.error('Failed to fetch orders.');
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    if (activeTab === 'orders') {
-      fetchOrders();
+        // Handle specific MongoDB errors
+        if (err.name === 'MongoServerSelectionError' || err.name === 'MongoNetworkError') {
+          toast.error('Database connection error. Please check your network or try again later.');
+        } else if (err.name === 'MongoWaitQueueTimeoutError') {
+          toast.error('Database connection timeout. Please try again later.');
+        }
+      } else {
+        // Handle cases where 'err' is not an Error object
+        console.error("Unknown error:", err);
+        setError('An unknown error occurred');
+        toast.error('An unknown error occurred.');
+      }
+    } finally {
+      setLoading(false);
     }
-    
-  }, [activeTab]);
+  };
+
+  if (activeTab === 'orders') {
+    fetchOrders();
+  }
+}, [activeTab]);
+
+// Fetch Restaurants from API
+useEffect(() => {
+  const fetchRestaurants = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:5001/api/restaurants');
+      if (!response.ok) throw new Error('Failed to fetch restaurants');
+      const data = await response.json();
+      setRestaurants(data);
+    } catch (err) {
+      // Handle the error properly since 'err' is of type 'unknown'
+      if (err instanceof Error) {
+        console.error("Error fetching restaurants:", err.message);
+        setError('Error fetching restaurants');
+        toast.error('Failed to fetch restaurants.');
+
+        // Handle specific MongoDB errors
+        if (err.name === 'MongoServerSelectionError' || err.name === 'MongoNetworkError') {
+          toast.error('Database connection error. Please check your network or try again later.');
+        } else if (err.name === 'MongoWaitQueueTimeoutError') {
+          toast.error('Database connection timeout. Please try again later.');
+        }
+      } else {
+        // Handle cases where 'err' is not an Error object
+        console.error("Unknown error:", err);
+        setError('An unknown error occurred');
+        toast.error('An unknown error occurred.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (activeTab === 'menu') {
+    fetchRestaurants();
+  }
+}, [activeTab]);
 
 
   // useEffect(() => {
@@ -485,8 +535,8 @@ function AdminDashboard() {
   const sidebarItems = [
     { icon: ClipboardList, label: 'Orders', id: 'orders' },
     { icon: UtensilsCrossed, label: 'Menu', id: 'menu' },
-    { icon: BarChart3, label: 'Reports', id: 'reports' },
-    { icon: Settings, label: 'Settings', id: 'settings' },
+    //{ icon: BarChart3, label: 'Reports', id: 'reports' },
+   // { icon: Settings, label: 'Settings', id: 'settings' },
   ];
 
   const filteredOrders = orders.filter(
@@ -1049,7 +1099,7 @@ function AdminDashboard() {
               )}
             </motion.div>
           )}
-
+{/* 
           {activeTab === 'reports' && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -1061,9 +1111,9 @@ function AdminDashboard() {
                 <p className="text-gray-600">Reports functionality coming soon...</p>
               </div>
             </motion.div>
-          )}
+          )} */}
 
-          {activeTab === 'settings' && (
+          {/* {activeTab === 'settings' && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -1074,7 +1124,7 @@ function AdminDashboard() {
                 <p className="text-gray-600">Settings functionality coming soon...</p>
               </div>
             </motion.div>
-          )}
+          )} */}
         </div>
       </motion.div>
     </div>
