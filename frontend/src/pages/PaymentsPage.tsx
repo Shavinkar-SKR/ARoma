@@ -10,11 +10,9 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 
-// Define the type for the state from the Location object
 interface LocationState {
   total: number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  cartItems: any[]; // You can further define the shape of cartItems if needed
+  cartItems: unknown[];
   specialInstructions: string;
   tableNumber: string;
   estimatedTime: number; // Add this line
@@ -33,12 +31,13 @@ const PaymentsPage: React.FC = () => {
     return <Navigate to="/" />;
   }
 
-  const { total, cartItems, specialInstructions, tableNumber } = state;
-
+  const { total, cartItems, specialInstructions, tableNumber, orderStatus } =
+    state;
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleProceedToPayment = async () => {
+    setIsLoading(true);
     setIsLoading(true);
 
     const orderDetails = {
@@ -47,8 +46,6 @@ const PaymentsPage: React.FC = () => {
       total,
       tableNumber, // Pass tableNumber as a separate field
     };
-
-    console.log("Sending order details to backend:", orderDetails);
 
     try {
       const response = await fetch(
@@ -63,14 +60,16 @@ const PaymentsPage: React.FC = () => {
       );
 
       if (response.ok) {
-        console.log("Order placed and saved to DB:", orderDetails);
-        navigate("/order-status");
+        const data = await response.json();
+        // Navigate to the order status page with the specific order ID
+        navigate(`/order-status/${data._id}`);
       } else {
         console.error("Error saving order:", response.statusText);
       }
     } catch (error) {
       console.error("Error:", error);
     } finally {
+      setIsLoading(false);
       setIsLoading(false);
     }
   };
@@ -97,7 +96,7 @@ const PaymentsPage: React.FC = () => {
                   size="lg"
                   className="w-full bg-blue-600 hover:bg-blue-700"
                   onClick={handleProceedToPayment}
-                  disabled={isLoading} // Disable button while loading
+                  disabled={isLoading}
                 >
                   {isLoading ? (
                     <>

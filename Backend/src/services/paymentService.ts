@@ -3,6 +3,11 @@ import Payment from "../models/paymentModel";
 import { connectDB } from "../config/dbConfig";
 
 const stripe = new stripePackage(process.env.STRIPE_SECRET_KEY!);
+import stripePackage from "stripe";
+import Payment from "../models/paymentModel";
+import { connectDB } from "../config/dbConfig";
+
+const stripe = new stripePackage(process.env.STRIPE_SECRET_KEY!);
 
 export const createStripePayment = async (
   amount: number,
@@ -19,6 +24,10 @@ export const createStripePayment = async (
   const paymentsCollection = db.collection("payments");
 
   await paymentsCollection.insertOne({
+  const db = await connectDB();
+  const paymentsCollection = db.collection("payments");
+
+  await paymentsCollection.insertOne({
     userId,
     amount,
     currency,
@@ -29,5 +38,7 @@ export const createStripePayment = async (
 
   return paymentIntent.client_secret;
 };
+
+export { stripe, Payment };
 
 export { stripe, Payment };

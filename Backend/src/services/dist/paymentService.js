@@ -36,68 +36,39 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.getOrderById = exports.getOrders = void 0;
-var dbConfig_1 = require("../config/dbConfig"); // Import the connectDB utility
-var mongodb_1 = require("mongodb"); // Add this import
-// Function to retrieve all orders
-exports.getOrders = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
-    var db, ordersCollection, orders, error_1;
+exports.Payment = exports.stripe = exports.createStripePayment = void 0;
+var stripe_1 = require("stripe");
+var paymentModel_1 = require("../models/paymentModel");
+exports.Payment = paymentModel_1["default"];
+var dbConfig_1 = require("../config/dbConfig");
+var stripe = new stripe_1["default"](process.env.STRIPE_SECRET_KEY);
+exports.stripe = stripe;
+exports.createStripePayment = function (amount, currency, userId) { return __awaiter(void 0, void 0, void 0, function () {
+    var paymentIntent, db, paymentsCollection;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                _a.trys.push([0, 3, , 4]);
-                return [4 /*yield*/, dbConfig_1.connectDB()];
+            case 0: return [4 /*yield*/, stripe.paymentIntents.create({
+                    amount: amount,
+                    currency: currency,
+                    payment_method_types: ["card"]
+                })];
             case 1:
-                db = _a.sent();
-                ordersCollection = db.collection("orders");
-                return [4 /*yield*/, ordersCollection.find().toArray()];
-            case 2:
-                orders = _a.sent();
-                // Return the orders in the response
-                res.status(200).json(orders);
-                return [3 /*break*/, 4];
-            case 3:
-                error_1 = _a.sent();
-                console.error("Error fetching orders:", error_1);
-                res.status(500).json({ error: "Internal server error" });
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
-        }
-    });
-}); };
-exports.getOrderById = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
-    var id, db, ordersCollection, objectId, order, error_2;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                id = req.params.id;
-                if (!mongodb_1.ObjectId.isValid(id)) {
-                    res.status(400).json({ message: "Invalid order ID format" });
-                    return [2 /*return*/];
-                }
-                _a.label = 1;
-            case 1:
-                _a.trys.push([1, 4, , 5]);
+                paymentIntent = _a.sent();
                 return [4 /*yield*/, dbConfig_1.connectDB()];
             case 2:
                 db = _a.sent();
-                ordersCollection = db.collection("orders");
-                objectId = new mongodb_1.ObjectId(id);
-                return [4 /*yield*/, ordersCollection.findOne({ _id: objectId })];
+                paymentsCollection = db.collection("payments");
+                return [4 /*yield*/, paymentsCollection.insertOne({
+                        userId: userId,
+                        amount: amount,
+                        currency: currency,
+                        status: "Pending",
+                        method: "Stripe",
+                        transactionId: paymentIntent.id
+                    })];
             case 3:
-                order = _a.sent();
-                if (!order) {
-                    res.status(404).json({ message: "Order not found" });
-                    return [2 /*return*/];
-                }
-                res.status(200).json(order);
-                return [3 /*break*/, 5];
-            case 4:
-                error_2 = _a.sent();
-                console.error("Error fetching order:", error_2);
-                res.status(500).json({ message: "Failed to fetch order", error: error_2 });
-                return [3 /*break*/, 5];
-            case 5: return [2 /*return*/];
+                _a.sent();
+                return [2 /*return*/, paymentIntent.client_secret];
         }
     });
 }); };

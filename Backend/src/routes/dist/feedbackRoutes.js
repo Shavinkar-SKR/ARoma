@@ -36,68 +36,47 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.getOrderById = exports.getOrders = void 0;
-var dbConfig_1 = require("../config/dbConfig"); // Import the connectDB utility
-var mongodb_1 = require("mongodb"); // Add this import
-// Function to retrieve all orders
-exports.getOrders = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
-    var db, ordersCollection, orders, error_1;
+var express_1 = require("express");
+var feedbackController_1 = require("../controllers/feedbackController"); // Controller for feedback logic
+var router = express_1.Router();
+// Get all feedback
+router.get("/", function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
+    var error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                _a.trys.push([0, 3, , 4]);
-                return [4 /*yield*/, dbConfig_1.connectDB()];
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, feedbackController_1.getAllFeedback(req, res)];
             case 1:
-                db = _a.sent();
-                ordersCollection = db.collection("orders");
-                return [4 /*yield*/, ordersCollection.find().toArray()];
+                _a.sent();
+                return [3 /*break*/, 3];
             case 2:
-                orders = _a.sent();
-                // Return the orders in the response
-                res.status(200).json(orders);
-                return [3 /*break*/, 4];
-            case 3:
                 error_1 = _a.sent();
-                console.error("Error fetching orders:", error_1);
-                res.status(500).json({ error: "Internal server error" });
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
+                console.error("Error fetching feedback:", error_1);
+                res.status(500).json({ message: "Error fetching feedback" });
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
         }
     });
-}); };
-exports.getOrderById = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
-    var id, db, ordersCollection, objectId, order, error_2;
+}); });
+// Submit new feedback
+router.post("/", function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
+    var error_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                id = req.params.id;
-                if (!mongodb_1.ObjectId.isValid(id)) {
-                    res.status(400).json({ message: "Invalid order ID format" });
-                    return [2 /*return*/];
-                }
-                _a.label = 1;
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, feedbackController_1.submitFeedback(req, res)];
             case 1:
-                _a.trys.push([1, 4, , 5]);
-                return [4 /*yield*/, dbConfig_1.connectDB()];
+                _a.sent();
+                return [3 /*break*/, 3];
             case 2:
-                db = _a.sent();
-                ordersCollection = db.collection("orders");
-                objectId = new mongodb_1.ObjectId(id);
-                return [4 /*yield*/, ordersCollection.findOne({ _id: objectId })];
-            case 3:
-                order = _a.sent();
-                if (!order) {
-                    res.status(404).json({ message: "Order not found" });
-                    return [2 /*return*/];
-                }
-                res.status(200).json(order);
-                return [3 /*break*/, 5];
-            case 4:
                 error_2 = _a.sent();
-                console.error("Error fetching order:", error_2);
-                res.status(500).json({ message: "Failed to fetch order", error: error_2 });
-                return [3 /*break*/, 5];
-            case 5: return [2 /*return*/];
+                console.error("Error submitting feedback:", error_2);
+                res.status(500).json({ message: "Error submitting feedback" });
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
         }
     });
-}); };
+}); });
+exports["default"] = router;

@@ -36,7 +36,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.getOrders = exports.placeOrder = void 0;
+exports.updateOrderStatus = exports.getOrders = exports.deleteOrder = exports.placeOrder = void 0;
+var mongodb_1 = require("mongodb");
 var dbConfig_1 = require("../config/dbConfig"); // Import the connectDB utility
 // Function to place an order
 exports.placeOrder = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
@@ -49,19 +50,22 @@ exports.placeOrder = function (req, res) { return __awaiter(void 0, void 0, Prom
                 return [4 /*yield*/, dbConfig_1.connectDB()];
             case 1:
                 db = _b.sent();
-                ordersCollection = db.collection('orders');
+                ordersCollection = db.collection("orders");
                 newOrder = {
                     cartItems: cartItems,
                     specialInstructions: specialInstructions,
                     total: total,
-                    tableNumber: tableNumber
+                    tableNumber: tableNumber,
+                    status: "received"
                 };
                 return [4 /*yield*/, ordersCollection.insertOne(newOrder)];
             case 2:
                 result = _b.sent();
+                // Return the response with _id (insertedId) instead of orderId
                 res.status(201).json({
                     message: "Order placed successfully",
-                    orderId: result.insertedId
+                    _id: result.insertedId,
+                    status: newOrder.status
                 });
                 return [3 /*break*/, 4];
             case 3:
@@ -73,9 +77,49 @@ exports.placeOrder = function (req, res) { return __awaiter(void 0, void 0, Prom
         }
     });
 }); };
-// New function to get all orders
+// Function to delete an order
+exports.deleteOrder = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
+    var id, db, ordersCollection, objectId, result, error_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                id = req.params.id;
+                // Validate the ID
+                if (!mongodb_1.ObjectId.isValid(id)) {
+                    res.status(400).json({ message: "Invalid order ID" });
+                    return [2 /*return*/];
+                }
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 4, , 5]);
+                return [4 /*yield*/, dbConfig_1.connectDB()];
+            case 2:
+                db = _a.sent();
+                ordersCollection = db.collection("orders");
+                objectId = new mongodb_1.ObjectId(id);
+                return [4 /*yield*/, ordersCollection.deleteOne({ _id: objectId })];
+            case 3:
+                result = _a.sent();
+                // Check if the order was found and deleted
+                if (result.deletedCount === 0) {
+                    res.status(404).json({ message: "Order not found" });
+                    return [2 /*return*/];
+                }
+                // Respond with a success message
+                res.status(200).json({ message: "Order deleted successfully" });
+                return [3 /*break*/, 5];
+            case 4:
+                error_2 = _a.sent();
+                console.error("Error deleting order:", error_2);
+                res.status(500).json({ message: "Failed to delete order", error: error_2 });
+                return [3 /*break*/, 5];
+            case 5: return [2 /*return*/];
+        }
+    });
+}); };
+// Function to get all orders
 exports.getOrders = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
-    var db, ordersCollection, orders, error_2;
+    var db, ordersCollection, orders, error_3;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -83,18 +127,74 @@ exports.getOrders = function (req, res) { return __awaiter(void 0, void 0, Promi
                 return [4 /*yield*/, dbConfig_1.connectDB()];
             case 1:
                 db = _a.sent();
-                ordersCollection = db.collection('orders');
+                ordersCollection = db.collection("orders");
                 return [4 /*yield*/, ordersCollection.find().toArray()];
             case 2:
                 orders = _a.sent();
                 res.status(200).json(orders);
                 return [3 /*break*/, 4];
             case 3:
-                error_2 = _a.sent();
-                console.error("Error fetching orders:", error_2);
+                error_3 = _a.sent();
+                console.error("Error fetching orders:", error_3);
                 res.status(500).json({ error: "Internal server error" });
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
+        }
+    });
+}); };
+// Function to update order status
+exports.updateOrderStatus = function (req, res) { return __awaiter(void 0, void 0, Promise, function () {
+    var id, status, db, ordersCollection, objectId, result, error_4;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                id = req.params.id;
+                status = req.body.status;
+                // Validate status is present in the request
+                if (!status) {
+                    res.status(400).json({ message: "Status is required" });
+                    return [2 /*return*/];
+                }
+                // Validate the ID format
+                if (!mongodb_1.ObjectId.isValid(id)) {
+                    res.status(400).json({ message: "Invalid order ID format" });
+                    return [2 /*return*/];
+                }
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 4, , 5]);
+                return [4 /*yield*/, dbConfig_1.connectDB()];
+            case 2:
+                db = _a.sent();
+                ordersCollection = db.collection("orders");
+                objectId = new mongodb_1.ObjectId(id);
+                // Log the ID to ensure it's in the correct format
+                console.log("ID to update:", id);
+                return [4 /*yield*/, ordersCollection.findOneAndUpdate({ _id: objectId }, // Find by ObjectId
+                    { $set: { status: status } }, // Set the new status
+                    { returnDocument: "after" } // Return the updated document after the update
+                    )];
+            case 3:
+                result = _a.sent();
+                // Log the result of the update operation
+                console.log("Update result:", result);
+                // Check if result is null or doesn't have a value
+                if (!result || !result.value) {
+                    // If no order was found or updated, return 404
+                    res.status(404).json({ message: "Order not found" });
+                    return [2 /*return*/];
+                }
+                // Emit the updated order to all connected clients (real-time update)
+                //emitOrderUpdate(result.value);
+                // Respond with the updated order
+                res.status(200).json(result.value);
+                return [3 /*break*/, 5];
+            case 4:
+                error_4 = _a.sent();
+                console.error("Error updating order status:", error_4);
+                res.status(500).json({ message: "Failed to update order status", error: error_4 });
+                return [3 /*break*/, 5];
+            case 5: return [2 /*return*/];
         }
     });
 }); };
