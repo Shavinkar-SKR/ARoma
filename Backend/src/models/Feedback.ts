@@ -4,6 +4,8 @@ export interface Feedback {
   _id?: ObjectId;
   comment: string;
   rating: number;
-  createdAt?: Date;
+  username: string; 
+  restaurantName: string; 
+  createdAt?: Date;//didnt add
 }
 

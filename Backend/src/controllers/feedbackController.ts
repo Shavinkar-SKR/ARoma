@@ -20,9 +20,9 @@ export const getAllFeedback = async (req: Request, res: Response): Promise<void>
 // Submit new feedback
 export const submitFeedback = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { comment, rating } = req.body;
+    const { comment, rating, username, restaurantName } = req.body;
 
-    if (!comment || !rating) {
+    if (!comment || !rating || !username || !restaurantName) {
       res.status(400).json({ message: "All fields are required" });
       return;
     }
@@ -33,6 +33,8 @@ export const submitFeedback = async (req: Request, res: Response): Promise<void>
     const newFeedback: Feedback = {
       comment,
       rating,
+      username, 
+      restaurantName,
       createdAt: new Date(),
     };
 

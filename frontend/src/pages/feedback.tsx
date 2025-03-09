@@ -7,7 +7,7 @@ import { toast, Toaster } from "sonner";
 interface Feedback {
   _id: string;
   username: string;
-  restaurant: string;
+  restaurantName: string;
   comment: string;
   rating: number;
 }
@@ -16,6 +16,7 @@ const FeedbackPage: React.FC = () => {
   const navigate = useNavigate();
   const [feedbackList, setFeedbackList] = useState<Feedback[]>([]);
   const [username, setUsername] = useState("");
+  const [restaurantName, setRestaurantName] = useState("Ramen House");
   const [restaurant, setRestaurant] = useState("Ramen House");
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(5);
@@ -47,7 +48,7 @@ const FeedbackPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newFeedback = { username, restaurant, comment, rating };
+    const newFeedback = { username, restaurantName, comment, rating };
 
     try {
       const response = await fetch("http://localhost:5001/api/feedback", {
@@ -60,7 +61,7 @@ const FeedbackPage: React.FC = () => {
 
       toast.success("Feedback submitted!");
       setUsername("");
-      setRestaurant("Ramen House");
+      setRestaurantName("Ramen House");
       setComment("");
       setRating(5);
       fetchFeedback(); // Refresh feedback list
@@ -97,7 +98,7 @@ const FeedbackPage: React.FC = () => {
                 className="w-full p-2 border rounded"
               />
               <select
-                value={restaurant}
+                value={restaurantName}
                 onChange={(e) => setRestaurant(e.target.value)}
                 className="p-2 border rounded"
               >
@@ -137,7 +138,7 @@ const FeedbackPage: React.FC = () => {
             feedbackList.map((fb) => (
               <Card key={fb._id} className="mb-2">
                 <CardContent>
-                  <p><strong>{fb.username}</strong> - {fb.restaurant}</p>
+                  <p><strong>{fb.username}</strong> - {fb.restaurantName}</p>
                   <p>{fb.comment}</p>
                   <p className="text-sm text-gray-600">Rating: {fb.rating} ⭐</p>
                 </CardContent>
