@@ -16,10 +16,10 @@ const FeedbackPage: React.FC = () => {
   const navigate = useNavigate();
   const [feedbackList, setFeedbackList] = useState<Feedback[]>([]);
   const [username, setUsername] = useState("");
-  const [restaurantName, setRestaurantName] = useState("Ramen House");
-  const [restaurant, setRestaurant] = useState("Ramen House");
+  const [restaurantName, setRestaurantName] = useState("Ramen House"); // Used for form and submission
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(5);
+  const [filterRestaurant, setFilterRestaurant] = useState(""); // Used for filtering reviews
 
   const restaurants = [
     "Ramen House",
@@ -30,7 +30,7 @@ const FeedbackPage: React.FC = () => {
     "Pasta Paradise"
   ];
 
-  // Fetch existing feedback (if needed)
+  // Fetch existing feedback
   useEffect(() => {
     fetchFeedback();
   }, []);
@@ -70,6 +70,15 @@ const FeedbackPage: React.FC = () => {
     }
   };
 
+  // Filter feedback based on the selected restaurant
+  const filteredFeedback = filterRestaurant
+    ? feedbackList.filter((fb) => fb.restaurantName === filterRestaurant)
+    : feedbackList;
+
+  // Debugging: Log the filtered feedback and filter value
+  console.log("Filtered Feedback:", filteredFeedback);
+  console.log("Filter Restaurant:", filterRestaurant);
+
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-2xl mx-auto">
@@ -99,7 +108,7 @@ const FeedbackPage: React.FC = () => {
               />
               <select
                 value={restaurantName}
-                onChange={(e) => setRestaurant(e.target.value)}
+                onChange={(e) => setRestaurantName(e.target.value)} // Use restaurantName here
                 className="p-2 border rounded"
               >
                 {restaurants.map((rest) => (
@@ -134,8 +143,26 @@ const FeedbackPage: React.FC = () => {
         {/* Feedback List */}
         <div className="mt-6">
           <h2 className="text-xl font-semibold mb-2">Recent Feedback</h2>
-          {feedbackList.length > 0 ? (
-            feedbackList.map((fb) => (
+
+          {/* Add a filter dropdown for restaurants */}
+          <div className="mb-4">
+            <label htmlFor="filterRestaurant" className="mr-2">Filter by Restaurant:</label>
+            <select
+              id="filterRestaurant"
+              value={filterRestaurant}
+              onChange={(e) => setFilterRestaurant(e.target.value)}
+              className="p-2 border rounded"
+            >
+              <option value="">All Restaurants</option>
+              {restaurants.map((rest) => (
+                <option key={rest} value={rest}>{rest}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Display filtered feedback */}
+          {filteredFeedback.length > 0 ? (
+            filteredFeedback.map((fb) => (
               <Card key={fb._id} className="mb-2">
                 <CardContent>
                   <p><strong>{fb.username}</strong> - {fb.restaurantName}</p>
