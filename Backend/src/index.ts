@@ -10,7 +10,6 @@ import * as dotenv from "dotenv";
 import restaurantMenuRoutes from './routes/restaurantMenuRoutes';
 import feedbackRoutes from "./routes/feedbackRoutes";
 import { Order } from "./models/orderModel";
-// import payment from './routes/paymentRoutes'
 //import payment from './routes/paymentRoutes'
 
 
@@ -78,7 +77,6 @@ app.use("/api/carts", cartRoutes);
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/menus", menuRoutes);
 app.use('/api/restaurants', restaurantMenuRoutes);
-// app.use('/api/payment', payment);
 //app.use('/api/payment', payment);
 
 

@@ -144,14 +144,19 @@ var __generator = void 0 && (void 0).__generator || function (thisArg, body) {
 };
 
 exports.__esModule = true;
+exports.emitOrderUpdate = void 0;
 
 var cors = require("cors");
 
-var express_1 = require("express");
+var express = require("express");
 
 var http_1 = require("http");
 
-var mongodb_1 = require("mongodb");
+var socket_io_1 = require("socket.io");
+
+var bodyParser = require("body-parser");
+
+var dbConfig_1 = require("./config/dbConfig");
 
 var cartRoutes_1 = require("./routes/cartRoutes");
 
@@ -163,306 +168,53 @@ var menuRoutes_1 = require("./routes/menuRoutes");
 
 var dotenv = require("dotenv");
 
-var restaurantMenuRoutes_1 = require("./routes/restaurantMenuRoutes");
-
-var feedbackRoutes_1 = require("./routes/feedbackRoutes"); // import payment from './routes/paymentRoutes'
+var restaurantMenuRoutes_1 = require("./routes/restaurantMenuRoutes"); // import paymentRoutes from "./routes/paymentRoutes";
 
 
 dotenv.config();
-var MONGODB_URI = "mongodb+srv://root:root@aroma.ae0sb.mongodb.net/ARoma?retryWrites=true&w=majority&appName=ARoma&replicaSet=atlas-4uxo98-shard-0&tls=true";
-var app = express_1["default"]();
+var app = express();
 var PORT = process.env.PORT || 5001;
-var httpServer = http_1.createServer(app);
-var mongoOptions = {
-  maxPoolSize: 50,
-  minPoolSize: 2,
-  serverSelectionTimeoutMS: 30000,
-  socketTimeoutMS: 60000,
-  connectTimeoutMS: 30000,
-  waitQueueTimeoutMS: 10000,
-  retryWrites: true,
-  retryReads: true,
-  tls: true,
-  directConnection: false
-};
-var mongoClient = new mongodb_1.MongoClient(MONGODB_URI, mongoOptions);
+var httpServer = http_1.createServer(app); // Configure CORS for Socket.IO
+
+var io = new socket_io_1.Server(httpServer, {
+  cors: {
+    origin: ["http://localhost:5173", "http://localhost:3000"],
+    methods: ["GET", "POST", "PATCH", "DELETE", "PUT"]
+  }
+}); // Configure CORS for Express
+
 app.use(cors({
   origin: "http://localhost:5173",
   methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
   allowedHeaders: ["Content-Type"]
-}));
-var dbConnection = null;
-app.use(function (req, res, next) {
-  return __awaiter(void 0, void 0, void 0, function () {
-    var error_1;
-    return __generator(this, function (_a) {
-      switch (_a.label) {
-        case 0:
-          _a.trys.push([0, 3,, 4]);
+})); // Middleware to parse JSON bodies
 
-          if (!!dbConnection) return [3
-          /*break*/
-          , 2];
-          dbConnection = mongoClient.db("ARoma");
-          return [4
-          /*yield*/
-          , dbConnection.admin().ping()];
+app.use(express.json()); // Routes
 
-        case 1:
-          _a.sent();
-
-          _a.label = 2;
-
-        case 2:
-          req.db = dbConnection;
-          next();
-          return [3
-          /*break*/
-          , 4];
-
-        case 3:
-          error_1 = _a.sent();
-          console.error('Database connection error:', error_1);
-          res.status(500).send('Database connection failed');
-          return [3
-          /*break*/
-          , 4];
-
-        case 4:
-          return [2
-          /*return*/
-          ];
-      }
-    });
-  });
-});
-app.use(express_1["default"].json());
-app.use(express_1["default"].urlencoded({
-  extended: true
-}));
-app.use("/api/feedback", feedbackRoutes_1["default"]);
 app.use("/api/orders", orderRoutes_1["default"]);
 app.use("/api/carts", cartRoutes_1["default"]);
 app.use("/api/restaurants", restaurantRoutes_1["default"]);
-app.use("/api/menus", menuRoutes_1["default"]);
-app.use('/api/restaurants', restaurantMenuRoutes_1["default"]); // app.use('/api/payment', payment);
+app.use("/api/menus", menuRoutes_1["default"]); // app.use("/api/payment", paymentRoutes);
 
-var activeConnections = new Set();
-app.get('/order-events/:orderId', function (req, res) {
-  if (activeConnections.size >= 50) {
-    res.status(429).send('Too many connections');
-    return;
-  }
+app.use('/api/restaurants', restaurantMenuRoutes_1["default"]);
+app.use(bodyParser.json()); // WebSocket connection
 
-  var connectionId = Symbol();
-  activeConnections.add(connectionId);
-  res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
-  res.setHeader('Connection', 'keep-alive');
-  res.flushHeaders();
-
-  (function () {
-    return __awaiter(void 0, void 0, void 0, function () {
-      var db, order, changeStream_1, onChange_1, onError_1, err_1;
-      return __generator(this, function (_a) {
-        switch (_a.label) {
-          case 0:
-            _a.trys.push([0, 2,, 3]);
-
-            db = req.db;
-            return [4
-            /*yield*/
-            , db.collection('orders').findOne({
-              _id: new mongodb_1.ObjectId(req.params.orderId)
-            })];
-
-          case 1:
-            order = _a.sent();
-
-            if (!order) {
-              res.write('event: error\ndata: Order not found\n\n');
-              res.end();
-              return [2
-              /*return*/
-              ];
-            }
-
-            res.write("event: initial\ndata: " + JSON.stringify(order) + "\n\n");
-            changeStream_1 = db.collection('orders').watch([{
-              $match: {
-                'fullDocument._id': new mongodb_1.ObjectId(req.params.orderId),
-                operationType: {
-                  $in: ['update', 'replace']
-                }
-              }
-            }], {
-              fullDocument: 'updateLookup'
-            });
-
-            onChange_1 = function onChange_1(change) {
-              if (change.operationType === 'update' && change.fullDocument) {
-                res.write("event: update\ndata: " + JSON.stringify(change.fullDocument) + "\n\n");
-              }
-            };
-
-            onError_1 = function onError_1(error) {
-              console.error('Change stream error:', error);
-              res.end();
-            };
-
-            changeStream_1.on('change', onChange_1);
-            changeStream_1.on('error', onError_1);
-            req.on('close', function () {
-              activeConnections["delete"](connectionId);
-              changeStream_1.off('change', onChange_1);
-              changeStream_1.off('error', onError_1);
-              changeStream_1.close();
-            });
-            return [3
-            /*break*/
-            , 3];
-
-          case 2:
-            err_1 = _a.sent();
-            console.error('SSE connection error:', err_1);
-            res.write('event: error\ndata: Failed to fetch order\n\n');
-            res.end();
-            return [3
-            /*break*/
-            , 3];
-
-          case 3:
-            return [2
-            /*return*/
-            ];
-        }
-      });
-    });
-  })();
-});
-
-var connectWithRetry = function connectWithRetry(attempt) {
-  if (attempt === void 0) {
-    attempt = 1;
-  }
-
-  return __awaiter(void 0, void 0, Promise, function () {
-    var error_2;
-    return __generator(this, function (_a) {
-      switch (_a.label) {
-        case 0:
-          _a.trys.push([0, 3,, 6]);
-
-          return [4
-          /*yield*/
-          , mongoClient.connect()];
-
-        case 1:
-          _a.sent();
-
-          console.log("Connected to MongoDB Atlas");
-          return [4
-          /*yield*/
-          , mongoClient.db().admin().ping()];
-
-        case 2:
-          _a.sent();
-
-          console.log("Database connection verified");
-          setInterval(function () {
-            return __awaiter(void 0, void 0, void 0, function () {
-              var pingError_1;
-              return __generator(this, function (_a) {
-                switch (_a.label) {
-                  case 0:
-                    _a.trys.push([0, 2,, 4]);
-
-                    return [4
-                    /*yield*/
-                    , mongoClient.db().command({
-                      ping: 1
-                    })];
-
-                  case 1:
-                    _a.sent();
-
-                    return [3
-                    /*break*/
-                    , 4];
-
-                  case 2:
-                    pingError_1 = _a.sent();
-                    console.error('Connection heartbeat failed:', pingError_1);
-                    return [4
-                    /*yield*/
-                    , mongoClient.close()];
-
-                  case 3:
-                    _a.sent();
-
-                    connectWithRetry();
-                    return [3
-                    /*break*/
-                    , 4];
-
-                  case 4:
-                    return [2
-                    /*return*/
-                    ];
-                }
-              });
-            });
-          }, 15000);
-          return [3
-          /*break*/
-          , 6];
-
-        case 3:
-          error_2 = _a.sent();
-          console.error("Connection attempt " + attempt + " failed:", error_2);
-          if (!(attempt < 5)) return [3
-          /*break*/
-          , 5];
-          return [4
-          /*yield*/
-          , new Promise(function (resolve) {
-            return setTimeout(resolve, Math.pow(2, attempt) * 1000);
-          })];
-
-        case 4:
-          _a.sent();
-
-          return [2
-          /*return*/
-          , connectWithRetry(attempt + 1)];
-
-        case 5:
-          console.error("Critical connection failure after 5 attempts");
-          process.exit(1);
-          return [3
-          /*break*/
-          , 6];
-
-        case 6:
-          return [2
-          /*return*/
-          ];
-      }
-    });
+io.on("connection", function (socket) {
+  console.log("Client connected:", socket.id);
+  socket.on("disconnect", function () {
+    console.log("Client disconnected:", socket.id);
   });
+}); // Function to emit order updates via WebSocket
+
+var emitOrderUpdate = function emitOrderUpdate(updatedOrder) {
+  io.emit("orderUpdated", updatedOrder);
 };
 
-process.on('uncaughtException', function (error) {
-  console.error('Uncaught Exception:', error);
-  process.exit(1);
-});
-process.on('unhandledRejection', function (reason, promise) {
-  console.error('Unhandled Rejection at:', promise, 'Reason:', reason);
-});
+exports.emitOrderUpdate = emitOrderUpdate; // Start the server
 
 var startServer = function startServer() {
   return __awaiter(void 0, void 0, void 0, function () {
-    var error_3;
+    var error_1;
     return __generator(this, function (_a) {
       switch (_a.label) {
         case 0:
@@ -470,43 +222,22 @@ var startServer = function startServer() {
 
           return [4
           /*yield*/
-          , connectWithRetry()];
+          , dbConfig_1.connectDB()];
 
         case 1:
           _a.sent();
 
+          console.log("Connected to the database");
           httpServer.listen(PORT, function () {
-            console.log("Server running on port " + PORT);
-            console.log("SSE endpoint: http://localhost:" + PORT + "/order-events/:orderId");
-          });
-          process.on('SIGINT', function () {
-            return __awaiter(void 0, void 0, void 0, function () {
-              return __generator(this, function (_a) {
-                switch (_a.label) {
-                  case 0:
-                    return [4
-                    /*yield*/
-                    , mongoClient.close()];
-
-                  case 1:
-                    _a.sent();
-
-                    console.log('MongoDB connection closed');
-                    process.exit(0);
-                    return [2
-                    /*return*/
-                    ];
-                }
-              });
-            });
+            console.log("Server is running on port " + PORT);
           });
           return [3
           /*break*/
           , 3];
 
         case 2:
-          error_3 = _a.sent();
-          console.error("Fatal connection error:", error_3);
+          error_1 = _a.sent();
+          console.error("Failed to connect to the database:", error_1);
           process.exit(1);
           return [3
           /*break*/
