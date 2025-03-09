@@ -147,7 +147,13 @@ const FAQPage: React.FC = () => {
 
       {/* Footer Section */}
       <footer className="bg-gray-900 text-white text-center p-6 mt-8">
-        <h2 className="text-xl font-semibold mb-2">About Us</h2>
+        <h2 className="text-xl font-semibold mb-2">
+        <a href="/about"  className="text-blue-400 hover:underline">
+				About Us
+			  </a>
+          
+        </h2>
+
         <p className="text-gray-400 text-sm mb-4">
           We provide digitalized solutions to enhance your dining experience.
         </p>
