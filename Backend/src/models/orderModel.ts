@@ -14,6 +14,8 @@ export interface Order {
   total: number;
   tableNumber: string;
   status?: "received" | "preparing" | "ready" | "complete";
+  estimatedTime?: number; 
+
 }
 
 const orderSchema = new Schema<Order & Document>({
