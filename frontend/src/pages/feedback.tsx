@@ -81,11 +81,20 @@ const FeedbackPage: React.FC = () => {
     ? feedbackList.filter((fb) => fb.restaurantName === filterRestaurant)
     : feedbackList;
 
-  // FBF: Get the image URL for the selected restaurant in the filter dropdown
+  // CA: Get the image URL for the selected restaurant in the filter dropdown
   const selectedRestaurant = restaurants.find(
     (rest) => rest.name === filterRestaurant
   );
   const selectedRestaurantImage = selectedRestaurant?.image || "";
+
+  // CA: Calculate the average rating for the selected restaurant
+  const averageRating =
+    filteredFeedback.length > 0
+      ? (
+          filteredFeedback.reduce((sum, fb) => sum + fb.rating, 0) /
+          filteredFeedback.length
+        ).toFixed(1) // Round to 1 decimal place
+      : "No ratings yet";
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -150,7 +159,7 @@ const FeedbackPage: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Restaurant Image */}
+        {/* Restaurant Image and Details */}
         {selectedRestaurantImage && (
           <div className="mt-6">
             <img
@@ -158,6 +167,13 @@ const FeedbackPage: React.FC = () => {
               alt={filterRestaurant}
               className="w-full h-48 object-cover rounded-lg"
             />
+            {/* CA: Restaurant Name and Average Rating */}
+            <div className="mt-4 text-center">
+              <h3 className="text-xl font-semibold">{filterRestaurant}</h3>
+              <p className="text-gray-600">
+                Average Rating: {averageRating} ⭐
+              </p>
+            </div>
           </div>
         )}
 
