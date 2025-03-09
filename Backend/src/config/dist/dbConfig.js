@@ -38,7 +38,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.connectDB = void 0;
 var mongodb_1 = require("mongodb");
-var config_1 = require("../../config");
 var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017";
 var DB_NAME = process.env.DB_NAME || "ARoma";
 exports.connectDB = function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -46,12 +45,11 @@ exports.connectDB = function () { return __awaiter(void 0, void 0, void 0, funct
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                console.log("Connecting to MongoDB with URI:", config_1.config.MONGODB_URI);
-                client = new mongodb_1.MongoClient(config_1.config.MONGODB_URI);
+                client = new mongodb_1.MongoClient(MONGODB_URI);
                 return [4 /*yield*/, client.connect()];
             case 1:
                 _a.sent();
-                db = client.db(config_1.config.DB_NAME);
+                db = client.db(DB_NAME);
                 return [2 /*return*/, db];
         }
     });
