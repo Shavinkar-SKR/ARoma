@@ -25,3 +25,4 @@
 //   return paymentIntent.client_secret;
 // };
 // export { stripe, Payment };
+// changes made in files 
