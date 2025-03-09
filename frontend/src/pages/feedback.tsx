@@ -12,6 +12,11 @@ interface Feedback {
   rating: number;
 }
 
+interface Restaurant {
+  name: string;
+  image: string;
+}
+
 const FeedbackPage: React.FC = () => {
   const navigate = useNavigate();
   const [feedbackList, setFeedbackList] = useState<Feedback[]>([]);
@@ -21,13 +26,14 @@ const FeedbackPage: React.FC = () => {
   const [rating, setRating] = useState(5);
   const [filterRestaurant, setFilterRestaurant] = useState(""); // Used for filtering reviews
 
+  // Hardcoded restaurant data (name and image URL)
   const restaurants = [
-    "Ramen House",
-    "Spice Island",
-    "Dragon Wok",
-    "La Pizzeria",
-    "Sushi Delight",
-    "Pasta Paradise"
+    { name: "Ramen House", image: "https://i1i1.io/3H7rg12.jpg" },
+    { name: "Spice Island", image: "https://i1i1.io/3H7rP89.jpg" },
+    { name: "Dragon Wok", image: "https://example.com/dragon-wok.jpg" },
+    { name: "La Pizzeria", image: "https://example.com/la-pizzeria.jpg" },
+    { name: "Sushi Delight", image: "https://example.com/sushi-delight.jpg" },
+    { name: "Pasta Paradise", image: "https://example.com/pasta-paradise.jpg" },
   ];
 
   // Fetch existing feedback
@@ -75,9 +81,11 @@ const FeedbackPage: React.FC = () => {
     ? feedbackList.filter((fb) => fb.restaurantName === filterRestaurant)
     : feedbackList;
 
-  // Debugging: Log the filtered feedback and filter value
-  console.log("Filtered Feedback:", filteredFeedback);
-  console.log("Filter Restaurant:", filterRestaurant);
+  // FBF: Get the image URL for the selected restaurant in the filter dropdown
+  const selectedRestaurant = restaurants.find(
+    (rest) => rest.name === filterRestaurant
+  );
+  const selectedRestaurantImage = selectedRestaurant?.image || "";
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -108,11 +116,13 @@ const FeedbackPage: React.FC = () => {
               />
               <select
                 value={restaurantName}
-                onChange={(e) => setRestaurantName(e.target.value)} // Use restaurantName here
+                onChange={(e) => setRestaurantName(e.target.value)}
                 className="p-2 border rounded"
               >
                 {restaurants.map((rest) => (
-                  <option key={rest} value={rest}>{rest}</option>
+                  <option key={rest.name} value={rest.name}>
+                    {rest.name}
+                  </option>
                 ))}
               </select>
               <textarea
@@ -140,6 +150,17 @@ const FeedbackPage: React.FC = () => {
           </CardContent>
         </Card>
 
+        {/* Restaurant Image */}
+        {selectedRestaurantImage && (
+          <div className="mt-6">
+            <img
+              src={selectedRestaurantImage}
+              alt={filterRestaurant}
+              className="w-full h-48 object-cover rounded-lg"
+            />
+          </div>
+        )}
+
         {/* Feedback List */}
         <div className="mt-6">
           <h2 className="text-xl font-semibold mb-2">Recent Feedback</h2>
@@ -155,7 +176,9 @@ const FeedbackPage: React.FC = () => {
             >
               <option value="">All Restaurants</option>
               {restaurants.map((rest) => (
-                <option key={rest} value={rest}>{rest}</option>
+                <option key={rest.name} value={rest.name}>
+                  {rest.name}
+                </option>
               ))}
             </select>
           </div>
