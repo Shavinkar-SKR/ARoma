@@ -40,7 +40,7 @@ const staticFAQs = [
   },
   {
     section: "Leaving Feedback",
-    video: "/cd/feedback_video.mp4", // Updated video path
+    video: "/cd/howto_feedback.mp4", // Updated video path
     description: "Learn how to leave feedback about your order or experience.",
     content: (
       <div className="space-y-4">
@@ -58,7 +58,7 @@ const staticFAQs = [
           <video
             controls
             className="w-full h-full object-cover"
-            src="/cd/feedback_video.mp4" // Path to the video
+            src="/cd/howto_feedback.mp4" // Path to the video
             title="Leaving Feedback Tutorial"
           >
             Your browser does not support the video tag.
