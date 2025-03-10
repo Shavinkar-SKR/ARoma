@@ -42,7 +42,7 @@ const AdminServiceRequestPanel = () => {
       {/* Top Bar */}
       <div className="bg-red-600 text-white p-4 flex justify-between items-center shadow-md">
         <h1 className="text-2xl font-semibold tracking-wide">Admin Dashboard</h1>
-        <img src="/path/to/logo.png" alt="Logo" className="h-12" />
+        <img src="/images/logoARoma1.gif" alt="Logo" className="h-12" />
       </div>
 
       {/* Admin Dashboard Content */}
