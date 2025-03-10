@@ -40,8 +40,35 @@ const staticFAQs = [
   },
   {
     section: "Leaving Feedback",
-    video: "https://www.example.com/video-feedback",
-    description: "How to leave feedback about your order or experience."
+    video: "/cd/feedback_video.mp4", // Updated video path
+    description: "Learn how to leave feedback about your order or experience.",
+    content: (
+      <div className="space-y-4">
+        <h3 className="text-xl font-semibold">How to Leave Feedback</h3>
+        <p className="text-gray-700">
+          Follow these simple steps to share your thoughts and help us improve:
+        </p>
+        <ol className="list-decimal list-inside text-gray-700">
+          <li>Navigate to the Feedback page.</li>
+          <li>Select the restaurant you visited.</li>
+          <li>Rate your experience and leave a comment.</li>
+          <li>Submit your feedback.</li>
+        </ol>
+        <div className="w-full h-64 bg-gray-100 flex items-center justify-center">
+          <video
+            controls
+            className="w-full h-full object-cover"
+            src="/cd/feedback_video.mp4" // Path to the video
+            title="Leaving Feedback Tutorial"
+          >
+            Your browser does not support the video tag.
+          </video>
+        </div>
+        <p className="text-gray-600 text-sm">
+          Watch the video above for a step-by-step guide on leaving feedback.
+        </p>
+      </div>
+    ),
   },
   {
     section: "How to Contact Us",
@@ -54,7 +81,6 @@ const FAQPage: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [faqOpen, setFaqOpen] = useState(false);
 
-  // Function to close the dropdown menu after clicking a link
   const handleMenuClick = () => {
     setMenuOpen(false);
   };
@@ -63,13 +89,10 @@ const FAQPage: React.FC = () => {
     <div className="min-h-screen bg-gray-100">
       {/* Top Navigation Bar */}
       <nav className="bg-gray-900 text-white p-4 flex justify-between items-center">
-        {/* Logo Section */}
         <div className="flex items-center gap-3">
           <img src="/cd/logo.gif" alt="Aroma Logo" className="h-10 w-auto" />
           <span className="text-xl font-bold">Aroma</span> 
         </div>
-
-        {/* Menu Toggle Button */}
         <button onClick={() => setMenuOpen(!menuOpen)} className="text-white text-2xl">
           {menuOpen ? <FaTimes /> : <FaBars />}
         </button>
@@ -81,8 +104,8 @@ const FAQPage: React.FC = () => {
           {staticFAQs.map((faq, index) => (
             <a
               key={index}
-              href={`#${faq.section.replace(/\s+/g, "-").toLowerCase()}`} // Convert section name to ID
-              onClick={handleMenuClick} // Close the menu after clicking
+              href={`#${faq.section.replace(/\s+/g, "-").toLowerCase()}`}
+              onClick={handleMenuClick}
               className="block py-2 hover:underline cursor-pointer"
             >
               {faq.section}
@@ -105,9 +128,6 @@ const FAQPage: React.FC = () => {
         <p className="text-gray-700 mt-2 text-lg font-semibold">
           Bringing Digitalized Solutions to Your Dining Experience
         </p>
-        <p className="text-gray-600 mt-2">
-          {/* Add detailed explanation about the app here later */}
-        </p>
       </div>
 
       {/* Intro Section */}
@@ -127,10 +147,14 @@ const FAQPage: React.FC = () => {
               <CardTitle>{faq.section}</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="w-full h-48 bg-gray-300 flex items-center justify-center mb-2">
-                <p className="text-gray-500">[Embed video here]</p>
-              </div>
-              <p>{faq.description}</p>
+              {faq.content || ( // Render custom content if available
+                <>
+                  <div className="w-full h-48 bg-gray-300 flex items-center justify-center mb-2">
+                    <p className="text-gray-500">[Embed video here]</p>
+                  </div>
+                  <p>{faq.description}</p>
+                </>
+              )}
             </CardContent>
           </Card>
         ))}
@@ -165,25 +189,19 @@ const FAQPage: React.FC = () => {
         <p className="text-gray-400 text-sm mb-4">
           We provide digitalized solutions to enhance your dining experience.
         </p>
-
-        {/* Social Media Links */}
         <div className="flex justify-center gap-6">
           <a href="https://www.instagram.com/aroma_offcial/?igsh=YzljYTk1ODg3Zg%3D%3D#" target="_blank" rel="noopener noreferrer">
             <FaInstagram size={24} className="cursor-pointer hover:text-gray-400 transition duration-300" />
           </a>
-
           <a href="#" target="_blank" rel="noopener noreferrer">
             <FaTiktok size={24} className="cursor-pointer hover:text-gray-400 transition duration-300" />
           </a>
-
           <a href="#">
             <FaEnvelope size={24} className="cursor-pointer hover:text-gray-400 transition duration-300" />
           </a>
-
           <a href="#" target="_blank" rel="noopener noreferrer">
             <FaLinkedin size={24} className="cursor-pointer hover:text-gray-400 transition duration-300" />
           </a>
-
           <a href="#" target="_blank" rel="noopener noreferrer">
             <FaFacebook size={24} className="cursor-pointer hover:text-gray-400 transition duration-300" />
           </a>
