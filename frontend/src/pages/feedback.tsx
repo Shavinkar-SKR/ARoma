@@ -14,7 +14,7 @@ interface Feedback {
 
 interface Restaurant {
   name: string;
-  image: string;
+  image: string; // Path to the restaurant image
 }
 
 const FeedbackPage: React.FC = () => {
@@ -28,12 +28,12 @@ const FeedbackPage: React.FC = () => {
 
   // Hardcoded restaurant data (name and image URL)
   const restaurants = [
-    { name: "Ramen House", image: "https://i1i1.io/3H7rg12.jpg" },
-    { name: "Spice Island", image: "https://i1i1.io/3H7rP89.jpg" },
-    { name: "Dragon Wok", image: "https://example.com/dragon-wok.jpg" },
-    { name: "La Pizzeria", image: "https://example.com/la-pizzeria.jpg" },
-    { name: "Sushi Delight", image: "https://example.com/sushi-delight.jpg" },
-    { name: "Pasta Paradise", image: "https://example.com/pasta-paradise.jpg" },
+    { name: "Ramen House", image: "/cd/ramen_house.webp" },
+    { name: "Spice Island", image: "/cd/spice_island.webp" },
+    { name: "Dragon Wok", image: "/cd/dragon_wok.webp" },
+    { name: "La Pizzeria", image: "/cd/la_pizzeria.webp" },
+    { name: "Sushi Delight", image: "/cd/sushi_delight.webp" },
+    { name: "Pasta Paradise", image: "/cd/pasta_paradise.webp" },
   ];
 
   // Fetch existing feedback
@@ -169,7 +169,7 @@ const FeedbackPage: React.FC = () => {
         {selectedRestaurantImage && (
           <div className="mt-6">
             <img
-              src={selectedRestaurantImage}
+              src={selectedRestaurantImage} // Dynamically load the restaurant image
               alt={filterRestaurant}
               className="w-full h-48 object-cover rounded-lg"
             />
