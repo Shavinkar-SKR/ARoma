@@ -19,10 +19,47 @@ const staticFAQs = [
     description: "Learn how to navigate the home page and find key features."
   },
   {
-    section: "Browsing Restaurants and menus",
-    video: "https://www.example.com/video-restaurants",
-    description: "A guide to exploring restaurants and finding the best meals."
-  },
+  section: "browsing restaurants and menus",
+  video: "/cd/howto_browse.mp4", // Ensure the correct video path
+  description: "how to view and browse ",
+  content: (
+    <div className="space-y-6 flex flex-col md:flex-row items-center md:items-start p-6 md:space-x-10">
+
+      {/* Video (Left Side) */}
+      <div className="w-full md:w-1/2 flex justify-center">
+        <div className="w-70 h-120 bg-gray-200 rounded-lg overflow-hidden shadow-lg">
+          <video
+            controls
+            className="w-full h-full object-cover"
+            src="/cd/howto_browse.mp4"
+            title="Leaving Feedback Tutorial"
+          >
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
+
+      {/* Instructions (Right Side) */}
+      <div className="w-full md:w-1/2 space-y-4">
+        <h3 className="text-2xl font-bold text-gray-900">
+          How to browse a resturant 
+        </h3>
+        <ul className="list-none text-gray-700 space-y-2">
+          <li>
+            <strong className="text-lg">Step 1:</strong> browse through scrolling our selection
+			of resturants
+          </li>
+          <li>
+            <strong className="text-lg">Step 2:</strong> serach a resturant by name 
+          </li>
+          <li>
+            <strong className="text-lg">Step 3:</strong> search a restuarant by catagory 
+          </li>
+        </ul>
+      </div>
+    </div>
+  ),
+},
 
   {
   section: "placing an order",
@@ -191,9 +228,7 @@ const FAQPage: React.FC = () => {
       <div className="max-w-3xl mx-auto text-center p-6">
         <h1 className="text-3xl font-bold mb-4">How to Use Aroma</h1>
         <p className="text-gray-700 mb-4">Watch the video below to understand how our app works.</p>
-        <div className="w-full h-64 bg-gray-300 flex items-center justify-center">
-          <p className="text-gray-500">[Embed video here]</p>
-        </div>
+        
       </div>
 
       {/* FAQ Sections */}
