@@ -19,25 +19,69 @@ const staticFAQs = [
     description: "Learn how to navigate the home page and find key features."
   },
   {
-    section: "Browsing Restaurants",
+    section: "Browsing Restaurants and menus",
     video: "https://www.example.com/video-restaurants",
     description: "A guide to exploring restaurants and finding the best meals."
   },
+
   {
-    section: "Viewing Digital Menu",
-    video: "https://www.example.com/video-menu",
-    description: "How to check restaurant menus and filter items based on preferences."
-  },
-  {
-    section: "Placing an Order",
-    video: "https://www.example.com/video-order",
-    description: "Step-by-step instructions for placing an order."
-  },
-  {
-    section: "Making an Online Purchase",
-    video: "https://www.example.com/video-payment",
-    description: "Secure payment methods and completing your purchase."
-  },
+  section: "placing an order",
+  video: "howto_order.mp4", 
+  description: "Learn how to leave feedback about your order or experience.",
+  content: (
+    <div className="space-y-6 flex flex-col md:flex-row items-center md:items-start p-6 md:space-x-10">
+
+      {/* Video (Left Side) */}
+      <div className="w-full md:w-1/2 flex justify-center">
+        <div className="w-70 h-120 bg-gray-200 rounded-lg overflow-hidden shadow-lg">
+          <video
+            controls
+            className="w-full h-full object-cover"
+            src="/cd/howto_order.mp4"
+            title="how to place an order"
+          >
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
+
+      {/* Instructions (Right Side) */}
+      <div className="w-full md:w-1/2 space-y-4">
+        <h3 className="text-2xl font-bold text-gray-900">
+          How to place an order
+        </h3>
+        <ul className="list-none text-gray-700 space-y-2">
+          <li>
+            <strong className="text-lg">Step 1:</strong> select a restuarant of choice 
+			and click view menu 
+          </li>
+          <li>
+            <strong className="text-lg">Step 2:</strong> pick a dish and click add to cart
+          </li>
+          <li>
+            <strong className="text-lg">Step 3:</strong> view cart 
+          </li>
+		  <li>
+            <strong className="text-lg">Step 4:</strong> edit the order in the cart (optional)
+          </li>
+		  <li>
+            <strong className="text-lg">Step 5:</strong> proceed to checkout
+          </li>
+		  <li>
+            <strong className="text-lg">Step 6:</strong> give your table number 
+			and instructions (optional). 
+		  </li>
+		  <li>
+            <strong className="text-lg">Step 7:</strong> click process payment  
+		  </li>
+        </ul>
+      </div>
+    </div>
+  ),
+},
+
+  
+  //
   {
   section: "Leaving Feedback",
   video: "/cd/howto_feedback.mp4", // Ensure the correct video path
@@ -80,7 +124,7 @@ const staticFAQs = [
   ),
 },
 
-
+//
 
 
   {
