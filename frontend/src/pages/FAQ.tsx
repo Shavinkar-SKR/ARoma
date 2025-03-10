@@ -54,6 +54,11 @@ const FAQPage: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [faqOpen, setFaqOpen] = useState(false);
 
+  // Function to close the dropdown menu after clicking a link
+  const handleMenuClick = () => {
+    setMenuOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Top Navigation Bar */}
@@ -74,9 +79,14 @@ const FAQPage: React.FC = () => {
       {menuOpen && (
         <div className="bg-gray-800 text-white p-4 absolute top-16 left-0 w-full shadow-lg">
           {staticFAQs.map((faq, index) => (
-            <p key={index} className="py-2 hover:underline cursor-pointer" onClick={() => setMenuOpen(false)}>
+            <a
+              key={index}
+              href={`#${faq.section.replace(/\s+/g, "-").toLowerCase()}`} // Convert section name to ID
+              onClick={handleMenuClick} // Close the menu after clicking
+              className="block py-2 hover:underline cursor-pointer"
+            >
               {faq.section}
-            </p>
+            </a>
           ))}
         </div>
       )}
@@ -112,7 +122,7 @@ const FAQPage: React.FC = () => {
       {/* FAQ Sections */}
       <div className="max-w-3xl mx-auto p-6">
         {staticFAQs.map((faq, index) => (
-          <Card key={index} className="mb-3">
+          <Card key={index} id={faq.section.replace(/\s+/g, "-").toLowerCase()} className="mb-3">
             <CardHeader>
               <CardTitle>{faq.section}</CardTitle>
             </CardHeader>
@@ -148,12 +158,10 @@ const FAQPage: React.FC = () => {
       {/* Footer Section */}
       <footer className="bg-gray-900 text-white text-center p-6 mt-8">
         <h2 className="text-xl font-semibold mb-2">
-        <a href="https://aromaofficials.com "  className="text-blue-400 hover:underline">
-				About Us
-			  </a>
-          
+          <a href="/about" className="text-blue-400 hover:underline">
+            About Us
+          </a>
         </h2>
-
         <p className="text-gray-400 text-sm mb-4">
           We provide digitalized solutions to enhance your dining experience.
         </p>
