@@ -39,37 +39,49 @@ const staticFAQs = [
     description: "Secure payment methods and completing your purchase."
   },
   {
-    section: "Leaving Feedback",
-    video: "/cd/howto_feedback.mp4", // Updated video path
-    description: "Learn how to leave feedback about your order or experience.",
-    content: (
-      <div className="space-y-4">
-        <h3 className="text-xl font-semibold">How to Leave Feedback</h3>
-        <p className="text-gray-700">
-          Follow these simple steps to share your thoughts and help us improve:
-        </p>
-        <ol className="list-decimal list-inside text-gray-700">
-          <li>Navigate to the Feedback page.</li>
-          <li>Select the restaurant you visited.</li>
-          <li>Rate your experience and leave a comment.</li>
-          <li>Submit your feedback.</li>
-        </ol>
-        <div className="w-full h-64 bg-gray-100 flex items-center justify-center">
+  section: "Leaving Feedback",
+  video: "/cd/howto_feedback.mp4", // Ensure the correct video path
+  description: "Learn how to leave feedback about your order or experience.",
+  content: (
+    <div className="space-y-6 flex flex-col md:flex-row items-center">
+      {/* Video (Left Side) */}
+      <div className="w-full md:w-1/2 flex justify-center">
+        <div className="w-56 h-96 bg-gray-200 rounded-lg overflow-hidden shadow-lg">
           <video
             controls
             className="w-full h-full object-cover"
-            src="/cd/howto_feedback.mp4" // Path to the video
+            src="/cd/howto_feedback.mp4"
             title="Leaving Feedback Tutorial"
           >
             Your browser does not support the video tag.
           </video>
         </div>
-        <p className="text-gray-600 text-sm">
-          Watch the video above for a step-by-step guide on leaving feedback.
-        </p>
       </div>
-    ),
-  },
+
+      {/* Instructions (Right Side) */}
+      <div className="w-full md:w-1/2 space-y-4">
+        <h3 className="text-2xl font-bold text-gray-900">
+          How to Leave a Feedback
+        </h3>
+        <ul className="list-none text-gray-700 space-y-2">
+          <li>
+            <strong className="text-lg">Step 1:</strong> Fill the submit form.
+          </li>
+          <li>
+            <strong className="text-lg">Step 2:</strong> Click the submit button.
+          </li>
+          <li>
+            <strong className="text-lg">Step 3:</strong> Check for a successful submission message.
+          </li>
+        </ul>
+      </div>
+    </div>
+  ),
+},
+
+
+
+
   {
     section: "How to Contact Us",
     video: "https://www.example.com/video-contact",
