@@ -43,10 +43,11 @@ const staticFAQs = [
   video: "/cd/howto_feedback.mp4", // Ensure the correct video path
   description: "Learn how to leave feedback about your order or experience.",
   content: (
-    <div className="space-y-6 flex flex-col md:flex-row items-center">
+    <div className="space-y-6 flex flex-col md:flex-row items-center md:items-start p-6 md:space-x-10">
+
       {/* Video (Left Side) */}
       <div className="w-full md:w-1/2 flex justify-center">
-        <div className="w-56 h-96 bg-gray-200 rounded-lg overflow-hidden shadow-lg">
+        <div className="w-70 h-120 bg-gray-200 rounded-lg overflow-hidden shadow-lg">
           <video
             controls
             className="w-full h-full object-cover"
