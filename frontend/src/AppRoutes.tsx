@@ -9,6 +9,7 @@ import DigitalMenuPage from "./pages/digital-menu";
 import FeedbackPage from "./pages/feedback";
 import FAQPage from "./pages/FAQ";
 import ServiceRequest from "./pages/service";
+import AdminServiceRequestPanel from "./pages/adminServiceRequestPanel";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -20,6 +21,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/feedback" element={<FeedbackPage />} />
       <Route path="/faq" element={<FAQPage />} />
       <Route path="/service" element={<ServiceRequest />} />
+      <Route path="/adminServiceRequestPanel" element={<AdminServiceRequestPanel />} />
       
       <Route
         path="restaurant-selection"
