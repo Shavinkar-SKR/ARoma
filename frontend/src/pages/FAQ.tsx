@@ -274,7 +274,7 @@ const FAQPage: React.FC = () => {
       {/* Footer Section */}
       <footer className="bg-gray-900 text-white text-center p-6 mt-8">
         <h2 className="text-xl font-semibold mb-2">
-          <a href="/about" className="text-blue-400 hover:underline">
+          <a href="https://aromaofficials.com/" className="text-blue-400 hover:underline">
             About Us
           </a>
         </h2>
