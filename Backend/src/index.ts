@@ -10,6 +10,8 @@ import * as dotenv from "dotenv";
 import restaurantMenuRoutes from './routes/restaurantMenuRoutes';
 import feedbackRoutes from "./routes/feedbackRoutes";
 import serviceRequestRoutes from "./routes/serviceRequestRoutes";
+import salesRoutes from "./routes/salesRoutes";
+import staffRoutes from "./routes/staffRoutes";
 import { Order } from "./models/orderModel";
 //import payment from './routes/paymentRoutes'
 
@@ -79,6 +81,8 @@ app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/menus", menuRoutes);
 app.use('/api/restaurants', restaurantMenuRoutes);
 app.use("/api/requests", serviceRequestRoutes);
+app.use("/api/sales", salesRoutes);
+app.use("/api/staff", staffRoutes);
 //app.use('/api/payment', payment);
 
 
