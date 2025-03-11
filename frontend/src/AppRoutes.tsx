@@ -10,6 +10,7 @@ import FeedbackPage from "./pages/feedback";
 import FAQPage from "./pages/FAQ";
 import ServiceRequest from "./pages/service";
 import AdminServiceRequestPanel from "./pages/adminServiceRequestPanel";
+import SalesAnalyticsStaffManagement from "./pages/salesAnalyticsStaffManagement";
 import SignIn from "./pages/signIn";
 
 const AppRoutes: React.FC = () => {
@@ -23,6 +24,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/faq" element={<FAQPage />} />
       <Route path="/service" element={<ServiceRequest />} />
       <Route path="/adminServiceRequestPanel" element={<AdminServiceRequestPanel />} />
+      <Route path="/salesAnalyticsStaffManagement" element={<SalesAnalyticsStaffManagement />} />
       <Route path="/signIn" element={<SignIn/>} />
       
       <Route
