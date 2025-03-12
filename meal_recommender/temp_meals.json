@@ -1,0 +1,29 @@
+[
+  {
+    "name": "California Rolls",
+    "description": "Crab, avocado, cucumber",
+    "category": "Sushi",
+    "dietary": {
+      "vegan": false,
+      "glutenFree": true
+    }
+  },
+  {
+    "name": "Dragon Roll",
+    "description": "Eel, crab, cucumber topped with avocado",
+    "category": "Sushi",
+    "dietary": {
+      "vegan": false,
+      "glutenFree": true
+    }
+  },
+  {
+    "name": "King Bee Chicken",
+    "description": "Grilled chicken with honey glaze",
+    "category": "Chicken",
+    "dietary": {
+      "vegan": false,
+      "glutenFree": false
+    }
+  }
+]
