@@ -208,8 +208,32 @@ const SalesAnalyticsAndStaffManagement = () => {
                 <tr key={s._id} className="border">
                   <td className="p-2 border">{s.staffId}</td>
                   <td className="p-2 border">{s.name}</td>
-                  <td className="p-2 border">{s.role}</td>
-                  <td className="p-2 border">${s.salary}</td>
+                  <td className="p-2 border">
+                    <input
+                      type="text"
+                      value={s.role}
+                      onChange={(e) => {
+                        const updatedStaff = staff.map((st) =>
+                          st._id === s._id ? { ...st, role: e.target.value } : st
+                        );
+                        setStaff(updatedStaff);
+                      }}
+                      className="p-1 border rounded"
+                    />
+                  </td>
+                  <td className="p-2 border">
+                    <input
+                      type="number"
+                      value={s.salary}
+                      onChange={(e) => {
+                        const updatedStaff = staff.map((st) =>
+                          st._id === s._id ? { ...st, salary: parseFloat(e.target.value) } : st
+                        );
+                        setStaff(updatedStaff);
+                      }}
+                      className="p-1 border rounded"
+                    />
+                  </td>
                   <td className="p-2 border">
                     <button
                       onClick={() => handleUpdateStaff(s._id, s.role, s.salary)}
@@ -235,3 +259,4 @@ const SalesAnalyticsAndStaffManagement = () => {
 };
 
 export default SalesAnalyticsAndStaffManagement;
+
