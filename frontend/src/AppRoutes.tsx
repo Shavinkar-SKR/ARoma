@@ -13,6 +13,7 @@ import AdminServiceRequestPanel from "./pages/adminServiceRequestPanel";
 import SalesAnalyticsStaffManagement from "./pages/salesAnalyticsStaffManagement";
 import SignIn from "./pages/signIn";
 import ForYou from "./pages/foryou";
+import Terms from "./pages/terms";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -28,6 +29,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/salesAnalyticsStaffManagement" element={<SalesAnalyticsStaffManagement />} />
       <Route path="/signIn" element={<SignIn/>} />
       <Route path="/foryou" element={<ForYou />} />
+      <Route path="/terms" element={<Terms />} />
       
       <Route
         path="restaurant-selection"
