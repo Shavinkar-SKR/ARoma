@@ -1,8 +1,8 @@
 import { ObjectId } from "mongodb";
 
-export interface Sales {
+export interface Sale {
   _id?: ObjectId;
-  day: string;
-  sales: number;
-  month: string;
+  orderId: string;
+  amount: number;
+  date: Date;
 }

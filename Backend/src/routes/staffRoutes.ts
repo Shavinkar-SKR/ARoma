@@ -1,10 +1,18 @@
 import { Router } from "express";
-import { getStaffMembers, addStaffMember, deleteStaffMember } from "../controllers/staffController";
+import {
+  addStaff,
+  getStaff,
+  searchStaff,
+  updateStaff,
+  deleteStaff,
+} from "../controllers/staffController";
 
 const router = Router();
 
-router.get("/", getStaffMembers);
-router.post("/", addStaffMember);
-router.delete("/:id", deleteStaffMember);
+router.post("/", addStaff);
+router.get("/", getStaff);
+router.get("/:staffId", searchStaff);
+router.put("/:id", updateStaff);
+router.delete("/:id", deleteStaff);
 
 export default router;
