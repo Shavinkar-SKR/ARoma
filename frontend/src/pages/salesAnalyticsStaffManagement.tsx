@@ -10,6 +10,7 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
+  ResponsiveContainer,
 } from "recharts";
 
 const SalesAnalyticsAndStaffManagement = () => {
@@ -132,6 +133,20 @@ const SalesAnalyticsAndStaffManagement = () => {
   const totalSales = sales.reduce((sum, sale) => sum + sale.amount, 0);
   const averageSale = totalOrders > 0 ? totalSales / totalOrders : 0;
 
+  // Salary Distribution Histogram Data
+  const salaryData = staff.map((s) => ({ salary: s.salary }));
+  const salaryBins = [0, 30000, 60000, 90000, 120000, 150000]; // Define salary bins/ranges
+
+  const histogramData = salaryBins.map((bin, index) => {
+    const rangeStart = bin;
+    const rangeEnd = salaryBins[index + 1] || Infinity;
+    const count = salaryData.filter((s) => s.salary >= rangeStart && s.salary < rangeEnd).length;
+    return {
+      range: `${rangeStart} - ${rangeEnd === Infinity ? "∞" : rangeEnd}`,
+      count,
+    };
+  });
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       {/* Toast Container */}
@@ -248,6 +263,21 @@ const SalesAnalyticsAndStaffManagement = () => {
               <p><strong>Salary:</strong> ${searchedStaff.salary}</p>
             </div>
           )}
+        </div>
+
+        {/* Salary Distribution Histogram */}
+        <div className="mb-4 bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold mb-4 text-red-600">Salary Distribution</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={histogramData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="range" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="count" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
 
         {/* Staff List */}
