@@ -16,7 +16,7 @@ import restaurantRoutes from "./routes/restaurantRoutes";
 import menuRoutes from "./routes/menuRoutes";
 import restaurantMenuRoutes from "./routes/restaurantMenuRoutes";
 import feedbackRoutes from "./routes/feedbackRoutes";
-import payment from "./routes/paymentRoutes";
+//import payment from "./routes/paymentRoutes";
 
 dotenv.config();
 
@@ -83,7 +83,7 @@ app.use("/api/carts", cartRoutes);
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/menus", menuRoutes);
 app.use("/api/restaurants", restaurantMenuRoutes);
-app.use("/api/payment", payment);
+//app.use("/api/payment", payment);
 
 const activeConnections = new Set();
 
