@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var cors_1 = require("cors");
+var cors = require("cors");
 var express_1 = require("express");
 var http_1 = require("http");
 var mongodb_1 = require("mongodb");
@@ -47,6 +47,7 @@ var menuRoutes_1 = require("./routes/menuRoutes");
 var dotenv = require("dotenv");
 var restaurantMenuRoutes_1 = require("./routes/restaurantMenuRoutes");
 var feedbackRoutes_1 = require("./routes/feedbackRoutes");
+var paymentRoutes_1 = require("./routes/paymentRoutes");
 dotenv.config();
 var MONGODB_URI = "mongodb+srv://root:root@aroma.ae0sb.mongodb.net/ARoma?retryWrites=true&w=majority&appName=ARoma&replicaSet=atlas-4uxo98-shard-0&tls=true";
 var app = express_1["default"]();
@@ -65,7 +66,7 @@ var mongoOptions = {
     directConnection: false
 };
 var mongoClient = new mongodb_1.MongoClient(MONGODB_URI, mongoOptions);
-app.use(cors_1["default"]({
+app.use(cors({
     origin: "http://localhost:5173",
     methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
     allowedHeaders: ["Content-Type"]
@@ -104,6 +105,7 @@ app.use("/api/carts", cartRoutes_1["default"]);
 app.use("/api/restaurants", restaurantRoutes_1["default"]);
 app.use("/api/menus", menuRoutes_1["default"]);
 app.use('/api/restaurants', restaurantMenuRoutes_1["default"]);
+app.use('/api/payment', paymentRoutes_1["default"]);
 var activeConnections = new Set();
 app.get('/order-events/:orderId', function (req, res) {
     if (activeConnections.size >= 50) {
