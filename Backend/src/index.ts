@@ -8,14 +8,16 @@ import {
   MongoClientOptions,
   Db,
 } from "mongodb";
-import * as dotenv from "dotenv";
-
 import cartRoutes from "./routes/cartRoutes";
 import orderRoutes from "./routes/orderRoutes";
 import restaurantRoutes from "./routes/restaurantRoutes";
 import menuRoutes from "./routes/menuRoutes";
+import * as dotenv from "dotenv";
 import restaurantMenuRoutes from "./routes/restaurantMenuRoutes";
 import feedbackRoutes from "./routes/feedbackRoutes";
+//import serviceRequestRoutes from "./routes/serviceRequestRoutes";
+//import salesRoutes from "./routes/salesRoutes";
+//import staffRoutes from "./routes/staffRoutes";
 import { Order } from "./models/orderModel";
 import payment from "./routes/paymentRoutes";
 
@@ -84,7 +86,10 @@ app.use("/api/carts", cartRoutes);
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/menus", menuRoutes);
 app.use("/api/restaurants", restaurantMenuRoutes);
-//app.use("/api/payment", payment);
+//app.use("/api/requests", serviceRequestRoutes);
+//app.use("/api/sales", salesRoutes);
+//app.use("/api/staff", staffRoutes);
+app.use("/api/payment", payment);
 
 const activeConnections = new Set();
 
@@ -107,7 +112,7 @@ app.get(
     (async () => {
       try {
         const db = req.db!;
-        const order = await db.collection("orders").findOne({
+        const order = await db.collection<Order>("orders").findOne({
           _id: new ObjectId(req.params.orderId),
         });
 
@@ -119,7 +124,7 @@ app.get(
 
         res.write(`event: initial\ndata: ${JSON.stringify(order)}\n\n`);
 
-        const changeStream = db.collection("orders").watch(
+        const changeStream = db.collection<Order>("orders").watch(
           [
             {
               $match: {
@@ -131,7 +136,7 @@ app.get(
           { fullDocument: "updateLookup" }
         );
 
-        const onChange = (change: ChangeStreamDocument<any>) => {
+        const onChange = (change: ChangeStreamDocument<Order>) => {
           if (change.operationType === "update" && change.fullDocument) {
             res.write(
               `event: update\ndata: ${JSON.stringify(change.fullDocument)}\n\n`

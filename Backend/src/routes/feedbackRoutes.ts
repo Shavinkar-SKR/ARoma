@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import {
   getAllFeedback,
-  submitFeedback
+  submitFeedback,
 } from "../controllers/feedbackController"; // Controller for feedback logic
 
 const router = Router();

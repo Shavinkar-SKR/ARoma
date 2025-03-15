@@ -36,12 +36,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getOrderById = exports.getOrders = void 0;
-var dbConfig_1 = require("../config/dbConfig"); // Import the connectDB utility
-var mongodb_1 = require("mongodb"); // Add this import
-// Function to retrieve all orders
-var getOrders = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var db, ordersCollection, orders, error_1;
+exports.submitFeedback = exports.getAllFeedback = void 0;
+var dbConfig_1 = require("../config/dbConfig");
+// Fetch all feedback from the database
+var getAllFeedback = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var db, feedbackCollection, feedbacks, error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -49,57 +48,55 @@ var getOrders = function (req, res) { return __awaiter(void 0, void 0, void 0, f
                 return [4 /*yield*/, (0, dbConfig_1.connectDB)()];
             case 1:
                 db = _a.sent();
-                ordersCollection = db.collection("orders");
-                return [4 /*yield*/, ordersCollection.find().toArray()];
+                feedbackCollection = db.collection("feedbacks");
+                return [4 /*yield*/, feedbackCollection.find({}).sort({ createdAt: -1 }).toArray()];
             case 2:
-                orders = _a.sent();
-                // Return the orders in the response
-                res.status(200).json(orders);
+                feedbacks = _a.sent();
+                res.status(200).json(feedbacks);
                 return [3 /*break*/, 4];
             case 3:
                 error_1 = _a.sent();
-                console.error("Error fetching orders:", error_1);
-                res.status(500).json({ error: "Internal server error" });
+                console.error("Error fetching feedback:", error_1);
+                res.status(500).json({ message: "Error fetching feedback" });
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
         }
     });
 }); };
-exports.getOrders = getOrders;
-var getOrderById = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var id, db, ordersCollection, objectId, order, error_2;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
+exports.getAllFeedback = getAllFeedback;
+// Submit new feedback
+var submitFeedback = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, comment, rating, db, feedbackCollection, newFeedback, error_2;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
             case 0:
-                id = req.params.id;
-                if (!mongodb_1.ObjectId.isValid(id)) {
-                    res.status(400).json({ message: "Invalid order ID format" });
+                _b.trys.push([0, 3, , 4]);
+                _a = req.body, comment = _a.comment, rating = _a.rating;
+                if (!comment || !rating) {
+                    res.status(400).json({ message: "All fields are required" });
                     return [2 /*return*/];
                 }
-                _a.label = 1;
-            case 1:
-                _a.trys.push([1, 4, , 5]);
                 return [4 /*yield*/, (0, dbConfig_1.connectDB)()];
+            case 1:
+                db = _b.sent();
+                feedbackCollection = db.collection("feedbacks");
+                newFeedback = {
+                    comment: comment,
+                    rating: rating,
+                    createdAt: new Date(),
+                };
+                return [4 /*yield*/, feedbackCollection.insertOne(newFeedback)];
             case 2:
-                db = _a.sent();
-                ordersCollection = db.collection("orders");
-                objectId = new mongodb_1.ObjectId(id);
-                return [4 /*yield*/, ordersCollection.findOne({ _id: objectId })];
+                _b.sent();
+                res.status(201).json({ message: "Feedback submitted successfully!" });
+                return [3 /*break*/, 4];
             case 3:
-                order = _a.sent();
-                if (!order) {
-                    res.status(404).json({ message: "Order not found" });
-                    return [2 /*return*/];
-                }
-                res.status(200).json(order);
-                return [3 /*break*/, 5];
-            case 4:
-                error_2 = _a.sent();
-                console.error("Error fetching order:", error_2);
-                res.status(500).json({ message: "Failed to fetch order", error: error_2 });
-                return [3 /*break*/, 5];
-            case 5: return [2 /*return*/];
+                error_2 = _b.sent();
+                console.error("Error saving feedback:", error_2);
+                res.status(500).json({ message: "Error saving feedback" });
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
         }
     });
 }); };
-exports.getOrderById = getOrderById;
+exports.submitFeedback = submitFeedback;

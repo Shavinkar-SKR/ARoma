@@ -289,6 +289,7 @@ const OrderStatus: React.FC = () => {
               </div>
             </div>
           )}
+
           {/* Preparation Time */}
           <div className="mb-8 bg-white p-6 rounded-2xl shadow-lg transform hover:scale-[1.02] transition-all duration-300">
             <div className="flex items-center gap-2 text-lg font-semibold">
