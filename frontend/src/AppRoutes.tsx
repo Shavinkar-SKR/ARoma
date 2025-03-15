@@ -11,9 +11,12 @@ import FAQPage from "./pages/FAQ";
 import ServiceRequest from "./pages/service";
 import AdminServiceRequestPanel from "./pages/adminServiceRequestPanel";
 import SalesAnalyticsStaffManagement from "./pages/salesAnalyticsStaffManagement";
-import SignIn from "./pages/signIn";
 import ForYou from "./pages/foryou";
 import Terms from "./pages/terms";
+import Security from "./pages/security";
+import Privacy from "./pages/privacy";
+import SignUpDialog from "./pages/signUpDialog";
+import SignIn from "./pages/signIn";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -27,9 +30,12 @@ const AppRoutes: React.FC = () => {
       <Route path="/service" element={<ServiceRequest />} />
       <Route path="/adminServiceRequestPanel" element={<AdminServiceRequestPanel />} />
       <Route path="/salesAnalyticsStaffManagement" element={<SalesAnalyticsStaffManagement />} />
-      <Route path="/signIn" element={<SignIn/>} />
       <Route path="/foryou" element={<ForYou />} />
       <Route path="/terms" element={<Terms />} />
+      <Route path="/security" element={<Security />} />
+      <Route path="/privacy" element={<Privacy/>} />
+      <Route path="/signUpDialog" element={<SignUpDialog />} />
+      <Route path="/signIn" element={<SignIn/>} />
       
       <Route
         path="restaurant-selection"
