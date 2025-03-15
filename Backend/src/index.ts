@@ -13,8 +13,6 @@ import serviceRequestRoutes from "./routes/serviceRequestRoutes";
 import salesRoutes from "./routes/salesRoutes";
 import staffRoutes from "./routes/staffRoutes";
 import { Order } from "./models/orderModel";
-import userRoutes from './routes/userRoutes';
-import loginRoutes from './routes/loginRoutes';
 //import payment from './routes/paymentRoutes'
 
 
@@ -85,8 +83,7 @@ app.use('/api/restaurants', restaurantMenuRoutes);
 app.use("/api/requests", serviceRequestRoutes);
 app.use("/api/sales", salesRoutes);
 app.use("/api/staff", staffRoutes);
-app.use('/api', userRoutes);
-app.use('/api/auth', loginRoutes);
+
 //app.use('/api/payment', payment);
 
 
