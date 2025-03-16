@@ -12,7 +12,16 @@ import {
   FaFacebook
 } from "react-icons/fa";
 
-const staticFAQs = [
+// Define the FAQ interface for type safety
+interface FAQ {
+  section: string;
+  video: string;
+  description: string;
+  content?: React.ReactNode; // Optional since not all objects have this property
+}
+
+// Add type to staticFAQs array
+const staticFAQs: FAQ[] = [
   {
     section: "Navigating Home Page",
     video: "https://www.example.com/video-homepage",
@@ -145,24 +154,95 @@ const staticFAQs = [
     ),
   },
   {
-    section: "How to Contact Us",
-    video: "https://www.example.com/video-contact",
-    description: "Ways to get in touch with our support team for assistance."
-  }
+    section: "How to contact us",
+    video: "/cd/howto_contact.mp4",
+    description: "Learn how to contact us",
+    content: (
+      <div className="space-y-6 flex flex-col md:flex-row items-center md:items-start p-6 md:space-x-10">
+        <div className="w-full md:w-1/2 flex justify-center">
+          <div className="w-70 h-120 bg-gray-200 rounded-lg overflow-hidden shadow-lg">
+            <video
+              controls
+              className="w-full h-full object-cover"
+              src="/cd/howto_feedback.mp4"
+              title="contact us"
+            >
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+        <div className="w-full md:w-1/2 space-y-4">
+          <h3 className="text-2xl font-bold text-gray-900">
+            How to Leave a Feedback
+          </h3>
+          <ul className="list-none text-gray-700 space-y-2">
+            <li>
+              <strong className="text-lg">Step 1:</strong> go to FAQ page .
+            </li>
+            <li>
+              <strong className="text-lg">Step 2:</strong> Click contact us button.
+            </li>
+            <li>
+              <strong className="text-lg">Step 3:</strong> fill the form and submit.
+            </li>
+          </ul>
+        </div>
+      </div>
+    ),
+  },
+  {
+    section: "How to request services ",
+    video: "/cd/howto_request.mp4",
+    description: "Learn how to request services",
+    content: (
+      <div className="space-y-6 flex flex-col md:flex-row items-center md:items-start p-6 md:space-x-10">
+        <div className="w-full md:w-1/2 flex justify-center">
+          <div className="w-70 h-120 bg-gray-200 rounded-lg overflow-hidden shadow-lg">
+            <video
+              controls
+              className="w-full h-full object-cover"
+              src="/cd/howto_feedback.mp4"
+              title="request services"
+            >
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+        <div className="w-full md:w-1/2 space-y-4">
+          <h3 className="text-2xl font-bold text-gray-900">
+            How to Leave a Feedback
+          </h3>
+          <ul className="list-none text-gray-700 space-y-2">
+            <li>
+              <strong className="text-lg">Step 1:</strong> click contact services .
+            </li>
+            <li>
+              <strong className="text-lg">Step 2:</strong> enter your table number.
+            </li>
+            <li>
+              <strong className="text-lg">Step 3:</strong> click the service you want from the selection.
+            </li>
+          </ul>
+        </div>
+      </div>
+    ),
+  },
 ];
 
 const FAQPage: React.FC = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [contactOpen, setContactOpen] = useState(false);
-  const [email, setEmail] = useState("");
-  const [userType, setUserType] = useState("");
-  const [message, setMessage] = useState("");
+  // Add types to useState hooks
+  const [menuOpen, setMenuOpen] = useState<boolean>(false); // Type: boolean
+  const [contactOpen, setContactOpen] = useState<boolean>(false); // Type: boolean
+  const [email, setEmail] = useState<string>(""); // Type: string
+  const [userType, setUserType] = useState<string>(""); // Type: string
+  const [message, setMessage] = useState<string>(""); // Type: string
 
   const handleMenuClick = () => {
     setMenuOpen(false);
   };
 
-  const handleContactSubmit = (e) => {
+  // Add type to the event parameter
+  const handleContactSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Handle form submission here
     console.log({ email, userType, message });
@@ -290,7 +370,7 @@ const FAQPage: React.FC = () => {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-                rows="4"
+                rows={4}
                 required
               />
             </div>
