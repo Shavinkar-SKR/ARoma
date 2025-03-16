@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AdminServiceRequestPanel = () => {
   const [requests, setRequests] = useState<any[]>([]);
@@ -12,6 +14,7 @@ const AdminServiceRequestPanel = () => {
         setRequests(res.data);
       } catch (error) {
         console.error("Error fetching requests:", error);
+        toast.error("Failed to fetch requests.");
       }
     };
     fetchRequests();
@@ -22,8 +25,10 @@ const AdminServiceRequestPanel = () => {
     try {
       await axios.put(`http://localhost:5001/api/requests/${id}`, { status });
       setRequests(requests.map(req => req._id === id ? { ...req, status } : req));
+      toast.success("Request status updated successfully!");
     } catch (error) {
       console.error("Error updating request status:", error);
+      toast.error("Failed to update request status.");
     }
   };
 
@@ -32,13 +37,28 @@ const AdminServiceRequestPanel = () => {
     try {
       await axios.delete(`http://localhost:5001/api/requests/${id}`);
       setRequests(requests.filter(req => req._id !== id));
+      toast.success("Request deleted successfully!");
     } catch (error) {
       console.error("Error deleting request:", error);
+      toast.error("Failed to delete request.");
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-100 font-poppins">
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+
       {/* Top Bar */}
       <div className="bg-red-600 text-white p-4 flex justify-between items-center shadow-md">
         <h1 className="text-2xl font-semibold tracking-wide">Admin Dashboard</h1>

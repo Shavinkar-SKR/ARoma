@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ServiceRequest = () => {
   const [requests, setRequests] = useState<any[]>([]);
@@ -15,6 +17,7 @@ const ServiceRequest = () => {
         setRequests(res.data);
       } catch (error) {
         console.error("Error fetching requests:", error);
+        toast.error("Failed to fetch requests.");
       }
     };
     fetchRequests();
@@ -24,7 +27,7 @@ const ServiceRequest = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!tableNo || !service) {
-      alert("Please fill in all fields.");
+      toast.warning("Please fill in all fields.");
       return;
     }
 
@@ -36,15 +39,17 @@ const ServiceRequest = () => {
       setRequests([...requests, res.data]);
       setTableNo("");
       setService("");
+      toast.success("Request submitted successfully!");
     } catch (error) {
       console.error("Error submitting request:", error);
+      toast.error("Failed to submit request.");
     }
   };
 
   // Function to handle predefined service requests
   const requestService = async (serviceName: string) => {
     if (!tableNo) {
-      alert("Please enter your table number first.");
+      toast.warning("Please enter your table number first.");
       return;
     }
 
@@ -54,15 +59,17 @@ const ServiceRequest = () => {
         service: serviceName,
       });
       setRequests([...requests, res.data]);
+      toast.success("Service request submitted successfully!");
     } catch (error) {
       console.error("Error submitting service request:", error);
+      toast.error("Failed to submit service request.");
     }
   };
 
   // Function to handle extra custom requests
   const submitCustomRequest = async () => {
     if (!tableNo || !customRequest) {
-      alert("Please enter your table number and describe your request.");
+      toast.warning("Please enter your table number and describe your request.");
       return;
     }
 
@@ -73,13 +80,28 @@ const ServiceRequest = () => {
       });
       setRequests([...requests, res.data]);
       setCustomRequest(""); // Clear input field after submission
+      toast.success("Custom request submitted successfully!");
     } catch (error) {
       console.error("Error submitting custom request:", error);
+      toast.error("Failed to submit custom request.");
     }
   };
 
   return (
     <div>
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+
       <section className="bg-gray-100 p-6">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
