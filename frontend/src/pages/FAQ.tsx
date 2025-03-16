@@ -192,41 +192,60 @@ const staticFAQs: FAQ[] = [
   },
   {
     section: "How to request services ",
-    video: "/cd/howto_request.mp4",
+    video: "/cd/howto_request.mp4", // This can remain, but we won't use it
     description: "Learn how to request services",
     content: (
       <div className="space-y-6 flex flex-col md:flex-row items-center md:items-start p-6 md:space-x-10">
         <div className="w-full md:w-1/2 flex justify-center">
+          {/* Image Slideshow */}
           <div className="w-70 h-120 bg-gray-200 rounded-lg overflow-hidden shadow-lg">
-            <video
-              controls
-              className="w-full h-full object-cover"
-              src="/cd/howto_feedback.mp4"
-              title="request services"
-            >
-              Your browser does not support the video tag.
-            </video>
+            <div className="relative w-full h-full">
+              {/* Slide 1 */}
+              <div className="absolute inset-0 transition-opacity duration-1000 ease-in-out">
+                <img
+                  src="/cd/ser1.png" 
+                  alt="Request Service Step 1"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              {/* Slide 2 */}
+              <div className="absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out">
+                <img
+                  src="/cd/ser2.png" 
+                  alt="Request Service Step 2"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              {/* Slide 3 */}
+              <div className="absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out">
+                <img
+                  src="/cd/ser3.png" 
+                  alt="Request Service Step 3"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
           </div>
         </div>
         <div className="w-full md:w-1/2 space-y-4">
           <h3 className="text-2xl font-bold text-gray-900">
-            How to request staff help while dinning
+            How to request services while dining
           </h3>
           <ul className="list-none text-gray-700 space-y-2">
             <li>
-              <strong className="text-lg">Step 1:</strong> click contact services .
+              <strong className="text-lg">Step 1:</strong> Click Contact Services.
             </li>
             <li>
-              <strong className="text-lg">Step 2:</strong> enter your table number.
+              <strong className="text-lg">Step 2:</strong> Enter your table number.
             </li>
             <li>
-              <strong className="text-lg">Step 3:</strong> click the service you want from the selection.
+              <strong className="text-lg">Step 3:</strong> Click the service you want from the selection.
             </li>
           </ul>
         </div>
       </div>
     ),
-  },
+  }
 ];
 
 const FAQPage: React.FC = () => {
