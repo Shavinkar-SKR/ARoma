@@ -94,7 +94,7 @@ export default function SignIn() {
 
           {/* Forgot Password Link */}
           <div className="mt-2 text-center text-sm text-gray-600">
-            <Link to="/ForgotPassword" className="text-blue-500 hover:underline">
+            <Link to="/ResetPassword" className="text-blue-500 hover:underline">
               Forgot Password?
             </Link>
           </div>
