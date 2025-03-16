@@ -8,7 +8,7 @@ interface MealRecommendation {
   description: string;
   category: string;
   price: number;
-  image: string;
+  image: string; // Add image URL for meals
   restaurantId: string;
 }
 
@@ -16,6 +16,7 @@ interface RestaurantRecommendation {
   name: string;
   rating: number;
   location: string;
+  image: string; // Add image URL for restaurants
 }
 
 const ForYou: React.FC = () => {
@@ -63,6 +64,12 @@ const ForYou: React.FC = () => {
               <CardTitle>{meal.name}</CardTitle>
             </CardHeader>
             <CardContent>
+              {/* Meal Image */}
+              <img
+                src={meal.image}
+                alt={meal.name}
+                className="w-full h-48 object-cover rounded-lg mb-4"
+              />
               <p>{meal.description}</p>
               <small className="text-gray-500">Category: {meal.category}</small>
               <p className="text-gray-700">Price: ${meal.price}</p>
@@ -81,6 +88,12 @@ const ForYou: React.FC = () => {
               <CardTitle>{restaurant.name}</CardTitle>
             </CardHeader>
             <CardContent>
+              {/* Restaurant Image */}
+              <img
+                src={restaurant.image}
+                alt={restaurant.name}
+                className="w-full h-48 object-cover rounded-lg mb-4"
+              />
               <p>Rating: {restaurant.rating}</p>
               <p>Location: {restaurant.location}</p>
             </CardContent>
