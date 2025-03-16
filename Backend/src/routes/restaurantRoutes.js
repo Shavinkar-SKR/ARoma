@@ -33,25 +33,9 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = __importStar(require("mongoose"));
-const orderSchema = new mongoose_1.Schema({
-    cartItems: [
-        {
-            id: Number,
-            name: String,
-            price: Number,
-            quantity: Number,
-            image: String,
-        },
-    ],
-    specialInstructions: String,
-    total: Number,
-    tableNumber: String,
-    status: {
-        type: String,
-        enum: ["received", "preparing", "ready", "complete"],
-        default: "received",
-    },
-});
-const Order = mongoose_1.default.model("Order", orderSchema);
-exports.default = Order;
+const express = __importStar(require("express"));
+const restaurantController_1 = require("../controllers/restaurantController");
+const router = express.Router();
+router.get("/", restaurantController_1.getAllRestaurants);
+router.get("/search", restaurantController_1.searchRestaurants);
+exports.default = router;

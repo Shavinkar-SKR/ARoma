@@ -17,6 +17,10 @@ import userRoutes from "./routes/userRoutes";
 import loginRoutes from "./routes/loginRoutes";
 import resetPasswordRoutes from "./routes/resetPasswordRoutes";
 //import payment from './routes/paymentRoutes'
+import { signUp } from "./controllers/userController";
+
+console.log("Direct import test:", signUp);
+
 
 
 dotenv.config();

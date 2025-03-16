@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.connectDB = void 0;
 const mongodb_1 = require("mongodb");
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017";
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://root:root@aroma.ae0sb.mongodb.net/ARoma?retryWrites=true&w=majority&tls=true&tlsAllowInvalidCertificates=true";
 const DB_NAME = process.env.DB_NAME || "ARoma";
 const connectDB = () => __awaiter(void 0, void 0, void 0, function* () {
     const client = new mongodb_1.MongoClient(MONGODB_URI);
