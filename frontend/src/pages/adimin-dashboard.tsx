@@ -1304,7 +1304,7 @@ function AdminDashboard() {
                   ) : (
                     <table className="w-full border-collapse">
                       <thead>
-                        <tr className="bg-black-000 text-white-500">
+                        <tr className="bg-red-600 text-white">
                           <th className="p-2 border">Staff ID</th>
                           <th className="p-2 border">Name</th>
                           <th className="p-2 border">Role</th>
