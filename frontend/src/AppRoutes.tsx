@@ -17,6 +17,7 @@ import Security from "./pages/security";
 import Privacy from "./pages/privacy";
 import SignUpDialog from "./pages/signUpDialog";
 import SignIn from "./pages/signIn";
+import Contact from "./pages/contact";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -36,6 +37,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/privacy" element={<Privacy/>} />
       <Route path="/signUpDialog" element={<SignUpDialog />} />
       <Route path="/signIn" element={<SignIn/>} />
+      <Route path="/contact" element={<Contact/>} />
       
       <Route
         path="restaurant-selection"
