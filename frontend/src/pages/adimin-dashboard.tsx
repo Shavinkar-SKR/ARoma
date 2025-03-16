@@ -1304,7 +1304,7 @@ function AdminDashboard() {
                   ) : (
                     <table className="w-full border-collapse">
                       <thead>
-                        <tr className="bg-red-600 text-white">
+                        <tr className="bg-black-000 text-white-500">
                           <th className="p-2 border">Staff ID</th>
                           <th className="p-2 border">Name</th>
                           <th className="p-2 border">Role</th>
@@ -1346,7 +1346,7 @@ function AdminDashboard() {
                             <td className="p-2 border">
                               <button
                                 onClick={() => handleUpdateStaff(s._id, s.role, s.salary)}
-                                className="bg-yellow-500 text-white p-1 rounded mr-2 hover:bg-yellow-600 active:bg-yellow-700 transition-colors duration-200"
+                                className="bg-green-500 text-white p-1 rounded mr-2 hover:bg-yellow-600 active:bg-yellow-700 transition-colors duration-200"
                               >
                                 Update
                               </button>
