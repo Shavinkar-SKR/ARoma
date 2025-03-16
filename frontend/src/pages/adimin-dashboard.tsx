@@ -21,12 +21,8 @@ import {
   Clock,
   CookingPot,
   Bell,
-  BarChart2,
-  Users,
 } from 'lucide-react';
 import { toast, Toaster } from 'sonner';
-import axios from 'axios';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 type Order = {
   _id: string;
@@ -122,50 +118,116 @@ function AdminDashboard() {
     hasARPreview: false
   });
 
-  // Sales & Staff Management State
-  const [staff, setStaff] = useState<any[]>([]);
-  const [sales, setSales] = useState<any[]>([]);
-  const [newStaff, setNewStaff] = useState({
-    staffId: "",
-    name: "",
-    role: "",
-    salary: 0,
-  });
-  const [searchId, setSearchId] = useState("");
-  const [searchedStaff, setSearchedStaff] = useState<any>(null);
-
   // Fetch Orders from API on component mount
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await fetch('http://localhost:5001/api/orders');
-        if (!response.ok) throw new Error('Failed to fetch orders');
-        const data = await response.json();
-        setOrders(data);
-      } catch (err) {
-        if (err instanceof Error) {
-          console.error("Error fetching orders:", err.message);
-          setError('Error fetching orders');
-          toast.error('Failed to fetch orders.');
-          if (err.name === 'MongoServerSelectionError' || err.name === 'MongoNetworkError') {
-            toast.error('Database connection error. Please check your network or try again later.');
-          } else if (err.name === 'MongoWaitQueueTimeoutError') {
-            toast.error('Database connection timeout. Please try again later.');
-          }
-        } else {
-          console.error("Unknown error:", err);
-          setError('An unknown error occurred');
-          toast.error('An unknown error occurred.');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
+// Fetch Orders from API on component mount
+useEffect(() => {
+  const fetchOrders = async () => {
+    try {
+      const response = await fetch('http://localhost:5001/api/orders');
+      if (!response.ok) throw new Error('Failed to fetch orders');
+      const data = await response.json();
+      setOrders(data);
+    } catch (err) {
+      // Handle the error properly since 'err' is of type 'unknown'
+      if (err instanceof Error) {
+        console.error("Error fetching orders:", err.message);
+        setError('Error fetching orders');
+        toast.error('Failed to fetch orders.');
 
-    if (activeTab === 'orders') {
-      fetchOrders();
+        // Handle specific MongoDB errors
+        if (err.name === 'MongoServerSelectionError' || err.name === 'MongoNetworkError') {
+          toast.error('Database connection error. Please check your network or try again later.');
+        } else if (err.name === 'MongoWaitQueueTimeoutError') {
+          toast.error('Database connection timeout. Please try again later.');
+        }
+      } else {
+        // Handle cases where 'err' is not an Error object
+        console.error("Unknown error:", err);
+        setError('An unknown error occurred');
+        toast.error('An unknown error occurred.');
+      }
+    } finally {
+      setLoading(false);
     }
-  }, [activeTab]);
+  };
+
+  if (activeTab === 'orders') {
+    fetchOrders();
+  }
+}, [activeTab]);
+
+// Fetch Restaurants from API
+useEffect(() => {
+  const fetchRestaurants = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:5001/api/restaurants');
+      if (!response.ok) throw new Error('Failed to fetch restaurants');
+      const data = await response.json();
+      setRestaurants(data);
+    } catch (err) {
+      // Handle the error properly since 'err' is of type 'unknown'
+      if (err instanceof Error) {
+        console.error("Error fetching restaurants:", err.message);
+        setError('Error fetching restaurants');
+        toast.error('Failed to fetch restaurants.');
+
+        // Handle specific MongoDB errors
+        if (err.name === 'MongoServerSelectionError' || err.name === 'MongoNetworkError') {
+          toast.error('Database connection error. Please check your network or try again later.');
+        } else if (err.name === 'MongoWaitQueueTimeoutError') {
+          toast.error('Database connection timeout. Please try again later.');
+        }
+      } else {
+        // Handle cases where 'err' is not an Error object
+        console.error("Unknown error:", err);
+        setError('An unknown error occurred');
+        toast.error('An unknown error occurred.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (activeTab === 'menu') {
+    fetchRestaurants();
+  }
+}, [activeTab]);
+
+
+  // useEffect(() => {
+  //   // Listen for order updates
+  //   socket.on('orderUpdated', (updatedOrder: Order) => {
+  //     setOrders(prevOrders => 
+  //       prevOrders.map(order => 
+  //         order._id === updatedOrder._id ? updatedOrder : order
+  //       )
+  //     );
+      
+  //     // Show toast notification for status change
+  //     const statusLabel = STATUS_OPTIONS.find(option => option.value === updatedOrder.status)?.label || updatedOrder.status;
+  //     toast.success(`Order #${updatedOrder._id.substring(updatedOrder._id.length - 6)} status updated to ${statusLabel}`);
+  //   });
+
+  //   // Listen for new orders
+  //   socket.on('newOrder', (newOrder: Order) => {
+  //     setOrders(prevOrders => [newOrder, ...prevOrders]);
+  //     toast.success(`New order received: #${newOrder._id.substring(newOrder._id.length - 6)}`);
+  //   });
+
+  //   // Listen for deleted orders
+  //   socket.on('orderDeleted', (deletedOrderId: string) => {
+  //     setOrders(prevOrders => prevOrders.filter(order => order._id !== deletedOrderId));
+  //     toast.info(`Order #${deletedOrderId.substring(deletedOrderId.length - 6)} has been removed`);
+  //   });
+
+  //   // Cleanup function to remove event listeners
+  //   return () => {
+  //     socket.off('orderUpdated');
+  //     socket.off('newOrder');
+  //     socket.off('orderDeleted');
+  //   };
+  // }, []);
 
   // Fetch Restaurants from API
   useEffect(() => {
@@ -177,20 +239,9 @@ function AdminDashboard() {
         const data = await response.json();
         setRestaurants(data);
       } catch (err) {
-        if (err instanceof Error) {
-          console.error("Error fetching restaurants:", err.message);
-          setError('Error fetching restaurants');
-          toast.error('Failed to fetch restaurants.');
-          if (err.name === 'MongoServerSelectionError' || err.name === 'MongoNetworkError') {
-            toast.error('Database connection error. Please check your network or try again later.');
-          } else if (err.name === 'MongoWaitQueueTimeoutError') {
-            toast.error('Database connection timeout. Please try again later.');
-          }
-        } else {
-          console.error("Unknown error:", err);
-          setError('An unknown error occurred');
-          toast.error('An unknown error occurred.');
-        }
+        console.error("Error fetching restaurants:", err);
+        setError('Error fetching restaurants');
+        toast.error('Failed to fetch restaurants.');
       } finally {
         setLoading(false);
       }
@@ -198,29 +249,6 @@ function AdminDashboard() {
 
     if (activeTab === 'menu') {
       fetchRestaurants();
-    }
-  }, [activeTab]);
-
-  // Fetch Staff and Sales Data
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const staffRes = await axios.get("http://localhost:5001/api/staff");
-        setStaff(staffRes.data);
-
-        const salesRes = await axios.get("http://localhost:5001/api/sales");
-        setSales(salesRes.data.sales);
-      } catch (error) {
-        setError("Error fetching data. Please try again later.");
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (activeTab === 'sales-staff') {
-      fetchData();
     }
   }, [activeTab]);
 
@@ -275,7 +303,9 @@ function AdminDashboard() {
 
   // Convert dietary array to object for form
   const dietaryArrayToObject = (dietaryArr: string[] | undefined): DietaryOptions => {
+    // Ensure dietaryArr is an array, if not, use an empty array
     const safeArray = Array.isArray(dietaryArr) ? dietaryArr : [];
+    
     return {
       isVegan: safeArray.includes('Vegan'),
       isNutFree: safeArray.includes('Nut-Free'),
@@ -505,8 +535,8 @@ function AdminDashboard() {
   const sidebarItems = [
     { icon: ClipboardList, label: 'Orders', id: 'orders' },
     { icon: UtensilsCrossed, label: 'Menu', id: 'menu' },
-    { icon: BarChart2, label: 'Sales & Staff', id: 'sales-staff' },
-    //{ icon: Settings, label: 'Settings', id: 'settings' },
+    //{ icon: BarChart3, label: 'Reports', id: 'reports' },
+   // { icon: Settings, label: 'Settings', id: 'settings' },
   ];
 
   const filteredOrders = orders.filter(
@@ -531,106 +561,6 @@ function AdminDashboard() {
         return 'bg-gray-100 text-gray-800';
       default:
         return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  // Sales analytics summary
-  const totalOrders = sales.length;
-  const totalSales = sales.reduce((sum, sale) => sum + sale.amount, 0);
-  const averageSale = totalOrders > 0 ? totalSales / totalOrders : 0;
-
-  // Salary Distribution Histogram Data
-  const salaryData = staff.map((s) => ({ salary: s.salary }));
-  const salaryBins = [0, 30000, 60000, 90000, 120000, 150000]; // Define salary bins/ranges
-
-  const histogramData = salaryBins.map((bin, index) => {
-    const rangeStart = bin;
-    const rangeEnd = salaryBins[index + 1] || Infinity;
-    const count = salaryData.filter((s) => s.salary >= rangeStart && s.salary < rangeEnd).length;
-    return {
-      range: `${rangeStart} - ${rangeEnd === Infinity ? "∞" : rangeEnd}`,
-      count,
-    };
-  });
-
-  // Add new staff
-  const handleAddStaff = async () => {
-    if (!newStaff.staffId || !newStaff.name || !newStaff.role || newStaff.salary <= 0) {
-      setError("Please fill all fields correctly.");
-      return;
-    }
-    setLoading(true);
-    try {
-      await axios.post("http://localhost:5001/api/staff", newStaff);
-      setError("");
-      toast.success("Staff added successfully!");
-      setNewStaff({ staffId: "", name: "", role: "", salary: 0 });
-      const res = await axios.get("http://localhost:5001/api/staff");
-      setStaff(res.data);
-    } catch (error) {
-      setError("Error adding staff. Please try again.");
-      console.error("Error adding staff:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Search staff by ID
-  const handleSearchStaff = async () => {
-    if (!searchId) {
-      setError("Please enter a Staff ID.");
-      return;
-    }
-    setLoading(true);
-    try {
-      const res = await axios.get(`http://localhost:5001/api/staff/${searchId}`);
-      setSearchedStaff(res.data);
-      setError("");
-    } catch (error) {
-      setError("Staff not found. Please check the Staff ID.");
-      console.error("Error searching staff:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Update staff role and salary
-  const handleUpdateStaff = async (id: string, role: string, salary: number) => {
-    if (!role || salary <= 0) {
-      setError("Please fill all fields correctly.");
-      return;
-    }
-    setLoading(true);
-    try {
-      await axios.put(`http://localhost:5001/api/staff/${id}`, { role, salary });
-      setError("");
-      toast.success("Staff updated successfully!");
-      const res = await axios.get("http://localhost:5001/api/staff");
-      setStaff(res.data);
-    } catch (error) {
-      setError("Error updating staff. Please try again.");
-      console.error("Error updating staff:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Delete staff
-  const handleDeleteStaff = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this staff member?")) {
-      setLoading(true);
-      try {
-        await axios.delete(`http://localhost:5001/api/staff/${id}`);
-        setError("");
-        toast.success("Staff deleted successfully!");
-        const res = await axios.get("http://localhost:5001/api/staff");
-        setStaff(res.data);
-      } catch (error) {
-        setError("Error deleting staff. Please try again.");
-        console.error("Error deleting staff:", error);
-      } finally {
-        setLoading(false);
-      }
     }
   };
 
@@ -1169,203 +1099,32 @@ function AdminDashboard() {
               )}
             </motion.div>
           )}
-
-          {activeTab === 'sales-staff' && (
+{/* 
+          {activeTab === 'reports' && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <h1 className="text-2xl font-bold mb-4 text-black-600">Sales Analytics & Staff Management</h1>
-
-              {/* Sales Analytics */}
-              <div className="mb-8">
-                <h2 className="text-xl font-semibold mb-4 text-black-600">Sales Analytics</h2>
-                <div className="grid grid-cols-3 gap-4 mb-4">
-                  <div className="bg-white p-4 rounded shadow">
-                    <p className="text-gray-600">Total Orders</p>
-                    <p className="text-2xl font-bold text-red-600">{totalOrders}</p>
-                  </div>
-                  <div className="bg-white p-4 rounded shadow">
-                    <p className="text-gray-600">Total Sales</p>
-                    <p className="text-2xl font-bold text-red-600">${totalSales.toFixed(2)}</p>
-                  </div>
-                  <div className="bg-white p-4 rounded shadow">
-                    <p className="text-gray-600">Average Sale</p>
-                    <p className="text-2xl font-bold text-red-600">${averageSale.toFixed(2)}</p>
-                  </div>
-                </div>
-
-                {/* Sales Chart */}
-                <BarChart width={600} height={300} data={sales}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="amount" fill="#8884d8" />
-                </BarChart>
-              </div>
-
-              {/* Staff Management */}
-              <div>
-                <h2 className="text-xl font-semibold mb-4 text-black-600">Staff Management</h2>
-
-                {/* Add Staff Form */}
-                <div className="mb-4 bg-white p-6 rounded-lg shadow-md">
-                  <h3 className="text-lg font-semibold mb-4 text-black-600">Add New Staff</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      placeholder="Staff ID"
-                      value={newStaff.staffId}
-                      onChange={(e) => setNewStaff({ ...newStaff, staffId: e.target.value })}
-                      className="p-2 border rounded focus:outline-none focus:ring-2 focus:ring-red-500"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Name"
-                      value={newStaff.name}
-                      onChange={(e) => setNewStaff({ ...newStaff, name: e.target.value })}
-                      className="p-2 border rounded focus:outline-none focus:ring-2 focus:ring-red-500"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Role"
-                      value={newStaff.role}
-                      onChange={(e) => setNewStaff({ ...newStaff, role: e.target.value })}
-                      className="p-2 border rounded focus:outline-none focus:ring-2 focus:ring-red-500"
-                    />
-                    <input
-                      type="number"
-                      placeholder="Salary"
-                      value={newStaff.salary}
-                      onChange={(e) => setNewStaff({ ...newStaff, salary: parseFloat(e.target.value) })}
-                      className="p-2 border rounded focus:outline-none focus:ring-2 focus:ring-red-500"
-                    />
-                  </div>
-                  <button
-                    onClick={handleAddStaff}
-                    className="mt-4 bg-red-600 text-white p-2 rounded hover:bg-red-700 active:bg-red-800 transition-colors duration-200"
-                  >
-                    Add Staff
-                  </button>
-                </div>
-
-                {/* Search Staff */}
-                <div className="mb-4 bg-white p-6 rounded-lg shadow-md">
-                  <h3 className="text-lg font-semibold mb-4 text-black-600">Search Staff by ID</h3>
-                  <div className="flex items-center">
-                    <input
-                      type="text"
-                      placeholder="Enter Staff ID"
-                      value={searchId}
-                      onChange={(e) => setSearchId(e.target.value)}
-                      className="p-2 border rounded mr-2 flex-grow focus:outline-none focus:ring-2 focus:ring-red-500"
-                    />
-                    <button
-                      onClick={handleSearchStaff}
-                      className="bg-red-600 text-white p-2 rounded hover:bg-red-700 active:bg-red-800 transition-colors duration-200"
-                    >
-                      Search
-                    </button>
-                  </div>
-                  {searchedStaff && (
-                    <div className="mt-4 p-4 bg-gray-50 rounded">
-                      <p><strong>Name:</strong> {searchedStaff.name}</p>
-                      <p><strong>Role:</strong> {searchedStaff.role}</p>
-                      <p><strong>Salary:</strong> ${searchedStaff.salary}</p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Salary Distribution Histogram */}
-                <div className="mb-4 bg-white p-6 rounded-lg shadow-md">
-                  <h3 className="text-lg font-semibold mb-4 text-black-600">Salary Distribution</h3>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={histogramData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="range" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="count" fill="#8884d8" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-
-                {/* Staff List */}
-                <div className="bg-white p-6 rounded-lg shadow-md">
-                  <h3 className="text-lg font-semibold mb-4 text-black-600">Staff List</h3>
-                  {loading ? (
-                    <div className="flex justify-center items-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
-                    </div>
-                  ) : (
-                    <table className="w-full border-collapse">
-                      <thead>
-                        <tr className="bg-red-600 text-white">
-                          <th className="p-2 border">Staff ID</th>
-                          <th className="p-2 border">Name</th>
-                          <th className="p-2 border">Role</th>
-                          <th className="p-2 border">Salary</th>
-                          <th className="p-2 border">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {staff.map((s) => (
-                          <tr key={s._id} className="border">
-                            <td className="p-2 border">{s.staffId}</td>
-                            <td className="p-2 border">{s.name}</td>
-                            <td className="p-2 border">
-                              <input
-                                type="text"
-                                value={s.role}
-                                onChange={(e) => {
-                                  const updatedStaff = staff.map((st) =>
-                                    st._id === s._id ? { ...st, role: e.target.value } : st
-                                  );
-                                  setStaff(updatedStaff);
-                                }}
-                                className="p-1 border rounded focus:outline-none focus:ring-2 focus:ring-red-500"
-                              />
-                            </td>
-                            <td className="p-2 border">
-                              <input
-                                type="number"
-                                value={s.salary}
-                                onChange={(e) => {
-                                  const updatedStaff = staff.map((st) =>
-                                    st._id === s._id ? { ...st, salary: parseFloat(e.target.value) } : st
-                                  );
-                                  setStaff(updatedStaff);
-                                }}
-                                className="p-1 border rounded focus:outline-none focus:ring-2 focus:ring-red-500"
-                              />
-                            </td>
-                            <td className="p-2 border">
-                              <button
-                                onClick={() => handleUpdateStaff(s._id, s.role, s.salary)}
-                                className="bg-green-500 text-white p-1 rounded mr-2 hover:bg-yellow-600 active:bg-yellow-700 transition-colors duration-200"
-                              >
-                                Update
-                              </button>
-                              <button
-                                onClick={() => handleDeleteStaff(s._id)}
-                                className="bg-red-500 text-white p-1 rounded hover:bg-red-600 active:bg-red-700 transition-colors duration-200"
-                              >
-                                Delete
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  )}
-                </div>
+              <h1 className="text-2xl font-bold text-gray-800 mb-6">Reports</h1>
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <p className="text-gray-600">Reports functionality coming soon...</p>
               </div>
             </motion.div>
-          )}
+          )} */}
+
+          {/* {activeTab === 'settings' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <h1 className="text-2xl font-bold text-gray-800 mb-6">Settings</h1>
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <p className="text-gray-600">Settings functionality coming soon...</p>
+              </div>
+            </motion.div>
+          )} */}
         </div>
       </motion.div>
     </div>
