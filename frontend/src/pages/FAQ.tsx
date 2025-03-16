@@ -164,7 +164,7 @@ const staticFAQs: FAQ[] = [
             <video
               controls
               className="w-full h-full object-cover"
-              src="/cd/howto_feedback.mp4"
+              src="/cd/howto_contact.mp4"
               title="contact us"
             >
               Your browser does not support the video tag.
@@ -173,7 +173,7 @@ const staticFAQs: FAQ[] = [
         </div>
         <div className="w-full md:w-1/2 space-y-4">
           <h3 className="text-2xl font-bold text-gray-900">
-            How to Leave a Feedback
+            How to contact us
           </h3>
           <ul className="list-none text-gray-700 space-y-2">
             <li>
@@ -210,7 +210,7 @@ const staticFAQs: FAQ[] = [
         </div>
         <div className="w-full md:w-1/2 space-y-4">
           <h3 className="text-2xl font-bold text-gray-900">
-            How to Leave a Feedback
+            How to request staff help while dinning
           </h3>
           <ul className="list-none text-gray-700 space-y-2">
             <li>
