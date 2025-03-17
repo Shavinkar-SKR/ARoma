@@ -63,7 +63,15 @@ const FeedbackPage: React.FC = () => {
         body: JSON.stringify(newFeedback),
       });
 
-      if (!response.ok) throw new Error("Failed to submit feedback");
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (response.status === 404) {
+          toast.error(errorData.message); // Display "User not found" error
+        } else {
+          throw new Error("Failed to submit feedback");
+        }
+        return;
+      }
 
       toast.success("Feedback submitted!");
       setUsername("");
@@ -96,7 +104,7 @@ const FeedbackPage: React.FC = () => {
         ).toFixed(1) // Round to 1 decimal place
       : "No ratings yet";
 
-  // CA: Function to get a random profile image
+  // Function to get a random profile image
   const getRandomProfileImage = () => {
     const randomIndex = Math.floor(Math.random() * 5) + 1; // Random number between 1 and 5
     return `/cd/profile_${randomIndex}.png`; // Updated path to the profile image
@@ -173,7 +181,6 @@ const FeedbackPage: React.FC = () => {
               alt={filterRestaurant}
               className="w-full h-48 object-cover rounded-lg"
             />
-            {/* CA: Restaurant Name and Average Rating */}
             <div className="mt-4 text-center">
               <h3 className="text-xl font-semibold">{filterRestaurant}</h3>
               <p className="text-gray-600">
@@ -210,7 +217,6 @@ const FeedbackPage: React.FC = () => {
             filteredFeedback.map((fb) => (
               <Card key={fb._id} className="mb-2">
                 <CardContent>
-                  {/* CA: User Profile Icon and Username */}
                   <div className="flex items-center gap-2">
                     <img
                       src={getRandomProfileImage()} // Random profile image
