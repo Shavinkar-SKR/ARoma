@@ -29,7 +29,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/order-placement" element={<OrderPlacementPage />} />
       <Route path="/payments" element={<PaymentsPage />} />
       <Route path="/order-status/:orderId" element={<OrderStatusPage />} />
-      <Route path="/admin-dashboard" element={<AdminDashboard />} />
+      <Route path="/adminServiceRequestPanel" element={<AdminServiceRequestPanel />} />
       <Route path="/feedback" element={<FeedbackPage />} />
       <Route path="/faq" element={<FAQPage />} />
       <Route path="/service" element={<ServiceRequest />} />
@@ -39,10 +39,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/terms" element={<Terms />} />
       <Route path="/security" element={<Security />} />
       <Route path="/privacy" element={<Privacy/>} />
-      <Route path="/signUpDialog" element={<SignUpDialog />} />
-      <Route path="/signIn" element={<SignIn/>} />
       <Route path="/contact" element={<Contact/>} />
-      <Route path="/resetPassword" element={<ResetPassword/>} />
       
       <Route
         path="restaurant-selection"
@@ -52,7 +49,10 @@ const AppRoutes: React.FC = () => {
 
       {/* You can add other routes here */}
 	  </Route>
-	  <Route path="/adminServiceRequestPanel" element={<AdminServiceRequestPanel />} />
+    <Route path="/signUpDialog" element={<SignUpDialog />} />
+    <Route path="/signIn" element={<SignIn/>} />
+    <Route path="/resetPassword" element={<ResetPassword/>} />
+    <Route path="/admin-dashboard" element={<AdminDashboard />} />
     </Routes>
   );
 };
