@@ -11,7 +11,6 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { useLocation } from 'react-router-dom';
 
-
 interface CartItem {
   id: number;
   name: string;
@@ -74,7 +73,6 @@ const statusConfig = {
   },
 };
 
-// Sample random restaurant-related messages
 const randomMessages = [
   {
     id: 1,
@@ -122,9 +120,7 @@ const OrderStatus: React.FC = () => {
     if (!orderId) return;
 
     const setupEventSource = () => {
-      eventSourceRef.current = new EventSource(
-        `http://localhost:5001/order-events/${orderId}`
-      );
+      eventSourceRef.current = new EventSource(`http://localhost:5001/order-events/${orderId}`);
 
       eventSourceRef.current.onopen = () => {
         setIsConnected(true);
@@ -177,10 +173,12 @@ const OrderStatus: React.FC = () => {
   const handleRetry = () => {
     setError('');
     eventSourceRef.current?.close();
-    const newEventSource = new EventSource(
-      `http://localhost:5001/order-events/${orderId}`
-    );
+    const newEventSource = new EventSource(`http://localhost:5001/order-events/${orderId}`);
     eventSourceRef.current = newEventSource;
+  };
+
+  const handleCallRestaurant = () => {
+    navigate('/service');
   };
 
   if (error) {
@@ -260,7 +258,10 @@ const OrderStatus: React.FC = () => {
                 <h3 className="text-xl font-bold text-gray-900 mb-4">Contact Restaurant Staff</h3>
                 <p className="text-gray-600 mb-4">Our staff is here to help you with your order.</p>
                 <div className="space-y-4">
-                  <button className="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-all duration-300">
+                  <button 
+                    onClick={handleCallRestaurant}
+                    className="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-all duration-300"
+                  >
                     <PhoneCall className="mr-2 h-5 w-5" />
                     Call Restaurant
                   </button>
@@ -274,6 +275,7 @@ const OrderStatus: React.FC = () => {
               </div>
             </div>
           )}
+
           {/* Preparation Time */}
           <div className="mb-8 bg-white p-6 rounded-2xl shadow-lg transform hover:scale-[1.02] transition-all duration-300">
             <div className="flex items-center gap-2 text-lg font-semibold">
@@ -345,8 +347,6 @@ const OrderStatus: React.FC = () => {
                 </div>
               )}
             </div>
-
-
           </div>
 
           {/* Random Recommendation */}
