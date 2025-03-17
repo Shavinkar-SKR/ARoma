@@ -109,7 +109,7 @@ def recommend_restaurants(user_id, top_n=3):
 
 # Test the model
 if __name__ == '__main__':
-    user_id = "ann jay"  # Replace with actual user ID
+    user_id = "ann jay"  # Replace with actual user manually
     recommendations = recommend_restaurants(user_id)
     print(f"\nRecommendations for user '{user_id}':")
     for restaurant in recommendations:

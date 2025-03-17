@@ -192,7 +192,7 @@ const staticFAQs: FAQ[] = [
   },
   {
     section: "How to request services ",
-    video: "/cd/howto_request.mp4", // This can remain, but we won't use it
+    video: "/cd/howto_request.mp4", // This
     description: "Learn how to request services",
     content: (
       <div className="space-y-6 flex flex-col md:flex-row items-center md:items-start p-6 md:space-x-10">
@@ -249,7 +249,7 @@ const staticFAQs: FAQ[] = [
 ];
 
 const FAQPage: React.FC = () => {
-  // Add types to useState hooks
+  
   const [menuOpen, setMenuOpen] = useState<boolean>(false); // Type: boolean
   const [contactOpen, setContactOpen] = useState<boolean>(false); // Type: boolean
   const [email, setEmail] = useState<string>(""); // Type: string
@@ -260,7 +260,7 @@ const FAQPage: React.FC = () => {
     setMenuOpen(false);
   };
 
-  // Add type to the event parameter
+  
   const handleContactSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Handle form submission here
