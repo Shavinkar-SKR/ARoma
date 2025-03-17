@@ -4,7 +4,7 @@ import { User } from "lucide-react";
 
 const Navbar: React.FC = () => {
   return (
-    <header className="bg-gray-100 p-6 shadow-md">
+    <header className="bg-gray-100 p-2 shadow-md">
       <div className="flex justify-between items-center max-w-screen-2xl container mx-auto">
         {/* Logo */}
         <div className="flex items-center space-x-2">

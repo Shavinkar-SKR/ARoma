@@ -1,5 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+import Layout from "./components/Layout";
 import OrderPlacementPage from "./pages/order-placement";
 import PaymentsPage from "./pages/PaymentsPage";
 import OrderStatusPage from "./pages/order-status";
@@ -23,6 +24,7 @@ import ResetPassword from "./pages/ResetPassword";
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
+	<Route element={<Layout />}>
       <Route path="/order-placement" element={<OrderPlacementPage />} />
       <Route path="/payments" element={<PaymentsPage />} />
       <Route path="/order-status/:orderId" element={<OrderStatusPage />} />
@@ -48,6 +50,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/digital-menu/:restaurantId" element={<DigitalMenuPage />} />
 
       {/* You can add other routes here */}
+	  </Route>
     </Routes>
   );
 };
