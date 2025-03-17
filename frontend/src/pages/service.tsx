@@ -124,25 +124,27 @@ const ServiceRequest = () => {
         )}
       />
 
+      
       <section className="bg-gray-100 p-6">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
+        {/* Header */}
+      {/*  <div className="flex justify-between items-center mb-6">
           <img src="/images/logoARoma.gif" alt="logo" className="w-12 h-12" />
           <div className="text-center">
             <h1 className="text-4xl font-bold">AROMA</h1>
             <p className="text-sm text-gray-600">A fine diner experience with us</p>
           </div>
           <div className="text-lg font-semibold">Welcome, User!</div>
-        </div>
+        </div> */}
 
         {/* Navigation */}
-        <nav className="flex justify-center space-x-8 mb-6">
+      {/*  <nav className="flex justify-center space-x-8 mb-6">
           {["Home", "Restaurant", "Menu", "Contact", "Feedback", "FAQ"].map((item) => (
             <a href={`${item.toLowerCase()}.html`} key={item} className="text-lg font-semibold">
               {item}
             </a>
           ))}
-        </nav>
+        </nav> */}
 
         {/* Hero Section */}
         <div className="relative">
