@@ -22,7 +22,6 @@ import {
   CookingPot,
   Bell,
   BarChart2,
-  Users,
 } from 'lucide-react';
 import { toast, Toaster } from 'sonner';
 import axios from 'axios';
@@ -1176,11 +1175,11 @@ function AdminDashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <h1 className="text-2xl font-bold mb-4 text-red-600">Sales Analytics & Staff Management</h1>
+              <h1 className="text-2xl font-bold mb-4 text-gray-800">Sales Analytics & Staff Management</h1>
 
               {/* Sales Analytics */}
               <div className="mb-8">
-                <h2 className="text-xl font-semibold mb-4 text-red-600">Sales Analytics</h2>
+                <h2 className="text-xl font-semibold mb-4 text-gray-800">Sales Analytics</h2>
                 <div className="grid grid-cols-3 gap-4 mb-4">
                   <div className="bg-white p-4 rounded shadow">
                     <p className="text-gray-600">Total Orders</p>
@@ -1209,11 +1208,11 @@ function AdminDashboard() {
 
               {/* Staff Management */}
               <div>
-                <h2 className="text-xl font-semibold mb-4 text-red-600">Staff Management</h2>
+                <h2 className="text-xl font-semibold mb-4 text-gray-800">Staff Management</h2>
 
                 {/* Add Staff Form */}
                 <div className="mb-4 bg-white p-6 rounded-lg shadow-md">
-                  <h3 className="text-lg font-semibold mb-4 text-red-600">Add New Staff</h3>
+                  <h3 className="text-lg font-semibold mb-4 text-gray-800">Add New Staff</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <input
                       type="text"
@@ -1254,7 +1253,7 @@ function AdminDashboard() {
 
                 {/* Search Staff */}
                 <div className="mb-4 bg-white p-6 rounded-lg shadow-md">
-                  <h3 className="text-lg font-semibold mb-4 text-red-600">Search Staff by ID</h3>
+                  <h3 className="text-lg font-semibold mb-4 text-gray-800">Search Staff by ID</h3>
                   <div className="flex items-center">
                     <input
                       type="text"
@@ -1281,7 +1280,7 @@ function AdminDashboard() {
 
                 {/* Salary Distribution Histogram */}
                 <div className="mb-4 bg-white p-6 rounded-lg shadow-md">
-                  <h3 className="text-lg font-semibold mb-4 text-red-600">Salary Distribution</h3>
+                  <h3 className="text-lg font-semibold mb-4 text-gray-800">Salary Distribution</h3>
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={histogramData}>
                       <CartesianGrid strokeDasharray="3 3" />
@@ -1296,7 +1295,7 @@ function AdminDashboard() {
 
                 {/* Staff List */}
                 <div className="bg-white p-6 rounded-lg shadow-md">
-                  <h3 className="text-lg font-semibold mb-4 text-red-600">Staff List</h3>
+                  <h3 className="text-lg font-semibold mb-4 text-gray-800">Staff List</h3>
                   {loading ? (
                     <div className="flex justify-center items-center">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
@@ -1346,13 +1345,13 @@ function AdminDashboard() {
                             <td className="p-2 border">
                               <button
                                 onClick={() => handleUpdateStaff(s._id, s.role, s.salary)}
-                                className="bg-yellow-500 text-white p-1 rounded mr-2 hover:bg-yellow-600 active:bg-yellow-700 transition-colors duration-200"
+                                className="bg-green-400 text-white p-1 rounded mr-2 hover:bg-green-600 active:bg-yellow-700 transition-colors duration-200"
                               >
                                 Update
                               </button>
                               <button
                                 onClick={() => handleDeleteStaff(s._id)}
-                                className="bg-red-500 text-white p-1 rounded hover:bg-red-600 active:bg-red-700 transition-colors duration-200"
+                                className="bg-red-400 text-white p-1 rounded hover:bg-red-600 active:bg-red-700 transition-colors duration-200"
                               >
                                 Delete
                               </button>
