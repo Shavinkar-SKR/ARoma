@@ -8,14 +8,13 @@ CORS(app)  # Enable CORS
 
 @app.route('/recommend', methods=['GET'])
 def recommend():
-    meal_name = request.args.get('meal_name')
-    user_id = request.args.get('user_id')  # Add user_id parameter for collaborative filtering
+    user_id = request.args.get('user_id')  # Get user_id from query parameters
 
-    if not meal_name or not user_id:
-        return jsonify({"error": "Please provide both 'meal_name' and 'user_id' parameters."}), 400
+    if not user_id:
+        return jsonify({"error": "Please provide 'user_id' parameter."}), 400
 
     # Get meal recommendations from the content-based model
-    meal_recommendations = recommend_meals(meal_name)
+    meal_recommendations = recommend_meals(user_id)
 
     # Get restaurant recommendations from the collaborative filtering model
     restaurant_recommendations = recommend_restaurants(user_id)
