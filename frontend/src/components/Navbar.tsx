@@ -1,12 +1,18 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { User, Menu, X } from "lucide-react";
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation(); // Get the current location
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  // Function to check if the link is active
+  const isActive = (path: string) => {
+    return location.pathname === path;
   };
 
   return (
@@ -14,7 +20,7 @@ const Navbar: React.FC = () => {
       <div className="flex justify-between items-center max-w-screen-2xl container mx-auto">
         {/* Logo */}
         <div className="flex items-center space-x-2">
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/HomePage" className="flex items-center space-x-2">
             <img src="/images/logoARoma.gif" alt="logo" className="w-12 h-12" />
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">AROMA</h1>
           </Link>
@@ -35,44 +41,45 @@ const Navbar: React.FC = () => {
           className={`${isMenuOpen ? "block" : "hidden"} lg:flex lg:items-center lg:space-x-6 text-lg font-semibold absolute lg:static top-16 left-0 w-full lg:w-auto bg-gray-100 lg:bg-transparent z-50 p-4 lg:p-0`}
         >
           <Link
-            to="/"
-            className="block lg:inline-block hover:text-red-500 py-2 lg:py-0"
+            to="/HomePage"
+            className={`block lg:inline-block hover:text-red-500 py-2 lg:py-0 ${
+              isActive("/HomePage") ? "text-red-500" : ""
+            }`}
             onClick={() => setIsMenuOpen(false)}
           >
             Home
           </Link>
           <Link
-            to="/add-restaurant"
-            className="block lg:inline-block hover:text-red-500 py-2 lg:py-0"
-            onClick={() => setIsMenuOpen(false)}
-          >
-            Add Restaurant
-          </Link>
-          <Link
-            to="/menu"
-            className="block lg:inline-block hover:text-red-500 py-2 lg:py-0"
+            to="/digital-menu/67b3783fd0845b272dd7cf7c"
+            className={`block lg:inline-block hover:text-red-500 py-2 lg:py-0 ${
+              isActive("/digital-menu/67b3783fd0845b272dd7cf7c") ? "text-red-500" : ""
+            }`}
             onClick={() => setIsMenuOpen(false)}
           >
             Menu
           </Link>
           <Link
-            to="/restaurants"
-            className="block lg:inline-block hover:text-red-500 py-2 lg:py-0"
+            to="/restaurant-selection"
+            className={`block lg:inline-block hover:text-red-500 py-2 lg:py-0 ${
+              isActive("/restaurant-selection") ? "text-red-500" : ""
+            }`}
             onClick={() => setIsMenuOpen(false)}
           >
             Restaurants
           </Link>
           <Link
-            to="/service"
-            className="block lg:inline-block hover:text-red-500 py-2 lg:py-0"
+            to="/FAQ"
+            className={`block lg:inline-block hover:text-red-500 py-2 lg:py-0 ${
+              isActive("/FAQ") ? "text-red-500" : ""
+            }`}
             onClick={() => setIsMenuOpen(false)}
           >
-            Service Requests
+            FAQ
           </Link>
 
           {/* Mobile Login Button */}
           <Link
-            to="/login"
+            to="/signIn"
             className="block lg:hidden w-full text-center px-6 py-2 text-white bg-red-500 rounded-full text-lg font-semibold hover:bg-green-500 mt-4"
             onClick={() => setIsMenuOpen(false)}
           >
@@ -81,7 +88,7 @@ const Navbar: React.FC = () => {
 
           {/* Mobile Profile Icon */}
           <Link
-            to="/userprofile"
+            to="/userProfilePage"
             className="block lg:hidden w-full text-center text-gray-700 hover:text-red-500 mt-4"
             onClick={() => setIsMenuOpen(false)}
           >
@@ -93,14 +100,14 @@ const Navbar: React.FC = () => {
         <div className="hidden lg:flex items-center space-x-4">
           {/* Login Button */}
           <Link
-            to="/login"
+            to="/signIn"
             className="px-6 py-2 text-white bg-red-500 rounded-full text-lg font-semibold hover:bg-green-500"
           >
             Login
           </Link>
 
           {/* Profile Icon */}
-          <Link to="/userprofile" className="text-gray-700 hover:text-red-500">
+          <Link to="/userProfilePage" className="text-gray-700 hover:text-red-500">
             <User className="h-6 w-6" />
           </Link>
         </div>
