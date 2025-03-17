@@ -88,27 +88,7 @@ const Banner: React.FC = () => {
             {/* Search Bar */}
             <div className="relative w-full max-w-md mx-auto md:mx-0">
               <div className="flex items-center bg-white rounded-full p-2">
-                {/* Location Input */}
-                <div className="relative flex items-center w-[100px] sm:w-[120px] px-2 sm:px-3 border-r border-gray-200">
-                  <MapPin className="w-4 h-4 text-gray-500 mr-2 flex-shrink-0" />
-                  {locationFocused || location ? (
-                    <Input
-                      type="text"
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
-                      onBlur={() => setLocationFocused(false)}
-                      className="w-full outline-none bg-transparent text-gray-800 text-sm sm:text-base"
-                      autoFocus
-                    />
-                  ) : (
-                    <div
-                      onClick={() => setLocationFocused(true)}
-                      className="cursor-text text-gray-500 truncate text-sm sm:text-base"
-                    >
-                      Colombo
-                    </div>
-                  )}
-                </div>
+                
 
                 {/* Search Input */}
                 <div className="flex-1 px-2 sm:px-3">
