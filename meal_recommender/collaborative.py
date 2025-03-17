@@ -96,10 +96,10 @@ def recommend_restaurants(user_id, top_n=3):
     print("\nRecommended Restaurant IDs:")
     print(recommended_restaurant_ids)
 
-    # Fetch restaurant details
+    # Fetch restaurant details, including the image
     recommended_restaurants = []
     for restaurant_id in recommended_restaurant_ids:
-        restaurant = restaurants_collection.find_one({"name": restaurant_id}, {"name": 1, "rating": 1, "location": 1, "_id": 0})
+        restaurant = restaurants_collection.find_one({"name": restaurant_id}, {"name": 1, "rating": 1, "location": 1, "image": 1, "_id": 0})
         if restaurant:
             recommended_restaurants.append(restaurant)
 
@@ -113,4 +113,4 @@ if __name__ == '__main__':
     recommendations = recommend_restaurants(user_id)
     print(f"\nRecommendations for user '{user_id}':")
     for restaurant in recommendations:
-        print(f" - {restaurant['name']} (Rating: {restaurant['rating']}, Location: {restaurant['location']})")
+        print(f" - {restaurant['name']} (Rating: {restaurant['rating']}, Location: {restaurant['location']}, Image: {restaurant['image']})")

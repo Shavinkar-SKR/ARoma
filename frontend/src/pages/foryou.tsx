@@ -90,7 +90,7 @@ const ForYou: React.FC = () => {
             <CardContent>
               {/* Restaurant Image */}
               <img
-                src={restaurant.image}
+                src={restaurant.image || "https://via.placeholder.com/300"} // Fallback image if no image is provided
                 alt={restaurant.name}
                 className="w-full h-48 object-cover rounded-lg mb-4"
               />
