@@ -22,6 +22,7 @@ interface MenuItem {
     isGlutenFree: boolean;
   };
   hasARPreview: boolean;
+  arLink: string;
 }
 
 interface CartItem {
@@ -294,7 +295,7 @@ const DigitalMenuPage: React.FC = () => {
                         <Button
                           className="absolute top-2 right-2 bg-white/90 hover:bg-white text-black"
                           size="sm"
-                          onClick={() => toast.info("AR View coming soon!")}
+                          onClick={() => location.href = item.arLink}
                         >
                           <View className="w-4 h-4 mr-1" />
                           AR View
