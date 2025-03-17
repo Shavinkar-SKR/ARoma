@@ -32,7 +32,6 @@ const AppRoutes: React.FC = () => {
       <Route path="/feedback" element={<FeedbackPage />} />
       <Route path="/faq" element={<FAQPage />} />
       <Route path="/service" element={<ServiceRequest />} />
-      <Route path="/adminServiceRequestPanel" element={<AdminServiceRequestPanel />} />
       <Route path="/salesAnalyticsStaffManagement" element={<SalesAnalyticsStaffManagement />} />
       <Route path="/foryou" element={<ForYou />} />
       <Route path="/terms" element={<Terms />} />
@@ -51,6 +50,7 @@ const AppRoutes: React.FC = () => {
 
       {/* You can add other routes here */}
 	  </Route>
+	  <Route path="/adminServiceRequestPanel" element={<AdminServiceRequestPanel />} />
     </Routes>
   );
 };
