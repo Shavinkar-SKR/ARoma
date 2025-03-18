@@ -16,7 +16,7 @@ const Footer: React.FC = () => {
         {/* Quick Links */}
         <nav className="text-center">
           <h6 className="text-lg font-semibold mb-6">Quick Links</h6>
-          <a href="/about" className="block mb-6 hover:text-red-500 transition-transform transform hover:scale-110">About Us</a>
+          <a href="https://aromaofficials.com/" className="block mb-6 hover:text-red-500 transition-transform transform hover:scale-110">About Us</a>
           <a href="/contact" className="block mb-6 hover:text-red-500 transition-transform transform hover:scale-110">Contact Us</a>
           <a href="/us" className="block mb-6 hover:text-red-500 transition-transform transform hover:scale-110">Who we are</a>
         </nav>
