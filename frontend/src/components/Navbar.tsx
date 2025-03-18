@@ -76,6 +76,15 @@ const Navbar: React.FC = () => {
           >
             FAQ
           </Link>
+          <Link
+            to="/feedback"
+            className={`block lg:inline-block hover:text-red-500 py-2 lg:py-0 ${
+              isActive("/feedback") ? "text-red-500" : ""
+            }`}
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Feedback
+          </Link>
 
           {/* Mobile Login Button */}
           <Link
