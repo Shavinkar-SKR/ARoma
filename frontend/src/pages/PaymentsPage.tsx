@@ -1,11 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
@@ -16,49 +10,40 @@ interface LocationState {
   specialInstructions: string;
   tableNumber: string;
   orderStatus: string;
-  estimatedTime: number; // Add this line
 }
 
 const PaymentsPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-
-  const estimatedTime = location.state?.estimatedTime || "Calculating...";
-  console.log("Estimated Time in Payments Page:", estimatedTime); // Log the estimated time
-
   const state = location.state as LocationState | null;
 
   if (!state) {
     return <Navigate to="/" />;
   }
 
-  const { total, cartItems, specialInstructions, tableNumber, orderStatus } =
-    state;
+  const { total, cartItems, specialInstructions, tableNumber, orderStatus } = state;
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleProceedToPayment = async () => {
     setIsLoading(true);
-    setIsLoading(true);
 
     const orderDetails = {
       cartItems,
-      specialInstructions, // Pass specialInstructions without the table number
+      specialInstructions,
       total,
-      tableNumber, // Pass tableNumber as a separate field
+      tableNumber,
+      orderStatus: orderStatus || "received"
     };
 
     try {
-      const response = await fetch(
-        "http://localhost:5001/api/orders/place-order",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(orderDetails),
-        }
-      );
+      const response = await fetch("http://localhost:5001/api/orders/place-order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderDetails),
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -70,7 +55,6 @@ const PaymentsPage: React.FC = () => {
     } catch (error) {
       console.error("Error:", error);
     } finally {
-      setIsLoading(false);
       setIsLoading(false);
     }
   };
@@ -101,8 +85,7 @@ const PaymentsPage: React.FC = () => {
                 >
                   {isLoading ? (
                     <>
-                      <Loader2 className="animate-spin w-5 h-5 mr-2" />{" "}
-                      Processing...
+                      <Loader2 className="animate-spin w-5 h-5 mr-2" /> Processing...
                     </>
                   ) : (
                     "Proceed to Payment"

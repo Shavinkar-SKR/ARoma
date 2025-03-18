@@ -8,105 +8,124 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
-    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getOrders = exports.placeOrder = void 0;
-var dbConfig_1 = require("../config/dbConfig"); // Import the connectDB utility
-var mlService_1 = require("../ml/mlService");
+exports.updateOrderStatus = exports.getOrders = exports.deleteOrder = exports.placeOrder = void 0;
+const mongodb_1 = require("mongodb");
+const dbConfig_1 = require("../config/dbConfig"); // Import the connectDB utility
 // Function to place an order
-var placeOrder = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, cartItems, specialInstructions, total, tableNumber, db, ordersCollection, estimatedTime, newOrder, result, error_1;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
-            case 0:
-                _b.trys.push([0, 4, , 5]);
-                _a = req.body, cartItems = _a.cartItems, specialInstructions = _a.specialInstructions, total = _a.total, tableNumber = _a.tableNumber;
-                return [4 /*yield*/, (0, dbConfig_1.connectDB)()];
-            case 1:
-                db = _b.sent();
-                ordersCollection = db.collection("orders");
-                return [4 /*yield*/, (0, mlService_1.predictOrderTime)({
-                        cartItems: cartItems,
-                        specialInstructions: specialInstructions,
-                        total: total,
-                    })];
-            case 2:
-                estimatedTime = _b.sent();
-                newOrder = {
-                    cartItems: cartItems,
-                    specialInstructions: specialInstructions,
-                    total: total,
-                    tableNumber: tableNumber,
-                    estimatedTime: estimatedTime,
-                };
-                return [4 /*yield*/, ordersCollection.insertOne(newOrder)];
-            case 3:
-                result = _b.sent();
-                res.status(201).json({
-                    message: "Order placed successfully",
-                    orderId: result.insertedId,
-                    estimatedTime: estimatedTime,
-                });
-                return [3 /*break*/, 5];
-            case 4:
-                error_1 = _b.sent();
-                console.error("Error placing order:", error_1);
-                res.status(500).json({ error: "Internal server error" });
-                return [3 /*break*/, 5];
-            case 5: return [2 /*return*/];
-        }
-    });
-}); };
+const placeOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { cartItems, specialInstructions, total, tableNumber } = req.body;
+        const db = yield (0, dbConfig_1.connectDB)();
+        const ordersCollection = db.collection("orders");
+        // Initialize the new order with status "received"
+        const newOrder = {
+            cartItems,
+            specialInstructions,
+            total,
+            tableNumber,
+            status: "received", // Default status
+        };
+        // Insert the new order into MongoDB
+        const result = yield ordersCollection.insertOne(newOrder);
+        // Return the response with _id (insertedId) instead of orderId
+        res.status(201).json({
+            message: "Order placed successfully",
+            _id: result.insertedId, // Use _id to be consistent with MongoDB
+            status: newOrder.status, // Include status in the response
+        });
+    }
+    catch (error) {
+        console.error("Error placing order:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
 exports.placeOrder = placeOrder;
-// New function to get all orders
-var getOrders = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var db, ordersCollection, orders, error_2;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                _a.trys.push([0, 3, , 4]);
-                return [4 /*yield*/, (0, dbConfig_1.connectDB)()];
-            case 1:
-                db = _a.sent();
-                ordersCollection = db.collection("orders");
-                return [4 /*yield*/, ordersCollection.find().toArray()];
-            case 2:
-                orders = _a.sent();
-                res.status(200).json(orders);
-                return [3 /*break*/, 4];
-            case 3:
-                error_2 = _a.sent();
-                console.error("Error fetching orders:", error_2);
-                res.status(500).json({ error: "Internal server error" });
-                return [3 /*break*/, 4];
-            case 4: return [2 /*return*/];
+// Function to delete an order
+const deleteOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params; // Extract the order ID from the request parameters
+    // Validate the ID
+    if (!mongodb_1.ObjectId.isValid(id)) {
+        res.status(400).json({ message: "Invalid order ID" });
+        return;
+    }
+    try {
+        const db = yield (0, dbConfig_1.connectDB)();
+        const ordersCollection = db.collection("orders");
+        // Convert the string ID to ObjectId
+        const objectId = new mongodb_1.ObjectId(id);
+        // Delete the order from the database
+        const result = yield ordersCollection.deleteOne({ _id: objectId });
+        // Check if the order was found and deleted
+        if (result.deletedCount === 0) {
+            res.status(404).json({ message: "Order not found" });
+            return;
         }
-    });
-}); };
+        // Respond with a success message
+        res.status(200).json({ message: "Order deleted successfully" });
+    }
+    catch (error) {
+        console.error("Error deleting order:", error);
+        res.status(500).json({ message: "Failed to delete order", error });
+    }
+});
+exports.deleteOrder = deleteOrder;
+// Function to get all orders
+const getOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const db = yield (0, dbConfig_1.connectDB)();
+        const ordersCollection = db.collection("orders");
+        const orders = yield ordersCollection.find().toArray();
+        res.status(200).json(orders);
+    }
+    catch (error) {
+        console.error("Error fetching orders:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
 exports.getOrders = getOrders;
+// Function to update order status
+const updateOrderStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const { status } = req.body;
+    // Validate status is present in the request
+    if (!status) {
+        res.status(400).json({ message: "Status is required" });
+        return;
+    }
+    // Validate the ID format
+    if (!mongodb_1.ObjectId.isValid(id)) {
+        res.status(400).json({ message: "Invalid order ID format" });
+        return;
+    }
+    try {
+        const db = yield (0, dbConfig_1.connectDB)();
+        const ordersCollection = db.collection("orders");
+        // Convert the string ID to ObjectId
+        const objectId = new mongodb_1.ObjectId(id);
+        // Log the ID to ensure it's in the correct format
+        console.log("ID to update:", id);
+        // Update the order status in the database
+        const result = yield ordersCollection.findOneAndUpdate({ _id: objectId }, // Find by ObjectId
+        { $set: { status } }, // Set the new status
+        { returnDocument: "after" } // Return the updated document after the update
+        );
+        // Log the result of the update operation
+        console.log("Update result:", result);
+        // Check if result is null or doesn't have a value
+        if (!result || !result.value) {
+            // If no order was found or updated, return 404
+            res.status(404).json({ message: "Order not found" });
+            return;
+        }
+        // Emit the updated order to all connected clients (real-time update)
+        //emitOrderUpdate(result.value);
+        // Respond with the updated order
+        res.status(200).json(result.value);
+    }
+    catch (error) {
+        console.error("Error updating order status:", error);
+        res.status(500).json({ message: "Failed to update order status", error });
+    }
+});
+exports.updateOrderStatus = updateOrderStatus;

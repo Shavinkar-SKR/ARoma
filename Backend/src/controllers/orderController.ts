@@ -5,10 +5,7 @@ import { connectDB } from "../config/dbConfig"; // Import the connectDB utility
 import { emitOrderUpdate } from "../realTimeUpdates/realtimeUpdates"; // Import the emitOrderUpdate function
 
 // Function to place an order
-export const placeOrder = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const placeOrder = async (req: Request, res: Response): Promise<void> => {
   try {
     const { cartItems, specialInstructions, total, tableNumber } = req.body;
 
@@ -39,11 +36,9 @@ export const placeOrder = async (
   }
 };
 
+
 // Function to delete an order
-export const deleteOrder = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const deleteOrder = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params; // Extract the order ID from the request parameters
 
   // Validate the ID
@@ -91,10 +86,7 @@ export const getOrders = async (req: Request, res: Response): Promise<void> => {
 };
 
 // Function to update order status
-export const updateOrderStatus = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
+export const updateOrderStatus = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   const { status } = req.body;
 

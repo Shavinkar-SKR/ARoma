@@ -22,6 +22,7 @@ interface MenuItem {
     isGlutenFree: boolean;
   };
   hasARPreview: boolean;
+  arLink: string;
 }
 
 interface CartItem {
@@ -54,13 +55,13 @@ const DigitalMenuPage: React.FC = () => {
   const addToCart = (item: MenuItem) => {
     setCartItems((prev) => {
       const existingItem = prev.find(
-        (cartItem) => cartItem.menuId === item._id,
+        (cartItem) => cartItem.menuId === item._id
       );
       if (existingItem) {
         return prev.map((cartItem) =>
           cartItem.menuId === item._id
             ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem,
+            : cartItem
         );
       }
       return [
@@ -79,25 +80,24 @@ const DigitalMenuPage: React.FC = () => {
       description: `Added ${item.name} to your cart`,
     });
   };
-  
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   useEffect(() => {
     fetchMenuItems();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restaurantId]);
 
   const fetchMenuItems = async () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:5001/api/menus/${restaurantId}`,
+        `http://localhost:5001/api/menus/${restaurantId}`
       );
       if (!response.ok) throw new Error("Failed to fetch menu items");
       const data = await response.json();
       setMenuItems(data);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error("Failed to load menu items");
     } finally {
@@ -115,22 +115,18 @@ const DigitalMenuPage: React.FC = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5001/api/menus/search?query=${query}&restaurantId=${restaurantId}`,
+        `http://localhost:5001/api/menus/search?query=${query}&restaurantId=${restaurantId}`
       );
       if (!response.ok) throw new Error("Search failed");
       const data = await response.json();
       setMenuItems(data);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error("Search failed");
     } finally {
       setSearching(false);
     }
   };
-
-
-
-  
 
   const filteredAndSortedItems = useMemo(() => {
     let result = [...menuItems];
@@ -168,7 +164,7 @@ const DigitalMenuPage: React.FC = () => {
   const totalPages = Math.ceil(filteredAndSortedItems.length / itemsPerPage);
   const currentItems = filteredAndSortedItems.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
   const categories = [
@@ -182,7 +178,7 @@ const DigitalMenuPage: React.FC = () => {
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery]);
 
   if (loading) {
@@ -294,7 +290,7 @@ const DigitalMenuPage: React.FC = () => {
                         <Button
                           className="absolute top-2 right-2 bg-white/90 hover:bg-white text-black"
                           size="sm"
-                          onClick={() => toast.info("AR View coming soon!")}
+                          onClick={() => (location.href = item.arLink)}
                         >
                           <View className="w-4 h-4 mr-1" />
                           AR View
@@ -329,7 +325,7 @@ const DigitalMenuPage: React.FC = () => {
                                   .join(" ")
                                   .replace("is ", "")}
                               </Badge>
-                            ),
+                            )
                         )}
                       </div>
                       <div className="flex justify-between items-center">

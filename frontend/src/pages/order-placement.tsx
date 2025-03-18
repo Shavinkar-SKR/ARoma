@@ -12,20 +12,16 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
-  ShoppingCart,
-  Minus,
-  Plus,
-  Trash2,
   ChefHat,
   Store,
   CheckCircle2,
   DollarSign,
+  Clock,
+  Utensils,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast, Toaster } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-
-// Add the TableNumberInput component
 import TableNumberInput from "@/components/ui/TableNumberInput";
 
 interface CartItem {
@@ -45,31 +41,13 @@ const OrderPlacementPage: React.FC = () => {
   const [total, setTotal] = useState<number>(0);
   const navigate = useNavigate();
   const location = useLocation();
+  const [tableNumber, setTableNumber] = useState<string>("");
 
-  const [tableNumber, setTableNumber] = useState<string>(""); // Table number state
-
-  // Use data passed from CartPage using react-router state
   useEffect(() => {
     const data = location.state?.cartItems || [];
     setCartItems(data);
     updateTotals(data);
   }, [location.state?.cartItems]);
-
-  const getOrderPrediction = async () => {
-    try {
-      const response = await fetch("http://127.0.0.1:5001/predict", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cartItems, tableNumber }),
-      });
-
-      const data = await response.json();
-      return data.predicted_time; // Assuming the response contains { estimated_time: "20 mins" }
-    } catch (error) {
-      console.error("Prediction error:", error);
-      return "Unknown"; // Fallback in case of error
-    }
-  };
 
   const updateTotals = (items: CartItem[]) => {
     const newSubtotal = items.reduce(
@@ -80,58 +58,18 @@ const OrderPlacementPage: React.FC = () => {
     setTotal(newSubtotal + serviceFee);
   };
 
-  const handleQuantityChange = async (id: number, delta: number) => {
-    const updatedItems = cartItems.map((item) => {
-      return item.id === id
-        ? { ...item, quantity: Math.max(item.quantity + delta, 1) }
-        : item;
-    });
-
-    setCartItems(updatedItems);
-    updateTotals(updatedItems);
-
-    toast.success("Quantity updated", {
-      duration: 1000,
-      position: "top-right",
-      style: { background: "#f3f4f6", color: "#1f2937" },
-    });
-  };
-
-  const handleRemoveItem = (id: number) => {
-    // Find the item and its index for accurate reinsertion
-    const itemIndex = cartItems.findIndex((item) => item.id === id);
-    const itemToRemove = cartItems[itemIndex];
-
-    if (itemToRemove) {
-      const updatedItems = cartItems.filter((item) => item.id !== id);
-      setCartItems(updatedItems);
-      updateTotals(updatedItems);
-
-      toast(
-        <div className="flex items-center gap-2">
-          <span>Item removed</span>
-          <Button
-            variant="link"
-            className="p-0 h-auto text-blue-500 hover:text-blue-700"
-            onClick={() => {
-              // Insert the item back at its original position
-              const newItems = [...cartItems];
-              newItems.splice(itemIndex, 0, itemToRemove);
-              setCartItems(newItems);
-              updateTotals(newItems);
-            }}
-          >
-            Undo
-          </Button>
-        </div>,
-        {
-          duration: 5000, // Increased duration for better user interaction time
-          position: "top-right",
-        }
-      );
-    } else {
-      // If no item is found, inform the user
-      toast.error("Item not found in the cart.");
+  const getOrderPrediction = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:5001/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cartItems, tableNumber }),
+      });
+      const data = await response.json();
+      return data.predicted_time;
+    } catch (error) {
+      console.error("Prediction error:", error);
+      return "Unknown";
     }
   };
 
@@ -147,10 +85,14 @@ const OrderPlacementPage: React.FC = () => {
 
     toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
       loading: (
-        <div className="flex items-center gap-3">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-3"
+        >
           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
-          <span>Processing your order...</span>
-        </div>
+          <span>Preparing your order...</span>
+        </motion.div>
       ),
       success: () => {
         setTimeout(() => {
@@ -159,257 +101,308 @@ const OrderPlacementPage: React.FC = () => {
               total,
               cartItems,
               specialInstructions,
-              tableNumber, // Pass table number
+              tableNumber,
               estimatedTime,
             },
           });
         }, 500);
 
         return (
-          <div className="flex items-center gap-3 p-2">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex items-center gap-3 p-2"
+          >
             <div className="flex items-center justify-center bg-green-100 rounded-full p-1">
               <CheckCircle2 className="h-5 w-5 text-green-600" />
             </div>
             <div className="flex flex-col">
               <span className="font-semibold text-green-900">
-                Order Confirmed!
+                Order Confirmed
               </span>
               <span className="text-sm text-gray-600">
-                Redirecting to payment...
+                Proceeding to payment...
               </span>
             </div>
-          </div>
+          </motion.div>
         );
       },
       error: (
-        <div className="flex items-center gap-3 p-2">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex items-center gap-3 p-2 bg-red-50 border border-red-100 rounded-lg"
+        >
           <div className="flex items-center justify-center bg-red-100 rounded-full p-1">
             <span className="h-5 w-5 text-red-600">×</span>
           </div>
           <div className="flex flex-col">
             <span className="font-semibold text-red-900">
-              Failed to process order
+              Order Processing Failed
             </span>
-            <span className="text-sm text-gray-600">Please try again</span>
+            <span className="text-sm text-red-600">Please try again</span>
           </div>
-        </div>
+        </motion.div>
       ),
       position: "top-right",
     });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-      <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-gray-50 via-gray-100 to-gray-200">
+      <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
           className="max-w-4xl mx-auto"
         >
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-12">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              className="space-y-2"
             >
-              <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-                Order Summary
+              <h1 className="text-4xl font-bold tracking-tight text-gray-900">
+                Your Order
               </h1>
-              <p className="mt-2 text-sm text-gray-500">
-                Review your order before checkout
+              <p className="text-lg text-gray-600">
+                Review your selections before proceeding
               </p>
             </motion.div>
             <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 200, delay: 0.3 }}
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{
+                type: "spring",
+                stiffness: 200,
+                damping: 20,
+                delay: 0.4,
+              }}
+              className="bg-red-500 rounded-full p-4"
             >
-              <Store className="h-12 w-12 text-red-500" />
+              <Store className="h-8 w-8 text-white" />
             </motion.div>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-[1fr,380px]">
-            <div className="space-y-6">
-              <Card className="overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                  <div className="space-y-1">
-                    <CardTitle>Your Cart</CardTitle>
-                    <CardDescription>
-                      Review and adjust your items
-                    </CardDescription>
-                  </div>
-                  <ShoppingCart className="h-5 w-5 text-red-500 animate-bounce" />
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <AnimatePresence>
-                    {cartItems.length > 0 ? (
-                      cartItems.map((item) => (
-                        <motion.div
-                          key={item.id}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: 20 }}
-                          className="flex items-center space-x-4 rounded-lg border p-4 hover:bg-gray-50 transition-all duration-200 hover:shadow-md"
-                        >
-                          <img
-                            src={item.image}
-                            alt={item.name}
-                            className="h-16 w-16 rounded-md object-cover transform transition-transform hover:scale-105"
-                          />
-                          <div className="flex-1 space-y-1">
-                            <h4 className="font-medium">{item.name}</h4>
-                            <p className="text-sm text-muted-foreground">
-                              €{item.price.toFixed(2)} each
-                            </p>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Button
-                              size="icon"
-                              variant="outline"
-                              onClick={() => handleQuantityChange(item.id, -1)}
-                              className="h-8 w-8 hover:bg-gray-100 transition-colors"
-                            >
-                              <Minus className="h-4 w-4" />
-                            </Button>
-                            <span className="w-8 text-center font-medium">
-                              {item.quantity}
-                            </span>
-                            <Button
-                              size="icon"
-                              variant="outline"
-                              onClick={() => handleQuantityChange(item.id, 1)}
-                              className="h-8 w-8 hover:bg-gray-100 transition-colors"
-                            >
-                              <Plus className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              size="icon"
-                              variant="destructive"
-                              onClick={() => handleRemoveItem(item.id)}
-                              className="h-8 w-8 hover:bg-red-600 transition-colors"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                          <div className="w-24 text-right font-medium">
-                            €{(item.price * item.quantity).toFixed(2)}
-                          </div>
-                        </motion.div>
-                      ))
-                    ) : (
+          <div className="grid gap-8 md:grid-cols-[1fr,400px]">
+            <div className="space-y-8">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                <Card className="overflow-hidden border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+                  <CardHeader className="border-b bg-white">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <CardTitle className="text-2xl">Selected Items</CardTitle>
+                        <CardDescription className="text-gray-600">
+                          Your carefully chosen dishes
+                        </CardDescription>
+                      </div>
                       <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
+                        animate={{
+                          rotate: [0, -10, 10, 0],
+                        }}
+                        transition={{
+                          duration: 3,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }}
                       >
-                        <Alert>
-                          <AlertDescription>
-                            Your cart is empty. Add some items to proceed with
-                            checkout.
-                          </AlertDescription>
-                        </Alert>
+                        <Utensils className="h-6 w-6 text-red-500" />
                       </motion.div>
-                    )}
-                  </AnimatePresence>
-                </CardContent>
-              </Card>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <AnimatePresence>
+                      {cartItems.length > 0 ? (
+                        <div className="space-y-6">
+                          {cartItems.map((item, index) => (
+                            <motion.div
+                              key={item.id}
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: index * 0.1 }}
+                              className="flex items-center gap-6 p-4 rounded-xl bg-white shadow-sm border border-gray-100"
+                            >
+                              <motion.img
+                                whileHover={{ scale: 1.05 }}
+                                transition={{ type: "spring", stiffness: 300 }}
+                                src={item.image}
+                                alt={item.name}
+                                className="h-20 w-20 rounded-lg object-cover shadow-md"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <h4 className="text-lg font-semibold text-gray-900 mb-1">
+                                  {item.name}
+                                </h4>
+                                <div className="flex items-center gap-4 text-gray-600">
+                                  <span className="flex items-center gap-1">
+                                    <Clock className="h-4 w-4" />
+                                    Quantity: {item.quantity}
+                                  </span>
+                                  <span>€{item.price.toFixed(2)} each</span>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-lg font-semibold text-gray-900">
+                                  €{(item.price * item.quantity).toFixed(2)}
+                                </p>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+                      ) : (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="text-center py-8"
+                        >
+                          <Alert>
+                            <AlertDescription className="text-lg">
+                              Your cart is empty. Please add items to proceed.
+                            </AlertDescription>
+                          </Alert>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </CardContent>
+                </Card>
+              </motion.div>
 
-              {/* Table Number Input */}
-              <TableNumberInput
-                tableNumber={tableNumber}
-                setTableNumber={setTableNumber}
-              />
-              {/* Special instructions */}
-              <Card className="hover:shadow-md transition-shadow duration-200">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <ChefHat className="h-5 w-5 text-red-500" />
-                    Special Instructions
-                  </CardTitle>
-                  <CardDescription>
-                    Add any dietary preferences or special requests
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Textarea
-                    placeholder="E.g., allergies, preparation preferences, or delivery instructions..."
-                    value={specialInstructions}
-                    onChange={(e) => setSpecialInstructions(e.target.value)} // Update state when text changes
-                    className="min-h-[100px] focus:ring-2 focus:ring-primary/20 transition-shadow"
-                  />
-                </CardContent>
-              </Card>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+              >
+                <TableNumberInput
+                  tableNumber={tableNumber}
+                  setTableNumber={setTableNumber}
+                />
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+              >
+                <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-3 text-2xl">
+                      <motion.div
+                        animate={{
+                          rotate: [0, 15, -15, 0],
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        }}
+                      >
+                        <ChefHat className="h-6 w-6 text-red-500" />
+                      </motion.div>
+                      Special Instructions
+                    </CardTitle>
+                    <CardDescription className="text-gray-600">
+                      Let us know about any dietary requirements or preferences
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Textarea
+                      placeholder="Share your preferences, allergies, or special requests..."
+                      value={specialInstructions}
+                      onChange={(e) => setSpecialInstructions(e.target.value)}
+                      className="min-h-[120px] bg-white/50 backdrop-blur-sm focus:ring-2 focus:ring-red-500/20 transition-all"
+                    />
+                  </CardContent>
+                </Card>
+              </motion.div>
             </div>
 
-            {/* Order Summary Sidebar */}
-            <div className="space-y-6">
-              <Card className="sticky top-4 hover:shadow-lg transition-shadow duration-200">
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.8 }}
+            >
+              <Card className="sticky top-8 border-0 shadow-xl bg-white/80 backdrop-blur-sm">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <DollarSign className="h-5 w-5 text-red-500" />
+                  <CardTitle className="flex items-center gap-3 text-2xl">
+                    <motion.div
+                      animate={{
+                        scale: [1, 1.1, 1],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    >
+                      <DollarSign className="h-6 w-6 text-red-500" />
+                    </motion.div>
                     Order Summary
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    {/* Display subtotal, service fee, and total */}
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="flex justify-between text-sm"
-                    >
-                      <span className="text-muted-foreground">Subtotal</span>
-                      <span>€{subtotal.toFixed(2)}</span>
+                  <div className="space-y-6">
+                    <motion.div className="flex justify-between text-lg">
+                      <span className="text-gray-600">Subtotal</span>
+                      <span className="font-medium">€{subtotal.toFixed(2)}</span>
                     </motion.div>
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 }}
-                      className="flex justify-between text-sm"
-                    >
-                      <span className="text-muted-foreground">Service Fee</span>
-                      <span>€{serviceFee.toFixed(2)}</span>
+                    <motion.div className="flex justify-between text-lg">
+                      <span className="text-gray-600">Service Fee</span>
+                      <span className="font-medium">€{serviceFee.toFixed(2)}</span>
                     </motion.div>
-                    <Separator className="my-2" />
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
-                      className="flex justify-between text-lg font-semibold text-black"
-                    >
+                    <Separator className="my-6" />
+                    <motion.div className="flex justify-between text-2xl font-semibold">
                       <span>Total</span>
-                      <span className="text-black">€{total.toFixed(2)}</span>
+                      <motion.span
+                        key={total}
+                        initial={{ scale: 1.1 }}
+                        animate={{ scale: 1 }}
+                        className="text-red-500"
+                      >
+                        €{total.toFixed(2)}
+                      </motion.span>
                     </motion.div>
                   </div>
                 </CardContent>
-                <CardFooter>
-                  <Button
-                    className="w-full h-12 text-lg font-semibold transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 bg-black text-white hover:bg-black focus:outline-none"
-                    disabled={
-                      isProcessing ||
-                      cartItems.length === 0 ||
-                      !tableNumber ||
-                      parseInt(tableNumber) < 1 ||
-                      parseInt(tableNumber) > 50
-                    } // Disable button if processing or no items
-                    onClick={navigateToPaymentPage}
+                <CardFooter className="pt-6">
+                  <motion.div
+                    className="w-full"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    {isProcessing ? (
-                      <div className="flex items-center gap-2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        Processing...
-                      </div>
-                    ) : (
-                      "Proceed to Payment"
-                    )}
-                  </Button>
+                    <Button
+                      className="w-full h-14 text-lg font-semibold bg-red-500 text-white hover:bg-red-600 transition-all duration-300 disabled:opacity-50 disabled:hover:bg-red-500 rounded-xl"
+                      disabled={
+                        isProcessing ||
+                        cartItems.length === 0 ||
+                        !tableNumber ||
+                        parseInt(tableNumber) < 1 ||
+                        parseInt(tableNumber) > 50
+                      }
+                      onClick={navigateToPaymentPage}
+                    >
+                      {isProcessing ? (
+                        <div className="flex items-center gap-3">
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                          Processing...
+                        </div>
+                      ) : (
+                        "Complete Order"
+                      )}
+                    </Button>
+                  </motion.div>
                 </CardFooter>
               </Card>
-            </div>
+            </motion.div>
           </div>
         </motion.div>
       </div>
 
-      {/* Toast notifications container */}
       <Toaster />
     </div>
   );

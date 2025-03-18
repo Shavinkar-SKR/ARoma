@@ -1,71 +1,294 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CdButton from "@/components/cd/CdButton";
-import { 
-  FaBars, 
-  FaTimes, 
-  FaQuestionCircle, 
-  FaInstagram, 
-  FaTiktok, 
-  FaEnvelope, 
-  FaLinkedin, 
-  FaFacebook
+import {
+  FaBars,
+  FaTimes,
+  FaQuestionCircle,
+  FaInstagram,
+  FaTiktok,
+  FaEnvelope,
+  FaLinkedin,
+  FaFacebook,
 } from "react-icons/fa";
 
-const staticFAQs = [
+// Define the FAQ interface for type safety
+interface FAQ {
+  section: string;
+  video: string;
+  description: string;
+  content?: React.ReactNode; // Optional since not all objects have this property
+}
+
+// Add type to staticFAQs array
+const staticFAQs: FAQ[] = [
   {
     section: "Navigating Home Page",
     video: "https://www.example.com/video-homepage",
-    description: "Learn how to navigate the home page and find key features."
+    description: "Learn how to navigate the home page and find key features.",
   },
   {
-    section: "Browsing Restaurants",
-    video: "https://www.example.com/video-restaurants",
-    description: "A guide to exploring restaurants and finding the best meals."
+    section: "browsing restaurants and menus",
+    video: "/cd/howto_browse.mp4",
+    description: "how to view and browse ",
+    content: (
+      <div className="space-y-6 flex flex-col md:flex-row items-center md:items-start p-6 md:space-x-10">
+        <div className="w-full md:w-1/2 flex justify-center">
+          <div className="w-70 h-120 bg-gray-200 rounded-lg overflow-hidden shadow-lg">
+            <video
+              controls
+              className="w-full h-full object-cover"
+              src="/cd/howto_browse.mp4"
+              title="Leaving Feedback Tutorial"
+            >
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+        <div className="w-full md:w-1/2 space-y-4">
+          <h3 className="text-2xl font-bold text-gray-900">
+            How to browse a resturant
+          </h3>
+          <ul className="list-none text-gray-700 space-y-2">
+            <li>
+              <strong className="text-lg">Step 1:</strong> browse through
+              scrolling our selection of resturants
+            </li>
+            <li>
+              <strong className="text-lg">Step 2:</strong> serach a resturant by
+              name
+            </li>
+            <li>
+              <strong className="text-lg">Step 3:</strong> search a restuarant
+              by catagory
+            </li>
+          </ul>
+        </div>
+      </div>
+    ),
   },
   {
-    section: "Viewing Digital Menu",
-    video: "https://www.example.com/video-menu",
-    description: "How to check restaurant menus and filter items based on preferences."
-  },
-  {
-    section: "Placing an Order",
-    video: "https://www.example.com/video-order",
-    description: "Step-by-step instructions for placing an order."
-  },
-  {
-    section: "Making an Online Purchase",
-    video: "https://www.example.com/video-payment",
-    description: "Secure payment methods and completing your purchase."
+    section: "placing an order",
+    video: "howto_order.mp4",
+    description: "Learn how to leave feedback about your order or experience.",
+    content: (
+      <div className="space-y-6 flex flex-col md:flex-row items-center md:items-start p-6 md:space-x-10">
+        <div className="w-full md:w-1/2 flex justify-center">
+          <div className="w-70 h-120 bg-gray-200 rounded-lg overflow-hidden shadow-lg">
+            <video
+              controls
+              className="w-full h-full object-cover"
+              src="/cd/howto_order.mp4"
+              title="how to place an order"
+            >
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+        <div className="w-full md:w-1/2 space-y-4">
+          <h3 className="text-2xl font-bold text-gray-900">
+            How to place an order
+          </h3>
+          <ul className="list-none text-gray-700 space-y-2">
+            <li>
+              <strong className="text-lg">Step 1:</strong> select a restuarant
+              of choice and click view menu
+            </li>
+            <li>
+              <strong className="text-lg">Step 2:</strong> pick a dish and click
+              add to cart
+            </li>
+            <li>
+              <strong className="text-lg">Step 3:</strong> view cart
+            </li>
+            <li>
+              <strong className="text-lg">Step 4:</strong> edit the order in the
+              cart (optional)
+            </li>
+            <li>
+              <strong className="text-lg">Step 5:</strong> proceed to checkout
+            </li>
+            <li>
+              <strong className="text-lg">Step 6:</strong> give your table
+              number and instructions (optional).
+            </li>
+            <li>
+              <strong className="text-lg">Step 7:</strong> click process payment
+            </li>
+          </ul>
+        </div>
+      </div>
+    ),
   },
   {
     section: "Leaving Feedback",
-    video: "https://www.example.com/video-feedback",
-    description: "How to leave feedback about your order or experience."
+    video: "/cd/howto_feedback.mp4",
+    description: "Learn how to leave feedback about your order or experience.",
+    content: (
+      <div className="space-y-6 flex flex-col md:flex-row items-center md:items-start p-6 md:space-x-10">
+        <div className="w-full md:w-1/2 flex justify-center">
+          <div className="w-70 h-120 bg-gray-200 rounded-lg overflow-hidden shadow-lg">
+            <video
+              controls
+              className="w-full h-full object-cover"
+              src="/cd/howto_feedback.mp4"
+              title="Leaving Feedback Tutorial"
+            >
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+        <div className="w-full md:w-1/2 space-y-4">
+          <h3 className="text-2xl font-bold text-gray-900">
+            How to Leave a Feedback
+          </h3>
+          <ul className="list-none text-gray-700 space-y-2">
+            <li>
+              <strong className="text-lg">Step 1:</strong> Fill the submit form.
+            </li>
+            <li>
+              <strong className="text-lg">Step 2:</strong> Click the submit
+              button.
+            </li>
+            <li>
+              <strong className="text-lg">Step 3:</strong> Check for a
+              successful submission message.
+            </li>
+          </ul>
+        </div>
+      </div>
+    ),
   },
   {
-    section: "How to Contact Us",
-    video: "https://www.example.com/video-contact",
-    description: "Ways to get in touch with our support team for assistance."
-  }
+    section: "How to contact us",
+    video: "/cd/howto_contact.mp4",
+    description: "Learn how to contact us",
+    content: (
+      <div className="space-y-6 flex flex-col md:flex-row items-center md:items-start p-6 md:space-x-10">
+        <div className="w-full md:w-1/2 flex justify-center">
+          <div className="w-70 h-120 bg-gray-200 rounded-lg overflow-hidden shadow-lg">
+            <video
+              controls
+              className="w-full h-full object-cover"
+              src="/cd/howto_contact.mp4"
+              title="contact us"
+            >
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+        <div className="w-full md:w-1/2 space-y-4">
+          <h3 className="text-2xl font-bold text-gray-900">
+            How to contact us
+          </h3>
+          <ul className="list-none text-gray-700 space-y-2">
+            <li>
+              <strong className="text-lg">Step 1:</strong> go to FAQ page .
+            </li>
+            <li>
+              <strong className="text-lg">Step 2:</strong> Click contact us
+              button.
+            </li>
+            <li>
+              <strong className="text-lg">Step 3:</strong> fill the form and
+              submit.
+            </li>
+          </ul>
+        </div>
+      </div>
+    ),
+  },
+  {
+    section: "How to request services ",
+    video: "/cd/howto_request.mp4", // This
+    description: "Learn how to request services",
+    content: (
+      <div className="space-y-6 flex flex-col md:flex-row items-center md:items-start p-6 md:space-x-10">
+        <div className="w-full md:w-1/2 flex justify-center">
+          {/* Image Slideshow */}
+          <div className="w-70 h-120 bg-gray-200 rounded-lg overflow-hidden shadow-lg">
+            <div className="relative w-full h-full">
+              {/* Slide 1 */}
+              <div className="absolute inset-0 transition-opacity duration-1000 ease-in-out">
+                <img
+                  src="/cd/ser1.png"
+                  alt="Request Service Step 1"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              {/* Slide 2 */}
+              <div className="absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out">
+                <img
+                  src="/cd/ser2.png"
+                  alt="Request Service Step 2"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              {/* Slide 3 */}
+              <div className="absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out">
+                <img
+                  src="/cd/ser3.png"
+                  alt="Request Service Step 3"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="w-full md:w-1/2 space-y-4">
+          <h3 className="text-2xl font-bold text-gray-900">
+            How to request services while dining
+          </h3>
+          <ul className="list-none text-gray-700 space-y-2">
+            <li>
+              <strong className="text-lg">Step 1:</strong> Click Contact
+              Services.
+            </li>
+            <li>
+              <strong className="text-lg">Step 2:</strong> Enter your table
+              number.
+            </li>
+            <li>
+              <strong className="text-lg">Step 3:</strong> Click the service you
+              want from the selection.
+            </li>
+          </ul>
+        </div>
+      </div>
+    ),
+  },
 ];
 
 const FAQPage: React.FC = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [faqOpen, setFaqOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState<boolean>(false); // Type: boolean
+  const [contactOpen, setContactOpen] = useState<boolean>(false); // Type: boolean
+  const [email, setEmail] = useState<string>(""); // Type: string
+  const [userType, setUserType] = useState<string>(""); // Type: string
+  const [message, setMessage] = useState<string>(""); // Type: string
+
+  const handleMenuClick = () => {
+    setMenuOpen(false);
+  };
+
+  const handleContactSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // Handle form submission here
+    console.log({ email, userType, message });
+    setContactOpen(false);
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Top Navigation Bar */}
       <nav className="bg-gray-900 text-white p-4 flex justify-between items-center">
-        {/* Logo Section */}
         <div className="flex items-center gap-3">
           <img src="/cd/logo.gif" alt="Aroma Logo" className="h-10 w-auto" />
-          <span className="text-xl font-bold">Aroma</span> 
+          <span className="text-xl font-bold">Aroma</span>
         </div>
-
-        {/* Menu Toggle Button */}
-        <button onClick={() => setMenuOpen(!menuOpen)} className="text-white text-2xl">
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="text-white text-2xl"
+        >
           {menuOpen ? <FaTimes /> : <FaBars />}
         </button>
       </nav>
@@ -74,9 +297,14 @@ const FAQPage: React.FC = () => {
       {menuOpen && (
         <div className="bg-gray-800 text-white p-4 absolute top-16 left-0 w-full shadow-lg">
           {staticFAQs.map((faq, index) => (
-            <p key={index} className="py-2 hover:underline cursor-pointer" onClick={() => setMenuOpen(false)}>
+            <a
+              key={index}
+              href={`#${faq.section.replace(/\s+/g, "-").toLowerCase()}`}
+              onClick={handleMenuClick}
+              className="block py-2 hover:underline cursor-pointer"
+            >
               {faq.section}
-            </p>
+            </a>
           ))}
         </div>
       )}
@@ -95,83 +323,169 @@ const FAQPage: React.FC = () => {
         <p className="text-gray-700 mt-2 text-lg font-semibold">
           Bringing Digitalized Solutions to Your Dining Experience
         </p>
-        <p className="text-gray-600 mt-2">
-          {/* Add detailed explanation about the app here later */}
-        </p>
       </div>
 
       {/* Intro Section */}
       <div className="max-w-3xl mx-auto text-center p-6">
         <h1 className="text-3xl font-bold mb-4">How to Use Aroma</h1>
-        <p className="text-gray-700 mb-4">Watch the video below to understand how our app works.</p>
-        <div className="w-full h-64 bg-gray-300 flex items-center justify-center">
-          <p className="text-gray-500">[Embed video here]</p>
-        </div>
+        <p className="text-gray-700 mb-4">
+          Watch the video below to understand how our app works.
+        </p>
       </div>
 
       {/* FAQ Sections */}
       <div className="max-w-3xl mx-auto p-6">
         {staticFAQs.map((faq, index) => (
-          <Card key={index} className="mb-3">
+          <Card
+            key={index}
+            id={faq.section.replace(/\s+/g, "-").toLowerCase()}
+            className="mb-3"
+          >
             <CardHeader>
               <CardTitle>{faq.section}</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="w-full h-48 bg-gray-300 flex items-center justify-center mb-2">
-                <p className="text-gray-500">[Embed video here]</p>
-              </div>
-              <p>{faq.description}</p>
+              {faq.content || ( // Render custom content if available
+                <>
+                  <div className="w-full h-48 bg-gray-300 flex items-center justify-center mb-2">
+                    <p className="text-gray-500">[Embed video here]</p>
+                  </div>
+                  <p>{faq.description}</p>
+                </>
+              )}
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* Floating FAQ Button */}
-      <CdButton 
-        onClick={() => setFaqOpen(!faqOpen)}
+      {/* Floating Contact Button */}
+      <CdButton
+        onClick={() => setContactOpen(!contactOpen)}
         className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition duration-300"
       >
-        <FaQuestionCircle size={24} />
+        Contact Us
       </CdButton>
 
-      {/* FAQ Sidebar */}
-      {faqOpen && (
+      {/* Contact Form Sidebar */}
+      {contactOpen && (
         <div className="fixed top-0 right-0 h-full w-80 bg-white shadow-lg p-4 overflow-y-auto">
-          <button onClick={() => setFaqOpen(false)} className="text-2xl float-right">
+          <button
+            onClick={() => setContactOpen(false)}
+            className="text-2xl float-right"
+          >
             <FaTimes />
           </button>
-          <h2 className="text-xl font-bold mb-4">Live FAQ</h2>
-          <p className="text-gray-600">Ask a question or browse previous FAQs.</p>
+          <h2 className="text-xl font-bold mb-4">Contact Us</h2>
+          <form onSubmit={handleContactSubmit} className="space-y-4">
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                required
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="userType"
+                className="block text-sm font-medium text-gray-700"
+              >
+                User Type
+              </label>
+              <select
+                id="userType"
+                value={userType}
+                onChange={(e) => setUserType(e.target.value)}
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                required
+              >
+                <option value="">Select...</option>
+                <option value="Retailer">Retailer</option>
+                <option value="Investor">Investor</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label
+                htmlFor="message"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Message
+              </label>
+              <textarea
+                id="message"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                rows={4}
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700"
+            >
+              Submit
+            </button>
+          </form>
         </div>
       )}
 
       {/* Footer Section */}
       <footer className="bg-gray-900 text-white text-center p-6 mt-8">
-        <h2 className="text-xl font-semibold mb-2">About Us</h2>
+        <h2 className="text-xl font-semibold mb-2">
+          <a
+            href="https://aromaofficials.com/"
+            className="text-blue-400 hover:underline"
+          >
+            About Us
+          </a>
+        </h2>
         <p className="text-gray-400 text-sm mb-4">
           We provide digitalized solutions to enhance your dining experience.
         </p>
-
-        {/* Social Media Links */}
         <div className="flex justify-center gap-6">
-          <a href="https://www.instagram.com/aroma_offcial/?igsh=YzljYTk1ODg3Zg%3D%3D#" target="_blank" rel="noopener noreferrer">
-            <FaInstagram size={24} className="cursor-pointer hover:text-gray-400 transition duration-300" />
+          <a
+            href="https://www.instagram.com/aroma_offcial/?igsh=YzljYTk1ODg3Zg%3D%3D#"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FaInstagram
+              size={24}
+              className="cursor-pointer hover:text-gray-400 transition duration-300"
+            />
           </a>
-
           <a href="#" target="_blank" rel="noopener noreferrer">
-            <FaTiktok size={24} className="cursor-pointer hover:text-gray-400 transition duration-300" />
+            <FaTiktok
+              size={24}
+              className="cursor-pointer hover:text-gray-400 transition duration-300"
+            />
           </a>
-
           <a href="#">
-            <FaEnvelope size={24} className="cursor-pointer hover:text-gray-400 transition duration-300" />
+            <FaEnvelope
+              size={24}
+              className="cursor-pointer hover:text-gray-400 transition duration-300"
+            />
           </a>
-
           <a href="#" target="_blank" rel="noopener noreferrer">
-            <FaLinkedin size={24} className="cursor-pointer hover:text-gray-400 transition duration-300" />
+            <FaLinkedin
+              size={24}
+              className="cursor-pointer hover:text-gray-400 transition duration-300"
+            />
           </a>
-
           <a href="#" target="_blank" rel="noopener noreferrer">
-            <FaFacebook size={24} className="cursor-pointer hover:text-gray-400 transition duration-300" />
+            <FaFacebook
+              size={24}
+              className="cursor-pointer hover:text-gray-400 transition duration-300"
+            />
           </a>
         </div>
       </footer>
