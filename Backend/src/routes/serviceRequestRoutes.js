@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
-const serviceRequestController_1 = require("../controllers/serviceRequestController");
-const router = (0, express_1.Router)();
+var express_1 = require("express");
+var serviceRequestController_1 = require("../controllers/serviceRequestController");
+var router = (0, express_1.Router)();
 // Get all service requests
 router.get("/", serviceRequestController_1.getServiceRequests);
 // Submit a new service request
