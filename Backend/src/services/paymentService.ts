@@ -18,7 +18,7 @@ export const createStripePayment = async (
   const db = await connectDB();
   const paymentsCollection = db.collection("payments");
 
-  await paymentsCollection.insertOne({
+  const result = await paymentsCollection.insertOne({
     userId,
     amount,
     currency,

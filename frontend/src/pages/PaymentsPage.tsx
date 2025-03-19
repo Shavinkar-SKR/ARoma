@@ -9,6 +9,11 @@ import {
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { Input } from "@/components/ui/input";
+import Label from "@/components/ui/label";
 
 interface LocationState {
   total: number;
@@ -16,37 +21,50 @@ interface LocationState {
   specialInstructions: string;
   tableNumber: string;
   orderStatus: string;
-  estimatedTime: number; // Add this line
+  estimatedTime: number;
 }
+
+const schema = yup.object().shape({
+  cardNumber: yup
+    .string()
+    .required("Card number is required")
+    .matches(/^\d{16}$/, "Card number must be 16 digits"),
+  expiryDate: yup
+    .string()
+    .required("Expiry date is required")
+    .matches(/^(0[1-9]|1[0-2])\/\d{2}$/, "Expiry date must be in MM/YY format"),
+  cvc: yup
+    .string()
+    .required("CVC is required")
+    .matches(/^\d{3}$/, "CVC must be 3 digits"),
+});
 
 const PaymentsPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-
-  const estimatedTime = location.state?.estimatedTime || "Calculating...";
-  console.log("Estimated Time in Payments Page:", estimatedTime); // Log the estimated time
-
   const state = location.state as LocationState | null;
-
-  if (!state) {
-    return <Navigate to="/" />;
-  }
-
-  const { total, cartItems, specialInstructions, tableNumber, orderStatus } =
-    state;
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const {
+    total,
+    cartItems,
+    specialInstructions,
+    tableNumber,
+    orderStatus,
+    estimatedTime,
+  } = state || {};
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const handleProceedToPayment = async () => {
-    setIsLoading(true);
-    setIsLoading(true);
+  const {
+    control,
+    handleSubmit,
+    formState: { isValid },
+  } = useForm({
+    resolver: yupResolver(schema),
+    mode: "onChange",
+  });
 
-    const orderDetails = {
-      cartItems,
-      specialInstructions, // Pass specialInstructions without the table number
-      total,
-      tableNumber, // Pass tableNumber as a separate field
-    };
+  const onSubmit = async (data: any) => {
+    setIsLoading(true);
+    console.log("Submitting card details:", data);
 
     try {
       const response = await fetch(
@@ -56,48 +74,118 @@ const PaymentsPage: React.FC = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(orderDetails),
+          body: JSON.stringify({
+            cardNumber: data.cardNumber,
+            expiryDate: data.expiryDate,
+            cvc: data.cvc,
+            total,
+            tableNumber,
+            specialInstructions,
+            cartItems,
+            estimatedTime,
+          }),
         }
       );
-
       if (response.ok) {
-        const data = await response.json();
-        // Navigate to the order status page with the specific order ID
-        navigate(`/order-status/${data._id}`);
+        const orderData = await response.json();
+        console.log("Order placed successfully:", orderData);
+        navigate(`/order-status/${orderData._id}`, {
+          state: {
+            total,
+            cartItems,
+            specialInstructions,
+            tableNumber,
+            estimatedTime, // Pass estimatedTime to the order-status page
+          },
+        });
       } else {
-        console.error("Error saving order:", response.statusText);
+        console.error("Error saving order:", await response.text());
       }
     } catch (error) {
       console.error("Error:", error);
     } finally {
       setIsLoading(false);
-      setIsLoading(false);
     }
   };
+
+  if (!state) {
+    return <Navigate to="/" />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Order Total</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between text-lg font-semibold">
-                    <span>Total Amount</span>
-                    <span>€{total.toFixed(2)}</span>
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Order Summary Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Order Summary</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex justify-between text-lg font-semibold">
+                  <span>Total Amount</span>
+                  <span>€{total?.toFixed(2)}</span>
+                </div>
+                <div className="text-sm text-gray-600">
+                  <p>Table Number: {tableNumber}</p>
+                  <p>Special Instructions: {specialInstructions}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Card Details Form Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Payment Details</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <div>
+                  <Label htmlFor="cardNumber">Card Number</Label>
+                  <Controller
+                    name="cardNumber"
+                    control={control}
+                    defaultValue=""
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        id="cardNumber"
+                        placeholder="1234 5678 9012 3456"
+                      />
+                    )}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="expiryDate">Expiry Date</Label>
+                    <Controller
+                      name="expiryDate"
+                      control={control}
+                      defaultValue=""
+                      render={({ field }) => (
+                        <Input {...field} id="expiryDate" placeholder="MM/YY" />
+                      )}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="cvc">CVC</Label>
+                    <Controller
+                      name="cvc"
+                      control={control}
+                      defaultValue=""
+                      render={({ field }) => (
+                        <Input {...field} id="cvc" placeholder="123" />
+                      )}
+                    />
                   </div>
                 </div>
-              </CardContent>
-              <CardFooter className="flex flex-col gap-4">
                 <Button
+                  type="submit"
                   size="lg"
                   className="w-full bg-blue-600 hover:bg-blue-700"
-                  onClick={handleProceedToPayment}
-                  disabled={isLoading}
+                  disabled={!isValid || isLoading}
                 >
                   {isLoading ? (
                     <>
@@ -108,9 +196,9 @@ const PaymentsPage: React.FC = () => {
                     "Proceed to Payment"
                   )}
                 </Button>
-              </CardFooter>
-            </Card>
-          </div>
+              </form>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

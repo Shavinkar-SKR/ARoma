@@ -42,25 +42,48 @@ var paymentService_1 = require("../services/paymentService");
 var dbConfig_1 = require("../config/dbConfig");
 var PaymentService = require("../services/paymentService");
 var processStripePayment = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, amount, currency, userId, clientSecret, error_1;
+    var _a, cardNumber, expiryDate, cvc, amount, currency, userId, paymentIntent, db, paymentsCollection, result, error_1;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                _b.trys.push([0, 2, , 3]);
-                _a = req.body, amount = _a.amount, currency = _a.currency, userId = _a.userId;
-                if (!amount || !currency || !userId) {
+                _b.trys.push([0, 4, , 5]);
+                _a = req.body, cardNumber = _a.cardNumber, expiryDate = _a.expiryDate, cvc = _a.cvc, amount = _a.amount, currency = _a.currency, userId = _a.userId;
+                console.log("Received payment request:", req.body);
+                if (!cardNumber || !expiryDate || !cvc || !amount || !currency || !userId) {
                     return [2 /*return*/, res.status(400).json({ error: "Missing required fields" })];
                 }
-                return [4 /*yield*/, PaymentService.createStripePayment(amount, currency, userId)];
+                console.log("Creating Stripe payment intent...");
+                return [4 /*yield*/, paymentService_1.stripe.paymentIntents.create({
+                        amount: amount,
+                        currency: currency,
+                        payment_method_types: ["card"],
+                    })];
             case 1:
-                clientSecret = _b.sent();
-                res.status(200).json({ clientSecret: clientSecret });
-                return [3 /*break*/, 3];
+                paymentIntent = _b.sent();
+                console.log("Payment intent created:", paymentIntent);
+                return [4 /*yield*/, (0, dbConfig_1.connectDB)()];
             case 2:
+                db = _b.sent();
+                paymentsCollection = db.collection("payments");
+                return [4 /*yield*/, paymentsCollection.insertOne({
+                        userId: userId,
+                        amount: amount,
+                        currency: currency,
+                        status: "Pending",
+                        method: "Stripe",
+                        transactionId: paymentIntent.id,
+                    })];
+            case 3:
+                result = _b.sent();
+                console.log("Payment record inserted:", result.insertedId);
+                res.status(200).json({ clientSecret: paymentIntent.client_secret });
+                return [3 /*break*/, 5];
+            case 4:
                 error_1 = _b.sent();
+                console.error("Error processing payment:", error_1);
                 res.status(500).json({ error: error_1.message });
-                return [3 /*break*/, 3];
-            case 3: return [2 /*return*/];
+                return [3 /*break*/, 5];
+            case 5: return [2 /*return*/];
         }
     });
 }); };

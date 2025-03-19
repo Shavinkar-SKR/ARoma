@@ -44,7 +44,7 @@ var dbConfig_1 = require("../config/dbConfig");
 var stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY);
 exports.stripe = stripe;
 var createStripePayment = function (amount, currency, userId) { return __awaiter(void 0, void 0, void 0, function () {
-    var paymentIntent, db, paymentsCollection;
+    var paymentIntent, db, paymentsCollection, result;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, stripe.paymentIntents.create({
@@ -67,7 +67,7 @@ var createStripePayment = function (amount, currency, userId) { return __awaiter
                         transactionId: paymentIntent.id,
                     })];
             case 3:
-                _a.sent();
+                result = _a.sent();
                 return [2 /*return*/, paymentIntent.client_secret];
         }
     });

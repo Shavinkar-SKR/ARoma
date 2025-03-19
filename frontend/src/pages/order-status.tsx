@@ -113,7 +113,6 @@ const OrderStatus: React.FC = () => {
   const eventSourceRef = useRef<EventSource | null>(null);
   const location = useLocation();
   const estimatedTime = location.state?.estimatedTime || "Calculating...";
-
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentMessageIndex(
