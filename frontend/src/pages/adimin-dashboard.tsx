@@ -26,6 +26,7 @@ import {
 import { toast, Toaster } from 'sonner';
 import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import AdminServiceRequestPanel from './adminServiceRequestPanel'; // Import the service request panel
 
 type Order = {
   _id: string;
@@ -504,8 +505,9 @@ function AdminDashboard() {
   const sidebarItems = [
     { icon: ClipboardList, label: 'Orders', id: 'orders' },
     { icon: UtensilsCrossed, label: 'Menu', id: 'menu' },
-    { icon: BarChart2, label: 'Sales & Staff', id: 'sales-staff' },
+    { icon: Bell, label: 'Service Requests', id: 'service-requests' }, // New tab for service requests
     //{ icon: Settings, label: 'Settings', id: 'settings' },
+    { icon: BarChart2, label: 'Sales & Staff', id: 'sales-staff' },
   ];
 
   const filteredOrders = orders.filter(
@@ -1363,6 +1365,16 @@ function AdminDashboard() {
                   )}
                 </div>
               </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'service-requests' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <AdminServiceRequestPanel />
             </motion.div>
           )}
         </div>
