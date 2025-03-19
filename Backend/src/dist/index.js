@@ -47,7 +47,7 @@ var menuRoutes_1 = require("./routes/menuRoutes");
 var dotenv = require("dotenv");
 var restaurantMenuRoutes_1 = require("./routes/restaurantMenuRoutes");
 var feedbackRoutes_1 = require("./routes/feedbackRoutes");
-var paymentRoutes_1 = require("./routes/paymentRoutes");
+//import payment from './routes/paymentRoutes'
 dotenv.config();
 var MONGODB_URI = "mongodb+srv://root:root@aroma.ae0sb.mongodb.net/ARoma?retryWrites=true&w=majority&appName=ARoma&replicaSet=atlas-4uxo98-shard-0&tls=true";
 var app = express_1["default"]();
@@ -105,7 +105,7 @@ app.use("/api/carts", cartRoutes_1["default"]);
 app.use("/api/restaurants", restaurantRoutes_1["default"]);
 app.use("/api/menus", menuRoutes_1["default"]);
 app.use('/api/restaurants', restaurantMenuRoutes_1["default"]);
-app.use('/api/payment', paymentRoutes_1["default"]);
+//app.use('/api/payment', payment);
 var activeConnections = new Set();
 app.get('/order-events/:orderId', function (req, res) {
     if (activeConnections.size >= 50) {

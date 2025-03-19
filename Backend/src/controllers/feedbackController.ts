@@ -2,6 +2,14 @@ import { Request, Response } from "express";
 import { connectDB } from "../config/dbConfig";
 import type { Feedback } from "../models/Feedback";
 
+// Function to check if the user exists in the users collection
+const checkUserExists = async (username: string): Promise<boolean> => {
+  const db = await connectDB();
+  const usersCollection = db.collection("users");
+  const user = await usersCollection.findOne({ name: username }); // Check by username
+  return !!user;
+};
+
 // Fetch all feedback from the database
 export const getAllFeedback = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -20,10 +28,17 @@ export const getAllFeedback = async (req: Request, res: Response): Promise<void>
 // Submit new feedback
 export const submitFeedback = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { comment, rating } = req.body;
+    const { comment, rating, username, restaurantName } = req.body;
 
-    if (!comment || !rating) {
+    if (!comment || !rating || !username || !restaurantName) {
       res.status(400).json({ message: "All fields are required" });
+      return;
+    }
+
+    // Check if the user exists
+    const userExists = await checkUserExists(username);
+    if (!userExists) {
+      res.status(404).json({ message: "User not found" });
       return;
     }
 
@@ -33,6 +48,8 @@ export const submitFeedback = async (req: Request, res: Response): Promise<void>
     const newFeedback: Feedback = {
       comment,
       rating,
+      username,
+      restaurantName,
       createdAt: new Date(),
     };
 

@@ -15,11 +15,17 @@ import menuRoutes from "./routes/menuRoutes";
 import * as dotenv from "dotenv";
 import restaurantMenuRoutes from "./routes/restaurantMenuRoutes";
 import feedbackRoutes from "./routes/feedbackRoutes";
-//import serviceRequestRoutes from "./routes/serviceRequestRoutes";
-//import salesRoutes from "./routes/salesRoutes";
-//import staffRoutes from "./routes/staffRoutes";
+import serviceRequestRoutes from "./routes/serviceRequestRoutes";
+import salesRoutes from "./routes/salesRoutes";
+import staffRoutes from "./routes/staffRoutes";
 import { Order } from "./models/orderModel";
-import payment from "./routes/paymentRoutes";
+import userRoutes from "./routes/userRoutes";
+import loginRoutes from "./routes/loginRoutes";
+import resetPasswordRoutes from "./routes/resetPasswordRoutes";
+//import payment from './routes/paymentRoutes'
+import { signUp } from "./controllers/userController";
+
+console.log("Direct import test:", signUp);
 
 dotenv.config();
 
@@ -86,10 +92,14 @@ app.use("/api/carts", cartRoutes);
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/menus", menuRoutes);
 app.use("/api/restaurants", restaurantMenuRoutes);
-//app.use("/api/requests", serviceRequestRoutes);
-//app.use("/api/sales", salesRoutes);
-//app.use("/api/staff", staffRoutes);
-app.use("/api/payment", payment);
+app.use("/api/requests", serviceRequestRoutes);
+app.use("/api/sales", salesRoutes);
+app.use("/api/staff", staffRoutes);
+app.use("/api", userRoutes);
+app.use("/api/auth", loginRoutes);
+app.use("/api/auth", resetPasswordRoutes);
+
+//app.use('/api/payment', payment);
 
 const activeConnections = new Set();
 

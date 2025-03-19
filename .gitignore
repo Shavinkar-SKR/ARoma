@@ -27,9 +27,16 @@ replay_pid*
 node_modules/
 **/node_modules/
 
-ml-service/venv/
-**/venv/
-
 # Secrets
 .env
 **/.env
+
+# Python virtual environment
+venv/
+**/venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd

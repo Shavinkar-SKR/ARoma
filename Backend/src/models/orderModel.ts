@@ -14,7 +14,6 @@ export interface Order {
   total: number;
   tableNumber: string;
   status?: "received" | "preparing" | "ready" | "complete";
-  estimatedTime?: number; //New field to store predicted preparation time
 }
 
 const orderSchema = new Schema<Order & Document>({
