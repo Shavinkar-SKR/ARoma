@@ -50,9 +50,9 @@ const Navbar: React.FC = () => {
             Home
           </Link>
           <Link
-            to="/digital-menu/67b3783fd0845b272dd7cf7c"
+            to="/digital-menu"
             className={`block lg:inline-block hover:text-red-500 py-2 lg:py-0 ${
-              isActive("/digital-menu/67b3783fd0845b272dd7cf7c") ? "text-red-500" : ""
+              isActive("/digital-menu") ? "text-red-500" : ""
             }`}
             onClick={() => setIsMenuOpen(false)}
           >
