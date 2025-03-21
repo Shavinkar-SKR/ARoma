@@ -32,6 +32,7 @@ export default function SignIn() {
       const result = await response.json();
 
       if (response.ok && result.success) {
+        localStorage.setItem("loginSuccess", "true");
         navigate("/homepage"); // Redirect to homepage on success
       } else {
         // Display specific error message from the backend
