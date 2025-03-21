@@ -26,6 +26,7 @@ import {
 import { toast, Toaster } from 'sonner';
 import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import AdminServiceRequestPanel from './adminServiceRequestPanel'; // Import the service request panel
 
 type Order = {
   _id: string;
@@ -504,8 +505,9 @@ function AdminDashboard() {
   const sidebarItems = [
     { icon: ClipboardList, label: 'Orders', id: 'orders' },
     { icon: UtensilsCrossed, label: 'Menu', id: 'menu' },
-    { icon: BarChart2, label: 'Sales & Staff', id: 'sales-staff' },
+    { icon: Bell, label: 'Service Requests', id: 'service-requests' }, // New tab for service requests
     //{ icon: Settings, label: 'Settings', id: 'settings' },
+    { icon: BarChart2, label: 'Sales & Staff', id: 'sales-staff' },
   ];
 
   const filteredOrders = orders.filter(
@@ -574,7 +576,6 @@ function AdminDashboard() {
     }
   };
 
-  // Search staff by ID
   const handleSearchStaff = async () => {
     if (!searchId) {
       setError("Please enter a Staff ID.");
@@ -583,10 +584,28 @@ function AdminDashboard() {
     setLoading(true);
     try {
       const res = await axios.get(`http://localhost:5001/api/staff/${searchId}`);
-      setSearchedStaff(res.data);
-      setError("");
+      
+      // Check if the response contains valid staff data
+      if (res.data && res.data._id) { // Assuming the staff object has an `_id` field
+        setSearchedStaff(res.data);
+        setError(""); // Clear any previous error
+      } else {
+        // If no valid staff data is returned, set an error
+        setError("Staff not found. Please check the Staff ID.");
+        setSearchedStaff(null); // Clear any previously searched staff
+      }
     } catch (error) {
-      setError("Staff not found. Please check the Staff ID.");
+      // Handle Axios errors (e.g., network errors, 404 Not Found, etc.)
+      if (axios.isAxiosError(error)) {
+        if (error.response && error.response.status === 404) {
+          setError("Staff not found. Please check the Staff ID.");
+        } else {
+          setError("An error occurred while searching for staff. Please try again.");
+        }
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+      setSearchedStaff(null); // Clear any previously searched staff
       console.error("Error searching staff:", error);
     } finally {
       setLoading(false);
@@ -1269,6 +1288,11 @@ function AdminDashboard() {
                       Search
                     </button>
                   </div>
+                  {error && (
+                    <div className="mt-4 p-4 bg-red-50 text-red-600 rounded">
+                      {error}
+                    </div>
+                  )}    
                   {searchedStaff && (
                     <div className="mt-4 p-4 bg-gray-50 rounded">
                       <p><strong>Name:</strong> {searchedStaff.name}</p>
@@ -1363,6 +1387,16 @@ function AdminDashboard() {
                   )}
                 </div>
               </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'service-requests' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <AdminServiceRequestPanel />
             </motion.div>
           )}
         </div>

@@ -1,118 +1,133 @@
-// require("dotenv").config();
-// import { Response, Request } from "express";
-// import { stripe, Payment } from "../services/paymentService";
-// import { connectDB } from "../config/dbConfig";
-// //import Payment from "../models/paymentModel";
-// const PaymentService = require("../services/paymentService");
+require("dotenv").config();
+import { Response, Request } from "express";
+import { stripe, Payment } from "../services/paymentService";
+import { connectDB } from "../config/dbConfig";
+const PaymentService = require("../services/paymentService");
 
-// export const processStripePayment = async (req: Request, res: Response) => {
-//   try {
-//     const { amount, currency, userId } = req.body;
+export const processStripePayment = async (req: Request, res: Response) => {
+  try {
+    const { cardNumber, expiryDate, cvc, amount, currency, userId } = req.body;
+    console.log("Received payment request:", req.body);
 
-//     if (!amount || !currency || !userId) {
-//       return res.status(400).json({ error: "Missing required fields" });
-//     }
+    if (!cardNumber || !expiryDate || !cvc || !amount || !currency || !userId) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
 
-//     const clientSecret = await PaymentService.createStripePayment(
-//       amount,
-//       currency,
-//       userId
-//     );
+    console.log("Creating Stripe payment intent...");
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency,
+      payment_method_types: ["card"],
+    });
+    console.log("Payment intent created:", paymentIntent);
 
-//     res.status(200).json({ clientSecret });
-//   } catch (error) {
-//     res.status(500).json({ error: (error as any).message });
-//   }
-// };
+    const db = await connectDB();
+    const paymentsCollection = db.collection("payments");
 
-// export const stripeWebhook = async (req: Request, res: Response) => {
-//   const sig = req.headers["stripe-signature"];
-//   if (!sig) {
-//     return res
-//       .status(400)
-//       .send("Webhook Error: Missing stripe-signature header");
-//   }
-//   let event;
+    const result = await paymentsCollection.insertOne({
+      userId,
+      amount,
+      currency,
+      status: "Pending",
+      method: "Stripe",
+      transactionId: paymentIntent.id,
+    });
+    console.log("Payment record inserted:", result.insertedId);
 
-//   try {
-//     event = stripe.webhooks.constructEvent(
-//       req.body,
-//       sig,
-//       process.env.STRIPE_WEBHOOK_SECRET as string
-//     );
-//   } catch (err) {
-//     return res.status(400).send(`Webhook Error: ${(err as Error).message}`);
-//   }
+    res.status(200).json({ clientSecret: paymentIntent.client_secret });
+  } catch (error) {
+    console.error("Error processing payment:", error);
+    res.status(500).json({ error: (error as any).message });
+  }
+};
 
-//   if (event.type === "payment_intent.succeeded") {
-//     const paymentIntent = event.data.object;
-//     try {
-//       await Payment.findOneAndUpdate(
-//         { transactionId: paymentIntent.id },
-//         { status: "Completed" }
-//       );
-//     } catch (err) {
-//       console.error("Failed to update payment status:", err);
-//     }
-//   }
-//   res.json({ received: true });
-// };
+export const stripeWebhook = async (req: Request, res: Response) => {
+  const sig = req.headers["stripe-signature"];
+  if (!sig) {
+    return res
+      .status(400)
+      .send("Webhook Error: Missing stripe-signature header");
+  }
+  let event;
 
-// export const processSplitBillPayment = async (req: Request, res: Response) => {
-//   try {
-//     const { totalAmount, currency, userId, splitDetails } = req.body;
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET as string
+    );
+  } catch (err) {
+    return res.status(400).send(`Webhook Error: ${(err as Error).message}`);
+  }
 
-//     if (
-//       !totalAmount ||
-//       !currency ||
-//       !userId ||
-//       !Array.isArray(splitDetails) ||
-//       splitDetails.length === 0
-//     ) {
-//       return res
-//         .status(400)
-//         .json({ error: "Missing required fields or invalid split details" });
-//     }
+  if (event.type === "payment_intent.succeeded") {
+    const paymentIntent = event.data.object;
+    try {
+      await Payment.findOneAndUpdate(
+        { transactionId: paymentIntent.id },
+        { status: "Completed" }
+      );
+    } catch (err) {
+      console.error("Failed to update payment status:", err);
+    }
+  }
+  res.json({ received: true });
+};
 
-//     const paymentIntents = [];
+export const processSplitBillPayment = async (req: Request, res: Response) => {
+  try {
+    const { totalAmount, currency, userId, splitDetails } = req.body;
 
-//     for (const split of splitDetails) {
-//       const { payerId, amount } = split;
+    if (
+      !totalAmount ||
+      !currency ||
+      !userId ||
+      !Array.isArray(splitDetails) ||
+      splitDetails.length === 0
+    ) {
+      return res
+        .status(400)
+        .json({ error: "Missing required fields or invalid split details" });
+    }
 
-//       if (!payerId || !amount) {
-//         return res.status(400).json({ error: "Invalid split detail format" });
-//       }
+    const paymentIntents = [];
 
-//       // Create a separate PaymentIntent for each payer
-//       const paymentIntent = await stripe.paymentIntents.create({
-//         amount,
-//         currency,
-//         payment_method_types: ["card"],
-//       });
+    for (const split of splitDetails) {
+      const { payerId, amount } = split;
 
-//       const db = await connectDB();
-//       const paymentsCollection = db.collection("payments");
+      if (!payerId || !amount) {
+        return res.status(400).json({ error: "Invalid split detail format" });
+      }
 
-//       await paymentsCollection.insertOne({
-//         userId: payerId,
-//         amount,
-//         currency,
-//         status: "Pending",
-//         method: "Stripe",
-//         transactionId: paymentIntent.id,
-//       });
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount,
+        currency,
+        payment_method_types: ["card"],
+      });
 
-//       paymentIntents.push({
-//         payerId,
-//         clientSecret: paymentIntent.client_secret,
-//       });
-//     }
+      const db = await connectDB();
+      const paymentsCollection = db.collection("payments");
 
-//     res.status(200).json({
-//       message: "Split payments initialized",
-//       splitPayments: paymentIntents,
-//     });
-//   } catch (error) {
-//     res.status(500).json({ error: (error as any).message });
-//   }
-// };
+      await paymentsCollection.insertOne({
+        userId: payerId,
+        amount,
+        currency,
+        status: "Pending",
+        method: "Stripe",
+        transactionId: paymentIntent.id,
+      });
+
+      paymentIntents.push({
+        payerId,
+        clientSecret: paymentIntent.client_secret,
+      });
+    }
+
+    res.status(200).json({
+      message: "Split payments initialized",
+      splitPayments: paymentIntents,
+    });
+  } catch (error) {
+    res.status(500).json({ error: (error as any).message });
+  }
+};
