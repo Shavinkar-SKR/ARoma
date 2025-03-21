@@ -23,6 +23,25 @@ export const getMenuByRestaurant = async (
   }
 };
 
+export const getMenu = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const db = await connectDB();
+    const menuCollection = db.collection<MenuItem>("menus");
+
+    const menuItems = await menuCollection
+      .find()
+      .toArray();
+
+    res.status(200).json(menuItems);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch menu items" });
+  }
+};
+
+
 export const searchMenuItems = async (
   req: Request,
   res: Response,

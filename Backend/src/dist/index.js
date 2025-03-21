@@ -47,7 +47,15 @@ var menuRoutes_1 = require("./routes/menuRoutes");
 var dotenv = require("dotenv");
 var restaurantMenuRoutes_1 = require("./routes/restaurantMenuRoutes");
 var feedbackRoutes_1 = require("./routes/feedbackRoutes");
-//import payment from './routes/paymentRoutes'
+var serviceRequestRoutes_1 = require("./routes/serviceRequestRoutes");
+var salesRoutes_1 = require("./routes/salesRoutes");
+var staffRoutes_1 = require("./routes/staffRoutes");
+var userRoutes_1 = require("./routes/userRoutes");
+var loginRoutes_1 = require("./routes/loginRoutes");
+var resetPasswordRoutes_1 = require("./routes/resetPasswordRoutes");
+// import payment from './routes/paymentRoutes'
+var userController_1 = require("./controllers/userController");
+console.log("Direct import test:", userController_1.signUp);
 dotenv.config();
 var MONGODB_URI = "mongodb+srv://root:root@aroma.ae0sb.mongodb.net/ARoma?retryWrites=true&w=majority&appName=ARoma&replicaSet=atlas-4uxo98-shard-0&tls=true";
 var app = express_1["default"]();
@@ -105,7 +113,13 @@ app.use("/api/carts", cartRoutes_1["default"]);
 app.use("/api/restaurants", restaurantRoutes_1["default"]);
 app.use("/api/menus", menuRoutes_1["default"]);
 app.use('/api/restaurants', restaurantMenuRoutes_1["default"]);
-//app.use('/api/payment', payment);
+app.use("/api/requests", serviceRequestRoutes_1["default"]);
+app.use("/api/sales", salesRoutes_1["default"]);
+app.use("/api/staff", staffRoutes_1["default"]);
+app.use("/api", userRoutes_1["default"]);
+app.use("/api/auth", loginRoutes_1["default"]);
+app.use("/api/auth", resetPasswordRoutes_1["default"]);
+// app.use('/api/payment', payment);
 var activeConnections = new Set();
 app.get('/order-events/:orderId', function (req, res) {
     if (activeConnections.size >= 50) {

@@ -25,27 +25,28 @@ import ResetPassword from "./pages/ResetPassword";
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
-      <Route element={<Layout />}>
-        <Route path="/order-placement" element={<OrderPlacementPage />} />
-        <Route path="/payments" element={<PaymentsPage />} />
-        <Route path="/order-status/:orderId" element={<OrderStatusPage />} />
-        <Route
-          path="/adminServiceRequestPanel"
-          element={<AdminServiceRequestPanel />}
-        />
-        <Route path="/feedback" element={<FeedbackPage />} />
-        <Route path="/faq" element={<FAQPage />} />
-        <Route path="/service" element={<ServiceRequest />} />
-        <Route
-          path="/salesAnalyticsStaffManagement"
-          element={<SalesAnalyticsStaffManagement />}
-        />
-        <Route path="/foryou" element={<ForYou />} />
-        <Route path="/homePage" element={<HomePage />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/security" element={<Security />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/contact" element={<Contact />} />
+	<Route element={<Layout />}>
+      <Route path="/order-placement" element={<OrderPlacementPage />} />
+      <Route path="/payments" element={<PaymentsPage />} />
+      <Route path="/order-status/:orderId" element={<OrderStatusPage />} />
+      <Route path="/adminServiceRequestPanel" element={<AdminServiceRequestPanel />} />
+      <Route path="/feedback" element={<FeedbackPage />} />
+      <Route path="/faq" element={<FAQPage />} />
+      <Route path="/service" element={<ServiceRequest />} />
+      <Route path="/salesAnalyticsStaffManagement" element={<SalesAnalyticsStaffManagement />} />
+      <Route path="/foryou" element={<ForYou />} />
+      <Route path="/homePage" element={<HomePage/>} />
+      <Route path="/terms" element={<Terms />} />
+      <Route path="/security" element={<Security />} />
+      <Route path="/privacy" element={<Privacy/>} />
+      <Route path="/contact" element={<Contact/>} />
+      
+      <Route
+        path="restaurant-selection"
+        element={<RestaurantSelectionPage />}
+      />
+      <Route path="/digital-menu/:restaurantId" element={<DigitalMenuPage />} />
+      <Route path="/digital-menu/" element={<DigitalMenuPage />} />
 
         <Route
           path="restaurant-selection"

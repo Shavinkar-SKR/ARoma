@@ -2,25 +2,41 @@ require("dotenv").config();
 import { Response, Request } from "express";
 import { stripe, Payment } from "../services/paymentService";
 import { connectDB } from "../config/dbConfig";
-//import Payment from "../models/paymentModel";
 const PaymentService = require("../services/paymentService");
 
 export const processStripePayment = async (req: Request, res: Response) => {
   try {
-    const { amount, currency, userId } = req.body;
+    const { cardNumber, expiryDate, cvc, amount, currency, userId } = req.body;
+    console.log("Received payment request:", req.body);
 
-    if (!amount || !currency || !userId) {
+    if (!cardNumber || !expiryDate || !cvc || !amount || !currency || !userId) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    const clientSecret = await PaymentService.createStripePayment(
+    console.log("Creating Stripe payment intent...");
+    const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency,
-      userId
-    );
+      payment_method_types: ["card"],
+    });
+    console.log("Payment intent created:", paymentIntent);
 
-    res.status(200).json({ clientSecret });
+    const db = await connectDB();
+    const paymentsCollection = db.collection("payments");
+
+    const result = await paymentsCollection.insertOne({
+      userId,
+      amount,
+      currency,
+      status: "Pending",
+      method: "Stripe",
+      transactionId: paymentIntent.id,
+    });
+    console.log("Payment record inserted:", result.insertedId);
+
+    res.status(200).json({ clientSecret: paymentIntent.client_secret });
   } catch (error) {
+    console.error("Error processing payment:", error);
     res.status(500).json({ error: (error as any).message });
   }
 };
@@ -83,7 +99,6 @@ export const processSplitBillPayment = async (req: Request, res: Response) => {
         return res.status(400).json({ error: "Invalid split detail format" });
       }
 
-      // Create a separate PaymentIntent for each payer
       const paymentIntent = await stripe.paymentIntents.create({
         amount,
         currency,
