@@ -46,6 +46,7 @@ const AppRoutes: React.FC = () => {
         element={<RestaurantSelectionPage />}
       />
       <Route path="/digital-menu/:restaurantId" element={<DigitalMenuPage />} />
+      <Route path="/digital-menu/" element={<DigitalMenuPage />} />
 
       {/* You can add other routes here */}
 	  </Route>

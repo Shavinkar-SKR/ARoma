@@ -34,6 +34,17 @@ interface CartItem {
   image: string;
 }
 
+interface Restaurant {
+  _id: string;
+  name: string;
+  cuisine: string;
+  location: string;
+  rating: number;
+  reviews: number;
+  priceRange: "€" | "€€" | "€€€" | "€€€€";
+  image: string;
+}
+
 const DigitalMenuPage: React.FC = () => {
   const navigate = useNavigate();
   const { restaurantId } = useParams();
@@ -51,6 +62,7 @@ const DigitalMenuPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
 
   const addToCart = (item: MenuItem) => {
     setCartItems((prev) => {
@@ -81,20 +93,37 @@ const DigitalMenuPage: React.FC = () => {
     });
   };
   
-
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   useEffect(() => {
     fetchMenuItems();
+    if (restaurantId) {
+      fetchRestaurantInfo();
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restaurantId]);
+
+  const fetchRestaurantInfo = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:5001/api/restaurants/${restaurantId}`
+      );
+      if (!response.ok) throw new Error("Failed to fetch restaurant info");
+      const data = await response.json();
+      setRestaurant(data.restaurant);
+    } catch (error) {
+      toast.error("Failed to load restaurant information");
+    }
+  };
 
   const fetchMenuItems = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `http://localhost:5001/api/menus/${restaurantId}`,
-      );
+      const url = restaurantId 
+        ? `http://localhost:5001/api/menus/${restaurantId}`
+        : `http://localhost:5001/api/menus`;
+      
+      const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch menu items");
       const data = await response.json();
       setMenuItems(data);
@@ -115,9 +144,12 @@ const DigitalMenuPage: React.FC = () => {
     }
 
     try {
-      const response = await fetch(
-        `http://localhost:5001/api/menus/search?query=${query}&restaurantId=${restaurantId}`,
-      );
+      let url = `http://localhost:5001/api/menus/search?query=${query}`;
+      if (restaurantId) {
+        url += `&restaurantId=${restaurantId}`;
+      }
+      
+      const response = await fetch(url);
       if (!response.ok) throw new Error("Search failed");
       const data = await response.json();
       setMenuItems(data);
@@ -128,10 +160,6 @@ const DigitalMenuPage: React.FC = () => {
       setSearching(false);
     }
   };
-
-
-
-  
 
   const filteredAndSortedItems = useMemo(() => {
     let result = [...menuItems];
@@ -207,7 +235,7 @@ const DigitalMenuPage: React.FC = () => {
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <h1 className="text-3xl font-bold text-gray-900">
-              Restaurant Name
+              {restaurant ? restaurant.name : "Menu Items"}
             </h1>
           </div>
 
