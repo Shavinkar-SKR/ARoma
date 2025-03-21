@@ -36,57 +36,73 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signUp = void 0;
-var db_1 = require("../config/db");
-var signUp = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, name, email, password, db, existingUser, newUser, result, insertedUser, error_1;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+exports.updateUserProfile = exports.fetchUserProfile = void 0;
+var dbConfig_1 = require("../config/dbConfig");
+var mongodb_1 = require("mongodb");
+// Fetch user profile
+var fetchUserProfile = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var userId, db, user, error_1;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
             case 0:
-                _a = req.body, name = _a.name, email = _a.email, password = _a.password;
-                console.log("Received sign-up request:", { name: name, email: email, password: password });
-                _b.label = 1;
+                userId = req.params.userId;
+                _a.label = 1;
             case 1:
-                _b.trys.push([1, 6, , 7]);
-                return [4 /*yield*/, (0, db_1.connectDB)()];
+                _a.trys.push([1, 4, , 5]);
+                return [4 /*yield*/, (0, dbConfig_1.connectDB)()];
             case 2:
-                db = _b.sent();
-                console.log("Attempting to find existing user...");
-                return [4 /*yield*/, db.collection("users").findOne({ email: email })];
+                db = _a.sent();
+                return [4 /*yield*/, db.collection("users").findOne({ _id: new mongodb_1.ObjectId(userId) })];
             case 3:
-                existingUser = _b.sent();
-                console.log("Existing user:", existingUser);
-                if (existingUser) {
-                    res.status(400).json({ message: "User already exists" });
+                user = _a.sent();
+                if (!user) {
+                    res.status(404).json({ message: "User not found" });
                     return [2 /*return*/];
                 }
-                // Create a new user
-                console.log("Creating new user...");
-                newUser = { name: name, email: email, password: password };
-                console.log("New user:", newUser);
-                // Save the new user to the database
-                console.log("Saving user to the database...");
-                return [4 /*yield*/, db.collection("users").insertOne(newUser)];
+                res.status(200).json(user);
+                return [3 /*break*/, 5];
             case 4:
-                result = _b.sent();
-                console.log("User saved successfully");
-                return [4 /*yield*/, db.collection("users").findOne({
-                        _id: result.insertedId,
-                    })];
-            case 5:
-                insertedUser = _b.sent();
-                if (!insertedUser) {
-                    throw new Error("Failed to fetch the inserted user");
-                }
-                res.status(201).json({ message: "User created successfully", userId: insertedUser });
-                return [3 /*break*/, 7];
-            case 6:
-                error_1 = _b.sent();
-                console.error("Error signing up:", error_1);
+                error_1 = _a.sent();
+                console.error("Error fetching user profile:", error_1);
                 res.status(500).json({ message: "Internal server error" });
-                return [3 /*break*/, 7];
-            case 7: return [2 /*return*/];
+                return [3 /*break*/, 5];
+            case 5: return [2 /*return*/];
         }
     });
 }); };
-exports.signUp = signUp;
+exports.fetchUserProfile = fetchUserProfile;
+// Update user profile
+var updateUserProfile = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var userId, _a, name, email, phone, dietaryPreferences, db, result, error_2;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                userId = req.params.userId;
+                _a = req.body, name = _a.name, email = _a.email, phone = _a.phone, dietaryPreferences = _a.dietaryPreferences;
+                _b.label = 1;
+            case 1:
+                _b.trys.push([1, 4, , 5]);
+                return [4 /*yield*/, (0, dbConfig_1.connectDB)()];
+            case 2:
+                db = _b.sent();
+                return [4 /*yield*/, db
+                        .collection("users")
+                        .updateOne({ _id: new mongodb_1.ObjectId(userId) }, { $set: { name: name, email: email, phone: phone, dietaryPreferences: dietaryPreferences } })];
+            case 3:
+                result = _b.sent();
+                if (result.matchedCount === 0) {
+                    res.status(404).json({ message: "User not found" });
+                    return [2 /*return*/];
+                }
+                res.status(200).json({ message: "Profile updated successfully" });
+                return [3 /*break*/, 5];
+            case 4:
+                error_2 = _b.sent();
+                console.error("Error updating user profile:", error_2);
+                res.status(500).json({ message: "Internal server error" });
+                return [3 /*break*/, 5];
+            case 5: return [2 /*return*/];
+        }
+    });
+}); };
+exports.updateUserProfile = updateUserProfile;

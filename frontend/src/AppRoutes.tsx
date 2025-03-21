@@ -21,6 +21,7 @@ import SignUpDialog from "./pages/signUpDialog";
 import SignIn from "./pages/signIn";
 import Contact from "./pages/contact";
 import ResetPassword from "./pages/ResetPassword";
+import UserProfilePage from "./pages/userProfilePage";
 
 const AppRoutes: React.FC = () => {
   return (
@@ -62,6 +63,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/signIn" element={<SignIn />} />
       <Route path="/resetPassword" element={<ResetPassword />} />
       <Route path="/admin-dashboard" element={<AdminDashboard />} />
+      <Route path="/userProfilePage" element={<UserProfilePage />} />
     </Routes>
   );
 };

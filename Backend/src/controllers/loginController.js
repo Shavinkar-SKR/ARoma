@@ -72,7 +72,7 @@ var login = function (req, res) { return __awaiter(void 0, void 0, void 0, funct
                 }
                 // Login successful
                 console.log("Login successful");
-                res.status(200).json({ success: true, message: "Login successful", user: user });
+                res.status(200).json({ success: true, message: "Login successful", userId: user._id });
                 return [3 /*break*/, 5];
             case 4:
                 error_1 = _b.sent();

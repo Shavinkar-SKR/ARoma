@@ -60,7 +60,6 @@ var serviceRequestRoutes_1 = require("./routes/serviceRequestRoutes");
 var salesRoutes_1 = require("./routes/salesRoutes");
 var staffRoutes_1 = require("./routes/staffRoutes");
 var userRoutes_1 = require("./routes/userRoutes");
-var loginRoutes_1 = require("./routes/loginRoutes");
 var resetPasswordRoutes_1 = require("./routes/resetPasswordRoutes");
 var paymentRoutes_1 = require("./routes/paymentRoutes");
 var userController_1 = require("./controllers/userController");

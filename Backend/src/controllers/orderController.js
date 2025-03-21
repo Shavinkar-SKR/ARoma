@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateOrderStatus = exports.getOrders = exports.deleteOrder = exports.placeOrder = void 0;
+exports.fetchOrderHistory = exports.updateOrderStatus = exports.getOrders = exports.deleteOrder = exports.placeOrder = void 0;
 var mongodb_1 = require("mongodb");
 var dbConfig_1 = require("../config/dbConfig"); // Import the connectDB utility
 // Function to place an order
@@ -202,3 +202,33 @@ var updateOrderStatus = function (req, res) { return __awaiter(void 0, void 0, v
     });
 }); };
 exports.updateOrderStatus = updateOrderStatus;
+var fetchOrderHistory = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var userId, db, orders, error_5;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                userId = req.params.userId;
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 4, , 5]);
+                return [4 /*yield*/, (0, dbConfig_1.connectDB)()];
+            case 2:
+                db = _a.sent();
+                return [4 /*yield*/, db
+                        .collection("orders")
+                        .find({ userId: new mongodb_1.ObjectId(userId) })
+                        .toArray()];
+            case 3:
+                orders = _a.sent();
+                res.status(200).json(orders);
+                return [3 /*break*/, 5];
+            case 4:
+                error_5 = _a.sent();
+                console.error("Error fetching order history:", error_5);
+                res.status(500).json({ message: "Internal server error" });
+                return [3 /*break*/, 5];
+            case 5: return [2 /*return*/];
+        }
+    });
+}); };
+exports.fetchOrderHistory = fetchOrderHistory;

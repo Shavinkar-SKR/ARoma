@@ -5,7 +5,10 @@ import { connectDB } from "../config/dbConfig"; // Import the connectDB utility
 import { emitOrderUpdate } from "../realTimeUpdates/realtimeUpdates"; // Import the emitOrderUpdate function
 
 // Function to place an order
-export const placeOrder = async (req: Request, res: Response): Promise<void> => {
+export const placeOrder = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const { cartItems, specialInstructions, total, tableNumber } = req.body;
 
@@ -36,9 +39,11 @@ export const placeOrder = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-
 // Function to delete an order
-export const deleteOrder = async (req: Request, res: Response): Promise<void> => {
+export const deleteOrder = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { id } = req.params; // Extract the order ID from the request parameters
 
   // Validate the ID
@@ -86,7 +91,10 @@ export const getOrders = async (req: Request, res: Response): Promise<void> => {
 };
 
 // Function to update order status
-export const updateOrderStatus = async (req: Request, res: Response): Promise<void> => {
+export const updateOrderStatus = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const { id } = req.params;
   const { status } = req.body;
 
@@ -137,5 +145,24 @@ export const updateOrderStatus = async (req: Request, res: Response): Promise<vo
   } catch (error) {
     console.error("Error updating order status:", error);
     res.status(500).json({ message: "Failed to update order status", error });
+  }
+};
+
+export const fetchOrderHistory = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { userId } = req.params;
+
+  try {
+    const db = await connectDB();
+    const orders = await db
+      .collection("orders")
+      .find({ userId: new ObjectId(userId) })
+      .toArray();
+    res.status(200).json(orders);
+  } catch (error) {
+    console.error("Error fetching order history:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
