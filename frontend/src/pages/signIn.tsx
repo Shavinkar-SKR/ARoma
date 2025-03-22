@@ -32,10 +32,10 @@ export default function SignIn() {
       const result = await response.json();
 
       if (response.ok && result.success) {
-        localStorage.setItem("loginSuccess", "true");
+        // Store user details in localStorage
+        localStorage.setItem("user", JSON.stringify(result.user)); 
         navigate("/homepage"); // Redirect to homepage on success
       } else {
-        // Display specific error message from the backend
         setErrorMessage(result.message || "Login failed. Please try again.");
       }
     } catch (error) {
@@ -69,6 +69,7 @@ export default function SignIn() {
               })} />
               {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
             </div>
+
             <div>
               <Label>Password</Label>
               <Input
