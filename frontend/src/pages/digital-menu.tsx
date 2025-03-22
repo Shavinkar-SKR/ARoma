@@ -32,6 +32,13 @@ interface CartItem {
   price: number;
   quantity: number;
   image: string;
+  userId: string;
+}
+
+interface User {
+  _id: string;
+  name: string;
+  email: string;
 }
 
 interface Restaurant {
@@ -63,36 +70,96 @@ const DigitalMenuPage: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
-  const addToCart = (item: MenuItem) => {
-    setCartItems((prev) => {
-      const existingItem = prev.find(
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      fetchCartItems();
+    }
+  }, [user]);
+
+  const fetchCartItems = async () => {
+    if (!user) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:5001/api/carts/${user._id}`
+      );
+      if (!response.ok) throw new Error("Failed to fetch cart items");
+      const data = await response.json();
+      setCartItems(data);
+    } catch (error) {
+      toast.error("Failed to load cart items");
+    }
+  };
+
+  const addToCart = async (item: MenuItem) => {
+    if (!user) {
+      toast.error("Please log in to add items to cart");
+      return;
+    }
+
+    try {
+      const existingItem = cartItems.find(
         (cartItem) => cartItem.menuId === item._id
       );
+
       if (existingItem) {
-        return prev.map((cartItem) =>
-          cartItem.menuId === item._id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
+        const response = await fetch(
+          `http://localhost:5001/api/carts/cart/${existingItem._id}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              quantity: existingItem.quantity + 1,
+            }),
+          }
         );
+
+        if (!response.ok) throw new Error("Failed to update cart item");
+
+        setCartItems((prev) =>
+          prev.map((cartItem) =>
+            cartItem._id === existingItem._id
+              ? { ...cartItem, quantity: cartItem.quantity + 1 }
+              : cartItem
+          )
+        );
+      } else {
+        const response = await fetch("http://localhost:5001/api/carts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            menuId: item._id,
+            name: item.name,
+            price: item.price,
+            quantity: 1,
+            image: item.image,
+            userId: user._id,
+          }),
+        });
+
+        if (!response.ok) throw new Error("Failed to add item to cart");
+
+        const newCartItem = await response.json();
+        setCartItems((prev) => [...prev, newCartItem]);
       }
-      return [
-        ...prev,
-        {
-          _id: new Date().toISOString(), // Generate a unique ID using current timestamp
-          menuId: item._id,
-          name: item.name,
-          price: item.price,
-          quantity: 1,
-          image: item.image,
-        },
-      ];
-    });
-    toast.success("Item added to cart!", {
-      description: `Added ${item.name} to your cart`,
-    });
+
+      toast.success("Item added to cart!", {
+        description: `Added ${item.name} to your cart`,
+      });
+    } catch (error) {
+      toast.error("Failed to add item to cart");
+    }
   };
-  
+
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   useEffect(() => {
@@ -100,7 +167,7 @@ const DigitalMenuPage: React.FC = () => {
     if (restaurantId) {
       fetchRestaurantInfo();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restaurantId]);
 
   const fetchRestaurantInfo = async () => {
@@ -119,10 +186,10 @@ const DigitalMenuPage: React.FC = () => {
   const fetchMenuItems = async () => {
     try {
       setLoading(true);
-      const url = restaurantId 
+      const url = restaurantId
         ? `http://localhost:5001/api/menus/${restaurantId}`
         : `http://localhost:5001/api/menus`;
-      
+
       const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch menu items");
       const data = await response.json();
@@ -148,7 +215,7 @@ const DigitalMenuPage: React.FC = () => {
       if (restaurantId) {
         url += `&restaurantId=${restaurantId}`;
       }
-      
+
       const response = await fetch(url);
       if (!response.ok) throw new Error("Search failed");
       const data = await response.json();
@@ -224,6 +291,8 @@ const DigitalMenuPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+      <Toaster position="top-right" />
+
       <div className="container mx-auto py-8 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center gap-4">
@@ -394,7 +463,13 @@ const DigitalMenuPage: React.FC = () => {
       </div>
 
       <Button
-        onClick={() => setIsCartOpen(true)}
+        onClick={() => {
+          if (!user) {
+            toast.error("Please log in to view your cart");
+            return;
+          }
+          setIsCartOpen(true);
+        }}
         className="fixed bottom-6 right-6 bg-red-600 hover:bg-red-700 rounded-full p-4 shadow-lg"
       >
         <ShoppingCart className="w-6 h-6" />
@@ -406,9 +481,9 @@ const DigitalMenuPage: React.FC = () => {
         onClose={() => setIsCartOpen(false)}
         cartItems={cartItems}
         setCartItems={setCartItems}
+        userId={user?._id}
+        onCartUpdated={fetchCartItems}
       />
-
-      <Toaster />
     </div>
   );
 };
