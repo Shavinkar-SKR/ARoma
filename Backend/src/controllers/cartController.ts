@@ -7,9 +7,10 @@ export const addToCart = async (req: Request, res: Response): Promise<void> => {
   try {
     const db = await connectDB();
     const cartsCollection = db.collection<CartItem>("carts");
-    const { name, price, quantity, image, userId } = req.body;
+    const { menuId, name, price, quantity, image, userId } = req.body;
 
     const cartItem: CartItem = {
+      menuId,
       name,
       price,
       quantity,
