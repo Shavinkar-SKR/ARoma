@@ -4,7 +4,6 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
-  CardFooter,
 } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
@@ -43,7 +42,7 @@ const PaymentsPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const state = location.state as LocationState | null;
-  const { total, cartItems, specialInstructions, tableNumber, orderStatus, estimatedTime } =
+  const { total, cartItems, specialInstructions, tableNumber, estimatedTime } =
     state || {};
   const [isLoading, setIsLoading] = useState<boolean>(false);
   console.log("Estimated Time in Payments Page:", estimatedTime);
@@ -56,6 +55,7 @@ const PaymentsPage: React.FC = () => {
     mode: "onChange",
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onSubmit = async (data: any) => {
     setIsLoading(true);
     console.log("Submitting card details:", data);
