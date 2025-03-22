@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"; // shadcn/ui Input
 import HeroImage from "../assets/HeroImage.jpg";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { motion } from "framer-motion"; // Import motion from Framer Motion
 
 interface Restaurant {
   _id: string;
@@ -64,7 +65,30 @@ const Banner: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-red-800 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-red-800 flex items-center justify-center p-6 relative overflow-hidden">
+      {/* Animated Background Particles */}
+      {Array.from({ length: 20 }).map((_, i) => (
+        <motion.div
+          key={i}
+          initial={{ 
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            scale: 0
+          }}
+          animate={{ 
+            y: [null, Math.random() * -500],
+            scale: [0, 1, 0],
+            opacity: [0, 1, 0]
+          }}
+          transition={{ 
+            duration: Math.random() * 3 + 2,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          className="absolute w-2 h-2 bg-yellow-400 rounded-full"
+        />
+      ))}
+
       <div className="max-w-7xl mx-auto w-full">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8 lg:gap-12">
           {/* Content */}
@@ -76,20 +100,18 @@ const Banner: React.FC = () => {
               Your Gateway To The Best Restaurants Near You.
             </p>
             <div className="flex flex-wrap justify-center md:justify-start gap-4">
-            <Button
-            className="bg-green-600 hover:bg-green-700 text-lg h-12 px-6 sm:px-8"
-            onClick={() => navigate("/signUpDialog")}
-          >
-            Sign Up
-          </Button>
-          
+              <Button
+                className="bg-green-600 hover:bg-green-700 text-lg h-12 px-6 sm:px-8"
+                onClick={() => navigate("/signUpDialog")}
+              >
+                Sign Up
+              </Button>
             </div>
 
             {/* Search Bar */}
             <div className="relative w-full max-w-md mx-auto md:mx-0">
               <div className="flex items-center bg-white rounded-full p-2">
                 
-
                 {/* Search Input */}
                 <div className="flex-1 px-2 sm:px-3">
                   {searchFocused || searchQuery ? (
