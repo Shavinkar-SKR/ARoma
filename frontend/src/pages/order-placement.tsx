@@ -19,7 +19,7 @@ import {
   Clock,
   Utensils,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast, Toaster } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import TableNumberInput from "@/components/ui/TableNumberInput";
@@ -32,64 +32,22 @@ interface CartItem {
   image: string;
 }
 
-interface User {
-  _id: string;
-  name: string;
-  email: string;
-}
-
 const OrderPlacementPage: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [specialInstructions, setSpecialInstructions] = useState<string>("");
   const [subtotal, setSubtotal] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const serviceFee: number = 3.0;
   const [total, setTotal] = useState<number>(0);
   const navigate = useNavigate();
+  const location = useLocation();
   const [tableNumber, setTableNumber] = useState<string>("");
-  const [user, setUser] = useState<User | null>(null);
-
+  const [predictedTime, setPredictedTime] = useState<string | null>(null);
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    } else {
-      toast.error("Please log in to view your order");
-      navigate("/HomePage", { replace: true });
-    }
-  }, [navigate]);
-
-  useEffect(() => {
-    if (!user) return;
-
-    const fetchCartItems = async () => {
-      setIsLoading(true);
-      setError(null);
-      
-      try {
-        const response = await fetch(`http://localhost:5001/api/carts/${user._id}`);
-        
-        if (!response.ok) {
-          throw new Error(`Error fetching cart: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        setCartItems(data);
-        updateTotals(data);
-      } catch (err) {
-        console.error("Failed to fetch cart items:", err);
-        setError(err instanceof Error ? err.message : "Failed to fetch cart items");
-        setCartItems([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchCartItems();
-  }, [user]);
+    const data = location.state?.cartItems || [];
+    setCartItems(data);
+    updateTotals(data);
+  }, [location.state?.cartItems]);
 
   const updateTotals = (items: CartItem[]) => {
     const newSubtotal = items.reduce(
@@ -100,26 +58,36 @@ const OrderPlacementPage: React.FC = () => {
     setTotal(newSubtotal + serviceFee);
   };
 
+  const getOrderPrediction = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:5001/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cartItems, tableNumber }),
+      });
+      const data = await response.json();
+      setPredictedTime(data.predicted_time); // Update state with predicted time
+      console.log("Prediction Response:", data); // Log the response
+      return data.predicted_time;
+    } catch (error) {
+      console.error("Prediction error:", error);
+      return "Unknown";
+    }
+  };
+
   const navigateToPaymentPage = async () => {
     setIsProcessing(true);
 
-    if (!user) {
-      toast.error("You must be logged in to complete this order");
-      setIsProcessing(false);
-      return;
-    }
-
     if (!tableNumber) {
       toast.error("Please enter your table number to proceed.");
-      setIsProcessing(false);
       return;
     }
 
-    if (cartItems.length === 0) {
-      toast.error("Your cart is empty. Please add items before proceeding.");
-      setIsProcessing(false);
-      return;
-    }
+    const estimatedTime = await getOrderPrediction();
+    console.log(
+      "Estimated Time in navigatetoPaymentPage (order placement):",
+      estimatedTime
+    );
 
     toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
       loading: (
@@ -140,6 +108,7 @@ const OrderPlacementPage: React.FC = () => {
               cartItems,
               specialInstructions,
               tableNumber,
+              estimatedTime,
             },
           });
         }, 500);
@@ -234,7 +203,9 @@ const OrderPlacementPage: React.FC = () => {
                   <CardHeader className="border-b bg-white">
                     <div className="flex items-center justify-between">
                       <div className="space-y-1">
-                        <CardTitle className="text-2xl">Selected Items</CardTitle>
+                        <CardTitle className="text-2xl">
+                          Selected Items
+                        </CardTitle>
                         <CardDescription className="text-gray-600">
                           Your carefully chosen dishes
                         </CardDescription>
@@ -255,28 +226,7 @@ const OrderPlacementPage: React.FC = () => {
                   </CardHeader>
                   <CardContent className="p-6">
                     <AnimatePresence>
-                      {isLoading ? (
-                        <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          className="flex items-center justify-center py-12"
-                        >
-                          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
-                          <span className="ml-3 text-lg text-gray-600">Loading your cart...</span>
-                        </motion.div>
-                      ) : error ? (
-                        <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          className="text-center py-8"
-                        >
-                          <Alert>
-                            <AlertDescription className="text-lg text-red-500">
-                              {error}. Please try refreshing the page.
-                            </AlertDescription>
-                          </Alert>
-                        </motion.div>
-                      ) : cartItems.length > 0 ? (
+                      {cartItems.length > 0 ? (
                         <div className="space-y-6">
                           {cartItems.map((item, index) => (
                             <motion.div
@@ -407,11 +357,15 @@ const OrderPlacementPage: React.FC = () => {
                   <div className="space-y-6">
                     <motion.div className="flex justify-between text-lg">
                       <span className="text-gray-600">Subtotal</span>
-                      <span className="font-medium">€{subtotal.toFixed(2)}</span>
+                      <span className="font-medium">
+                        €{subtotal.toFixed(2)}
+                      </span>
                     </motion.div>
                     <motion.div className="flex justify-between text-lg">
                       <span className="text-gray-600">Service Fee</span>
-                      <span className="font-medium">€{serviceFee.toFixed(2)}</span>
+                      <span className="font-medium">
+                        €{serviceFee.toFixed(2)}
+                      </span>
                     </motion.div>
                     <Separator className="my-6" />
                     <motion.div className="flex justify-between text-2xl font-semibold">
@@ -437,9 +391,6 @@ const OrderPlacementPage: React.FC = () => {
                       className="w-full h-14 text-lg font-semibold bg-red-500 text-white hover:bg-red-600 transition-all duration-300 disabled:opacity-50 disabled:hover:bg-red-500 rounded-xl"
                       disabled={
                         isProcessing ||
-                        isLoading ||
-                        !!error ||
-                        !user ||
                         cartItems.length === 0 ||
                         !tableNumber ||
                         parseInt(tableNumber) < 1 ||
@@ -452,8 +403,6 @@ const OrderPlacementPage: React.FC = () => {
                           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                           Processing...
                         </div>
-                      ) : isLoading ? (
-                        "Loading Cart..."
                       ) : (
                         "Complete Order"
                       )}

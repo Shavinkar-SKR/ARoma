@@ -1,15 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  CheckCircle2, 
-  ChefHat, 
-  Timer, 
-  Package, 
-  PhoneCall, 
-  Clock} from 'lucide-react';
-import { motion } from 'framer-motion';
-import { toast } from 'sonner';
-import { useLocation } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  CheckCircle2,
+  ChefHat,
+  Timer,
+  Package,
+  PhoneCall,
+  Clock,
+} from "lucide-react";
+import { motion } from "framer-motion";
+import { toast } from "sonner";
+import { useLocation } from "react-router-dom";
 
 interface CartItem {
   id: number;
@@ -25,7 +26,7 @@ interface OrderDetails {
   specialInstructions: string;
   total: number;
   tableNumber: string;
-  status: 'received' | 'preparing' | 'ready' | 'complete';
+  status: "received" | "preparing" | "ready" | "complete";
 }
 
 type StatusKey = keyof typeof statusConfig;
@@ -33,84 +34,91 @@ type StatusKey = keyof typeof statusConfig;
 const statusConfig = {
   received: {
     icon: Package,
-    color: 'text-red-600',
-    bgColor: 'bg-red-50',
-    borderColor: 'border-red-200',
-    label: 'Order Received',
+    color: "text-red-600",
+    bgColor: "bg-red-50",
+    borderColor: "border-red-200",
+    label: "Order Received",
     progress: 25,
-    description: 'Your order has been received and is being processed',
-    estimatedTime: '5-10 minutes'
+    description: "Your order has been received and is being processed",
+    estimatedTime: "5-10 minutes",
   },
   preparing: {
     icon: ChefHat,
-    color: 'text-red-700',
-    bgColor: 'bg-red-50',
-    borderColor: 'border-red-200',
-    label: 'Preparing',
+    color: "text-red-700",
+    bgColor: "bg-red-50",
+    borderColor: "border-red-200",
+    label: "Preparing",
     progress: 50,
-    description: 'Our chefs are preparing your delicious meal',
-    estimatedTime: '15-20 minutes'
+    description: "Our chefs are preparing your delicious meal",
+    estimatedTime: "15-20 minutes",
   },
   ready: {
     icon: Timer,
-    color: 'text-red-800',
-    bgColor: 'bg-red-50',
-    borderColor: 'border-red-200',
-    label: 'Ready for Pickup',
+    color: "text-red-800",
+    bgColor: "bg-red-50",
+    borderColor: "border-red-200",
+    label: "Ready for Pickup",
     progress: 75,
-    description: 'Your order is ready to be served',
-    estimatedTime: '2-5 minutes'
+    description: "Your order is ready to be served",
+    estimatedTime: "2-5 minutes",
   },
   complete: {
     icon: CheckCircle2,
-    color: 'text-red-900',
-    bgColor: 'bg-red-50',
-    borderColor: 'border-red-200',
-    label: 'Completed',
+    color: "text-red-900",
+    bgColor: "bg-red-50",
+    borderColor: "border-red-200",
+    label: "Completed",
     progress: 100,
-    description: 'Enjoy your meal!',
-    estimatedTime: 'Completed'
+    description: "Enjoy your meal!",
+    estimatedTime: "Completed",
   },
 };
 
+// Sample random restaurant-related messages
 const randomMessages = [
   {
     id: 1,
     title: "A classic combo that never goes out of style!",
-    image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1000&q=80"
+    image:
+      "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1000&q=80",
   },
   {
     id: 2,
     title: "Indulge in a slice of happiness with every bite!",
-    image: "https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&w=1000&q=80"
+    image:
+      "https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&w=1000&q=80",
   },
   {
     id: 3,
     title: "Satisfy your cravings—one bite at a time!",
-    image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=1000&q=80"
+    image:
+      "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=1000&q=80",
   },
   {
     id: 4,
     title: "Fresh ingredients, amazing flavors!",
-    image: "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=1000&q=80"
-  }
+    image:
+      "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=1000&q=80",
+  },
 ];
 
 const OrderStatus: React.FC = () => {
   const navigate = useNavigate();
   const { orderId } = useParams<{ orderId: string }>();
   const [order, setOrder] = useState<OrderDetails | null>(null);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<string>("");
   const [, setIsConnected] = useState(true);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const eventSourceRef = useRef<EventSource | null>(null);
   const location = useLocation();
   const estimatedTime = location.state?.estimatedTime || "Calculating...";
-
+  console.log("Estimated Time in order-status Page:", estimatedTime); // Log the estimated time
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentMessageIndex((prevIndex) => (prevIndex + 1) % randomMessages.length);
+      setCurrentMessageIndex(
+        (prevIndex) => (prevIndex + 1) % randomMessages.length
+      );
     }, 5000);
 
     return () => clearInterval(interval);
@@ -120,44 +128,49 @@ const OrderStatus: React.FC = () => {
     if (!orderId) return;
 
     const setupEventSource = () => {
-      eventSourceRef.current = new EventSource(`http://localhost:5001/order-events/${orderId}`);
+      eventSourceRef.current = new EventSource(
+        `http://localhost:5001/order-events/${orderId}`
+      );
 
       eventSourceRef.current.onopen = () => {
         setIsConnected(true);
-        setError('');
+        setError("");
       };
 
-      eventSourceRef.current.addEventListener('initial', (event) => {
+      eventSourceRef.current.addEventListener("initial", (event) => {
         const data = JSON.parse((event as MessageEvent).data);
         setOrder(data);
       });
 
-      eventSourceRef.current.addEventListener('update', (event) => {
+      eventSourceRef.current.addEventListener("update", (event) => {
         const data = JSON.parse((event as MessageEvent).data);
-        setOrder(prev => {
+        setOrder((prev) => {
           if (!prev) return data;
-          
+
           const newStatus = data.status;
           if (prev.status !== newStatus) {
             const statusKey = newStatus as StatusKey;
-            toast.success(`Order status updated to ${statusConfig[statusKey].label}`, {
-              icon: React.createElement(statusConfig[statusKey].icon, {
-                className: statusConfig[statusKey].color,
-              }),
-            });
+            toast.success(
+              `Order status updated to ${statusConfig[statusKey].label}`,
+              {
+                icon: React.createElement(statusConfig[statusKey].icon, {
+                  className: statusConfig[statusKey].color,
+                }),
+              }
+            );
 
-            if (newStatus === 'complete') {
-              setTimeout(() => navigate('/restaurant-selection'), 3000);
+            if (newStatus === "complete") {
+              setTimeout(() => navigate("/restaurant-selection"), 3000);
             }
           }
           return data;
         });
       });
 
-      eventSourceRef.current.addEventListener('error', (event) => {
-        console.error('SSE Error:', event);
+      eventSourceRef.current.addEventListener("error", (event) => {
+        console.error("SSE Error:", event);
         setIsConnected(false);
-        setError('Connection lost - reconnecting...');
+        setError("Connection lost - reconnecting...");
         eventSourceRef.current?.close();
         setTimeout(setupEventSource, 3000);
       });
@@ -171,14 +184,12 @@ const OrderStatus: React.FC = () => {
   }, [orderId, navigate]);
 
   const handleRetry = () => {
-    setError('');
+    setError("");
     eventSourceRef.current?.close();
-    const newEventSource = new EventSource(`http://localhost:5001/order-events/${orderId}`);
+    const newEventSource = new EventSource(
+      `http://localhost:5001/order-events/${orderId}`
+    );
     eventSourceRef.current = newEventSource;
-  };
-
-  const handleCallRestaurant = () => {
-    navigate('/service');
   };
 
   if (error) {
@@ -240,7 +251,9 @@ const OrderStatus: React.FC = () => {
             <div>
               <h1 className="text-3xl font-bold text-red-600 mb-2">Aroma</h1>
               <h2 className="text-2xl font-bold text-gray-900">Order Status</h2>
-              <p className="mt-1 text-sm text-gray-500">Track your order preparation in real-time</p>
+              <p className="mt-1 text-sm text-gray-500">
+                Track your order preparation in real-time
+              </p>
             </div>
             <button
               onClick={() => setIsContactOpen(!isContactOpen)}
@@ -255,13 +268,14 @@ const OrderStatus: React.FC = () => {
           {isContactOpen && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn">
               <div className="bg-white rounded-lg p-6 max-w-md w-full m-4 transform transition-all duration-300 animate-slideIn">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Contact Restaurant Staff</h3>
-                <p className="text-gray-600 mb-4">Our staff is here to help you with your order.</p>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                  Contact Restaurant Staff
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Our staff is here to help you with your order.
+                </p>
                 <div className="space-y-4">
-                  <button 
-                    onClick={handleCallRestaurant}
-                    className="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-all duration-300"
-                  >
+                  <button className="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-all duration-300">
                     <PhoneCall className="mr-2 h-5 w-5" />
                     Call Restaurant
                   </button>
@@ -275,6 +289,7 @@ const OrderStatus: React.FC = () => {
               </div>
             </div>
           )}
+
           {/* Preparation Time */}
           <div className="mb-8 bg-white p-6 rounded-2xl shadow-lg transform hover:scale-[1.02] transition-all duration-300">
             <div className="flex items-center gap-2 text-lg font-semibold">
@@ -287,7 +302,10 @@ const OrderStatus: React.FC = () => {
           {/* Progress */}
           <div className="mb-8 bg-white p-6 rounded-2xl shadow-lg transform hover:scale-[1.02] transition-all duration-300">
             <div className="relative">
-              <div className="absolute inset-0 flex items-center" aria-hidden="true">
+              <div
+                className="absolute inset-0 flex items-center"
+                aria-hidden="true"
+              >
                 <div className="h-1 w-full bg-gray-200 rounded-full">
                   <motion.div
                     initial={{ width: 0 }}
@@ -300,22 +318,36 @@ const OrderStatus: React.FC = () => {
               <div className="relative flex justify-between">
                 {Object.entries(statusConfig).map(([key, value]) => (
                   <div key={key} className="flex flex-col items-center group">
-                    <motion.div 
+                    <motion.div
                       className={`relative flex h-14 w-14 items-center justify-center rounded-full transition-all duration-300
-                        ${order.status === key ? 'bg-red-600' : 
-                          progress >= statusConfig[key as StatusKey].progress ? 'bg-red-600' : 'bg-gray-200'}`}
+                        ${
+                          order.status === key
+                            ? "bg-red-600"
+                            : progress >=
+                              statusConfig[key as StatusKey].progress
+                            ? "bg-red-600"
+                            : "bg-gray-200"
+                        }`}
                       whileHover={{ scale: 1.1 }}
-                      animate={order.status === key ? {
-                        scale: [1, 1.1, 1],
-                        transition: { 
-                          duration: 2,
-                          repeat: Infinity,
-                          ease: "easeInOut"
-                        }
-                      } : {}}
+                      animate={
+                        order.status === key
+                          ? {
+                              scale: [1, 1.1, 1],
+                              transition: {
+                                duration: 2,
+                                repeat: Infinity,
+                                ease: "easeInOut",
+                              },
+                            }
+                          : {}
+                      }
                     >
                       {React.createElement(value.icon, {
-                        className: `h-7 w-7 ${progress >= statusConfig[key as StatusKey].progress ? 'text-white' : 'text-gray-500'}`
+                        className: `h-7 w-7 ${
+                          progress >= statusConfig[key as StatusKey].progress
+                            ? "text-white"
+                            : "text-gray-500"
+                        }`,
                       })}
                     </motion.div>
                     <p className="mt-3 text-sm font-medium text-gray-900 group-hover:text-red-600 transition-colors duration-300">
@@ -333,7 +365,9 @@ const OrderStatus: React.FC = () => {
               <div className="flex items-center mb-4">
                 <Clock className="h-8 w-8 text-red-600 mr-4" />
                 <div>
-                  <h3 className="text-xl font-medium text-gray-900">Order Details</h3>
+                  <h3 className="text-xl font-medium text-gray-900">
+                    Order Details
+                  </h3>
                   <p className="text-sm text-gray-500 mt-1">
                     Table {order.tableNumber} • Total: €{order.total.toFixed(2)}
                   </p>
@@ -341,8 +375,12 @@ const OrderStatus: React.FC = () => {
               </div>
               {order.specialInstructions && (
                 <div className="mt-4 p-4 bg-red-50 rounded-lg">
-                  <p className="text-red-700 font-medium">Special Instructions:</p>
-                  <p className="mt-2 text-gray-700">{order.specialInstructions}</p>
+                  <p className="text-red-700 font-medium">
+                    Special Instructions:
+                  </p>
+                  <p className="mt-2 text-gray-700">
+                    {order.specialInstructions}
+                  </p>
                 </div>
               )}
             </div>
@@ -350,7 +388,7 @@ const OrderStatus: React.FC = () => {
 
           {/* Random Recommendation */}
           {currentMessage && (
-            <motion.div 
+            <motion.div
               className="bg-white p-6 rounded-2xl shadow-lg overflow-hidden h-64 relative"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -362,7 +400,7 @@ const OrderStatus: React.FC = () => {
                 className="absolute inset-0 w-full h-full object-cover"
               />
               <div className="relative z-10 h-full flex items-center justify-center">
-                <motion.h3 
+                <motion.h3
                   className="text-white text-2xl font-bold text-center px-4 py-2 bg-black bg-opacity-50 rounded-lg"
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
