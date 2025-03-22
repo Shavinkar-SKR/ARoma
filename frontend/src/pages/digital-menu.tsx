@@ -110,7 +110,7 @@ const DigitalMenuPage: React.FC = () => {
       );
       if (!response.ok) throw new Error("Failed to fetch restaurant info");
       const data = await response.json();
-      setRestaurant(data.restaurant);
+      setRestaurant(data);
     } catch (error) {
       toast.error("Failed to load restaurant information");
     }
