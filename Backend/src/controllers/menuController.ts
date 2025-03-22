@@ -50,8 +50,11 @@ export const searchMenuItems = async (
     const { query, restaurantId } = req.query;
     const db = await connectDB();
     const menuCollection = db.collection<MenuItem>("menus");
+    let filter: any = {};
 
-    const filter: any = { restaurantId: restaurantId as string };
+    if (restaurantId !== undefined) {
+      filter = { restaurantId: restaurantId as string };
+    }
 
     if (query) {
       filter.$or = [

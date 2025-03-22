@@ -104,7 +104,10 @@ var searchMenuItems = function (req, res) { return __awaiter(void 0, void 0, voi
             case 1:
                 db = _b.sent();
                 menuCollection = db.collection("menus");
-                filter = { restaurantId: restaurantId };
+                filter = {};
+                if (restaurantId !== undefined) {
+                    filter = { restaurantId: restaurantId };
+                }
                 if (query) {
                     filter.$or = [
                         { name: { $regex: query, $options: "i" } },
