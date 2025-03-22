@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.searchMenuItems = exports.getMenuByRestaurant = void 0;
+exports.searchMenuItems = exports.getMenu = exports.getMenuByRestaurant = void 0;
 var dbConfig_1 = require("../config/dbConfig");
 var getMenuByRestaurant = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var restaurantId, db, menuCollection, menuItems, error_1;
@@ -67,8 +67,34 @@ var getMenuByRestaurant = function (req, res) { return __awaiter(void 0, void 0,
     });
 }); };
 exports.getMenuByRestaurant = getMenuByRestaurant;
+var getMenu = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var db, menuCollection, menuItems, error_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 3, , 4]);
+                return [4 /*yield*/, (0, dbConfig_1.connectDB)()];
+            case 1:
+                db = _a.sent();
+                menuCollection = db.collection("menus");
+                return [4 /*yield*/, menuCollection
+                        .find()
+                        .toArray()];
+            case 2:
+                menuItems = _a.sent();
+                res.status(200).json(menuItems);
+                return [3 /*break*/, 4];
+            case 3:
+                error_2 = _a.sent();
+                res.status(500).json({ error: "Failed to fetch menu items" });
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
+    });
+}); };
+exports.getMenu = getMenu;
 var searchMenuItems = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, query, restaurantId, db, menuCollection, filter, menuItems, error_2;
+    var _a, query, restaurantId, db, menuCollection, filter, menuItems, error_3;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -92,7 +118,7 @@ var searchMenuItems = function (req, res) { return __awaiter(void 0, void 0, voi
                 res.status(200).json(menuItems);
                 return [3 /*break*/, 4];
             case 3:
-                error_2 = _b.sent();
+                error_3 = _b.sent();
                 res.status(500).json({ error: "Failed to search menu items" });
                 return [3 /*break*/, 4];
             case 4: return [2 /*return*/];
