@@ -49,7 +49,12 @@ const SalesAnalyticsAndStaffManagement = () => {
 
   // Add new staff
   const handleAddStaff = async () => {
-    if (!newStaff.staffId || !newStaff.name || !newStaff.role || newStaff.salary <= 0) {
+    if (
+      !newStaff.staffId ||
+      !newStaff.name ||
+      !newStaff.role ||
+      newStaff.salary <= 0
+    ) {
       setError("Please fill all fields correctly.");
       return;
     }
@@ -77,7 +82,9 @@ const SalesAnalyticsAndStaffManagement = () => {
     }
     setLoading(true);
     try {
-      const res = await axios.get(`http://localhost:5001/api/staff/${searchId}`);
+      const res = await axios.get(
+        `http://localhost:5001/api/staff/${searchId}`
+      );
       setSearchedStaff(res.data);
       setError("");
     } catch (error) {
@@ -89,14 +96,21 @@ const SalesAnalyticsAndStaffManagement = () => {
   };
 
   // Update staff role and salary
-  const handleUpdateStaff = async (id: string, role: string, salary: number) => {
+  const handleUpdateStaff = async (
+    id: string,
+    role: string,
+    salary: number
+  ) => {
     if (!role || salary <= 0) {
       setError("Please fill all fields correctly.");
       return;
     }
     setLoading(true);
     try {
-      await axios.put(`http://localhost:5001/api/staff/${id}`, { role, salary });
+      await axios.put(`http://localhost:5001/api/staff/${id}`, {
+        role,
+        salary,
+      });
       setError("");
       toast.success("Staff updated successfully!");
       const res = await axios.get("http://localhost:5001/api/staff");
@@ -140,7 +154,9 @@ const SalesAnalyticsAndStaffManagement = () => {
   const histogramData = salaryBins.map((bin, index) => {
     const rangeStart = bin;
     const rangeEnd = salaryBins[index + 1] || Infinity;
-    const count = salaryData.filter((s) => s.salary >= rangeStart && s.salary < rangeEnd).length;
+    const count = salaryData.filter(
+      (s) => s.salary >= rangeStart && s.salary < rangeEnd
+    ).length;
     return {
       range: `${rangeStart} - ${rangeEnd === Infinity ? "∞" : rangeEnd}`,
       count,
@@ -162,11 +178,15 @@ const SalesAnalyticsAndStaffManagement = () => {
         pauseOnHover
       />
 
-      <h1 className="text-2xl font-bold mb-4 text-red-600">Sales Analytics & Staff Management</h1>
+      <h1 className="text-2xl font-bold mb-4 text-red-600">
+        Sales Analytics & Staff Management
+      </h1>
 
       {/* Sales Analytics */}
       <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-4 text-red-600">Sales Analytics</h2>
+        <h2 className="text-xl font-semibold mb-4 text-red-600">
+          Sales Analytics
+        </h2>
         <div className="grid grid-cols-3 gap-4 mb-4">
           <div className="bg-white p-4 rounded shadow">
             <p className="text-gray-600">Total Orders</p>
@@ -174,11 +194,15 @@ const SalesAnalyticsAndStaffManagement = () => {
           </div>
           <div className="bg-white p-4 rounded shadow">
             <p className="text-gray-600">Total Sales</p>
-            <p className="text-2xl font-bold text-red-600">${totalSales.toFixed(2)}</p>
+            <p className="text-2xl font-bold text-red-600">
+              ${totalSales.toFixed(2)}
+            </p>
           </div>
           <div className="bg-white p-4 rounded shadow">
             <p className="text-gray-600">Average Sale</p>
-            <p className="text-2xl font-bold text-red-600">${averageSale.toFixed(2)}</p>
+            <p className="text-2xl font-bold text-red-600">
+              ${averageSale.toFixed(2)}
+            </p>
           </div>
         </div>
 
@@ -195,38 +219,50 @@ const SalesAnalyticsAndStaffManagement = () => {
 
       {/* Staff Management */}
       <div>
-        <h2 className="text-xl font-semibold mb-4 text-red-600">Staff Management</h2>
+        <h2 className="text-xl font-semibold mb-4 text-red-600">
+          Staff Management
+        </h2>
 
         {/* Add Staff Form */}
         <div className="mb-4 bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold mb-4 text-red-600">Add New Staff</h3>
+          <h3 className="text-lg font-semibold mb-4 text-red-600">
+            Add New Staff
+          </h3>
           <div className="grid grid-cols-2 gap-4">
             <input
               type="text"
               placeholder="Staff ID"
               value={newStaff.staffId}
-              onChange={(e) => setNewStaff({ ...newStaff, staffId: e.target.value })}
+              onChange={(e) =>
+                setNewStaff({ ...newStaff, staffId: e.target.value })
+              }
               className="p-2 border rounded focus:outline-none focus:ring-2 focus:ring-red-500"
             />
             <input
               type="text"
               placeholder="Name"
               value={newStaff.name}
-              onChange={(e) => setNewStaff({ ...newStaff, name: e.target.value })}
+              onChange={(e) =>
+                setNewStaff({ ...newStaff, name: e.target.value })
+              }
               className="p-2 border rounded focus:outline-none focus:ring-2 focus:ring-red-500"
             />
             <input
               type="text"
               placeholder="Role"
               value={newStaff.role}
-              onChange={(e) => setNewStaff({ ...newStaff, role: e.target.value })}
+              onChange={(e) =>
+                setNewStaff({ ...newStaff, role: e.target.value })
+              }
               className="p-2 border rounded focus:outline-none focus:ring-2 focus:ring-red-500"
             />
             <input
               type="number"
               placeholder="Salary"
               value={newStaff.salary}
-              onChange={(e) => setNewStaff({ ...newStaff, salary: parseFloat(e.target.value) })}
+              onChange={(e) =>
+                setNewStaff({ ...newStaff, salary: parseFloat(e.target.value) })
+              }
               className="p-2 border rounded focus:outline-none focus:ring-2 focus:ring-red-500"
             />
           </div>
@@ -240,7 +276,9 @@ const SalesAnalyticsAndStaffManagement = () => {
 
         {/* Search Staff */}
         <div className="mb-4 bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold mb-4 text-red-600">Search Staff by ID</h3>
+          <h3 className="text-lg font-semibold mb-4 text-red-600">
+            Search Staff by ID
+          </h3>
           <div className="flex items-center">
             <input
               type="text"
@@ -258,16 +296,24 @@ const SalesAnalyticsAndStaffManagement = () => {
           </div>
           {searchedStaff && (
             <div className="mt-4 p-4 bg-gray-50 rounded">
-              <p><strong>Name:</strong> {searchedStaff.name}</p>
-              <p><strong>Role:</strong> {searchedStaff.role}</p>
-              <p><strong>Salary:</strong> ${searchedStaff.salary}</p>
+              <p>
+                <strong>Name:</strong> {searchedStaff.name}
+              </p>
+              <p>
+                <strong>Role:</strong> {searchedStaff.role}
+              </p>
+              <p>
+                <strong>Salary:</strong> ${searchedStaff.salary}
+              </p>
             </div>
           )}
         </div>
 
         {/* Salary Distribution Histogram */}
         <div className="mb-4 bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold mb-4 text-red-600">Salary Distribution</h3>
+          <h3 className="text-lg font-semibold mb-4 text-red-600">
+            Salary Distribution
+          </h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={histogramData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -282,7 +328,9 @@ const SalesAnalyticsAndStaffManagement = () => {
 
         {/* Staff List */}
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold mb-4 text-red-600">Staff List</h3>
+          <h3 className="text-lg font-semibold mb-4 text-red-600">
+            Staff List
+          </h3>
           {loading ? (
             <div className="flex justify-center items-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
@@ -309,7 +357,9 @@ const SalesAnalyticsAndStaffManagement = () => {
                         value={s.role}
                         onChange={(e) => {
                           const updatedStaff = staff.map((st) =>
-                            st._id === s._id ? { ...st, role: e.target.value } : st
+                            st._id === s._id
+                              ? { ...st, role: e.target.value }
+                              : st
                           );
                           setStaff(updatedStaff);
                         }}
@@ -322,7 +372,9 @@ const SalesAnalyticsAndStaffManagement = () => {
                         value={s.salary}
                         onChange={(e) => {
                           const updatedStaff = staff.map((st) =>
-                            st._id === s._id ? { ...st, salary: parseFloat(e.target.value) } : st
+                            st._id === s._id
+                              ? { ...st, salary: parseFloat(e.target.value) }
+                              : st
                           );
                           setStaff(updatedStaff);
                         }}
@@ -331,7 +383,9 @@ const SalesAnalyticsAndStaffManagement = () => {
                     </td>
                     <td className="p-2 border">
                       <button
-                        onClick={() => handleUpdateStaff(s._id, s.role, s.salary)}
+                        onClick={() =>
+                          handleUpdateStaff(s._id, s.role, s.salary)
+                        }
                         className="bg-yellow-500 text-white p-1 rounded mr-2 hover:bg-yellow-600 active:bg-yellow-700 transition-colors duration-200"
                       >
                         Update
