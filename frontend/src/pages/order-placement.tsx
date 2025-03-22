@@ -50,6 +50,7 @@ const OrderPlacementPage: React.FC = () => {
   const navigate = useNavigate();
   const [tableNumber, setTableNumber] = useState<string>("");
   const [user, setUser] = useState<User | null>(null);
+  const [, setPredictedTime] = useState<string | null>(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -100,6 +101,24 @@ const OrderPlacementPage: React.FC = () => {
     setTotal(newSubtotal + serviceFee);
   };
 
+  const getOrderPrediction = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:5001/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cartItems, tableNumber }),
+      });
+      const data = await response.json();
+      setPredictedTime(data.predicted_time); // Update state with predicted time
+      console.log("Prediction Response:", data); // Log the response
+      return data.predicted_time;
+    } catch (error) {
+      console.error("Prediction error:", error);
+      return "Unknown";
+    }
+  };
+
+
   const navigateToPaymentPage = async () => {
     setIsProcessing(true);
 
@@ -114,6 +133,11 @@ const OrderPlacementPage: React.FC = () => {
       setIsProcessing(false);
       return;
     }
+    const estimatedTime = await getOrderPrediction();
+    console.log(
+      "Estimated Time in navigatetoPaymentPage (order placement):",
+      estimatedTime
+    );
 
     if (cartItems.length === 0) {
       toast.error("Your cart is empty. Please add items before proceeding.");
@@ -140,6 +164,7 @@ const OrderPlacementPage: React.FC = () => {
               cartItems,
               specialInstructions,
               tableNumber,
+              estimatedTime
             },
           });
         }, 500);
