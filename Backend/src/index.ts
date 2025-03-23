@@ -7,7 +7,6 @@ import orderRoutes from "./routes/orderRoutes";
 import restaurantRoutes from "./routes/restaurantRoutes";
 import menuRoutes from "./routes/menuRoutes";
 import * as dotenv from "dotenv";
-import restaurantMenuRoutes from './routes/restaurantMenuRoutes';
 import feedbackRoutes from "./routes/feedbackRoutes";
 import serviceRequestRoutes from "./routes/serviceRequestRoutes";
 import salesRoutes from "./routes/salesRoutes";
@@ -18,6 +17,7 @@ import loginRoutes from "./routes/loginRoutes";
 import resetPasswordRoutes from "./routes/resetPasswordRoutes";
 // import payment from './routes/paymentRoutes'
 import { signUp } from "./controllers/userController";
+import restaurantMenuRoutes from './routes/restaurantMenuRoutes';
 
 console.log("Direct import test:", signUp);
 

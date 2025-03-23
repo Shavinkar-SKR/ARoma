@@ -45,7 +45,6 @@ var orderRoutes_1 = require("./routes/orderRoutes");
 var restaurantRoutes_1 = require("./routes/restaurantRoutes");
 var menuRoutes_1 = require("./routes/menuRoutes");
 var dotenv = require("dotenv");
-var restaurantMenuRoutes_1 = require("./routes/restaurantMenuRoutes");
 var feedbackRoutes_1 = require("./routes/feedbackRoutes");
 var serviceRequestRoutes_1 = require("./routes/serviceRequestRoutes");
 var salesRoutes_1 = require("./routes/salesRoutes");
@@ -55,6 +54,7 @@ var loginRoutes_1 = require("./routes/loginRoutes");
 var resetPasswordRoutes_1 = require("./routes/resetPasswordRoutes");
 // import payment from './routes/paymentRoutes'
 var userController_1 = require("./controllers/userController");
+var restaurantMenuRoutes_1 = require("./routes/restaurantMenuRoutes");
 console.log("Direct import test:", userController_1.signUp);
 dotenv.config();
 var MONGODB_URI = "mongodb+srv://root:root@aroma.ae0sb.mongodb.net/ARoma?retryWrites=true&w=majority&appName=ARoma&replicaSet=atlas-4uxo98-shard-0&tls=true";
