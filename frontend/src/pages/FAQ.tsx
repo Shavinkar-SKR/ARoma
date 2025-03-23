@@ -17,7 +17,7 @@ interface FAQ {
   section: string;
   video: string;
   description: string;
-  content?: React.ReactNode; // Optional since not all objects have this property
+  content?: React.ReactNode; 
 }
 
 // Add type to staticFAQs array
