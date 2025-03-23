@@ -123,7 +123,7 @@ const Banner: React.FC = () => {
                       onKeyPress={handleKeyPress}
                       className="w-full outline-none bg-transparent text-gray-800 text-sm sm:text-base"
                       autoFocus
-                      placeholder="Search for restaurant and Cuisine"
+                      placeholder="Search for restaurant"
                     />
                   ) : (
                     <div
