@@ -74,7 +74,6 @@ const statusConfig = {
   },
 };
 
-// Sample random restaurant-related messages
 const randomMessages = [
   {
     id: 1,
@@ -255,13 +254,8 @@ const OrderStatus: React.FC = () => {
                 Track your order preparation in real-time
               </p>
             </div>
-            <button
-              onClick={() => setIsContactOpen(!isContactOpen)}
-              className="group flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-full hover:bg-red-700 transition-all duration-300 ease-in-out transform hover:scale-105"
-            >
-              <PhoneCall className="mr-2 h-5 w-5" />
-              Contact Staff
-            </button>
+
+
           </div>
 
           {/* Contact Staff Modal */}
