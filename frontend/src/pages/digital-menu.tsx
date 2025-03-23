@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import ARViewModal from "@/components/ARViewModal";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ArrowLeft, ShoppingCart, View } from "lucide-react";
@@ -71,6 +72,11 @@ const DigitalMenuPage: React.FC = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [arModalOpen, setArModalOpen] = useState(false);
+  const [selectedArItem, setSelectedArItem] = useState<{
+    name: string;
+    url: string;
+  } | null>(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -90,7 +96,7 @@ const DigitalMenuPage: React.FC = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5001/api/carts/${user._id}`
+        `http://localhost:5001/api/carts/${user._id}`,
       );
       if (!response.ok) throw new Error("Failed to fetch cart items");
       const data = await response.json();
@@ -98,6 +104,14 @@ const DigitalMenuPage: React.FC = () => {
     } catch (error) {
       toast.error("Failed to load cart items");
     }
+  };
+
+  const handleArButtonClick = (item: MenuItem) => {
+    setSelectedArItem({
+      name: item.name,
+      url: item.arLink,
+    });
+    setArModalOpen(true);
   };
 
   const addToCart = async (item: MenuItem) => {
@@ -108,7 +122,7 @@ const DigitalMenuPage: React.FC = () => {
 
     try {
       const existingItem = cartItems.find(
-        (cartItem) => cartItem.menuId === item._id
+        (cartItem) => cartItem.menuId === item._id,
       );
 
       if (existingItem) {
@@ -120,7 +134,7 @@ const DigitalMenuPage: React.FC = () => {
             body: JSON.stringify({
               quantity: existingItem.quantity + 1,
             }),
-          }
+          },
         );
 
         if (!response.ok) throw new Error("Failed to update cart item");
@@ -129,8 +143,8 @@ const DigitalMenuPage: React.FC = () => {
           prev.map((cartItem) =>
             cartItem._id === existingItem._id
               ? { ...cartItem, quantity: cartItem.quantity + 1 }
-              : cartItem
-          )
+              : cartItem,
+          ),
         );
       } else {
         const response = await fetch("http://localhost:5001/api/carts", {
@@ -173,7 +187,7 @@ const DigitalMenuPage: React.FC = () => {
   const fetchRestaurantInfo = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5001/api/restaurants/${restaurantId}`
+        `http://localhost:5001/api/restaurants/${restaurantId}`,
       );
       if (!response.ok) throw new Error("Failed to fetch restaurant info");
       const data = await response.json();
@@ -264,7 +278,7 @@ const DigitalMenuPage: React.FC = () => {
   const totalPages = Math.ceil(filteredAndSortedItems.length / itemsPerPage);
   const currentItems = filteredAndSortedItems.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   const categories = [
@@ -392,7 +406,7 @@ const DigitalMenuPage: React.FC = () => {
                         <Button
                           className="absolute top-2 right-2 bg-white/90 hover:bg-white text-black"
                           size="sm"
-                          onClick={() => (location.href = item.arLink)}
+                          onClick={() => handleArButtonClick(item)}
                         >
                           <View className="w-4 h-4 mr-1" />
                           AR View
@@ -427,7 +441,7 @@ const DigitalMenuPage: React.FC = () => {
                                   .join(" ")
                                   .replace("is ", "")}
                               </Badge>
-                            )
+                            ),
                         )}
                       </div>
                       <div className="flex justify-between items-center">
@@ -484,6 +498,15 @@ const DigitalMenuPage: React.FC = () => {
         userId={user?._id}
         onCartUpdated={fetchCartItems}
       />
+
+      {selectedArItem && arModalOpen && (
+        <ARViewModal
+          isOpen={arModalOpen}
+          onClose={() => setArModalOpen(false)}
+          modelUrl={selectedArItem.url}
+          itemName={selectedArItem.name}
+        />
+      )}
     </div>
   );
 };
