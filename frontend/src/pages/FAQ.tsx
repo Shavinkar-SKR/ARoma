@@ -24,8 +24,43 @@ interface FAQ {
 const staticFAQs: FAQ[] = [
   {
     section: "Navigating Home Page",
-    video: "https://www.example.com/video-homepage",
+    video: "/cd/howto_homepage.mp4", 
     description: "Learn how to navigate the home page and find key features.",
+    content: (
+      <div className="space-y-6 flex flex-col md:flex-row items-center md:items-start p-6 md:space-x-10">
+        <div className="w-full md:w-1/2 flex justify-center">
+          <div className="w-70 h-120 bg-gray-200 rounded-lg overflow-hidden shadow-lg">
+            <video
+              controls
+              className="w-full h-full object-cover"
+              src="/cd/howto_homepage.mp4" 
+              title="Navigating Home Page Tutorial"
+            >
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+        <div className="w-full md:w-1/2 space-y-4">
+          <h3 className="text-2xl font-bold text-gray-900">
+            How to Navigate the Home Page
+          </h3>
+          <ul className="list-none text-gray-700 space-y-2">
+            <li>
+              <strong className="text-lg">Step 1:</strong> Explore the featured
+              restaurants on the home page.
+            </li>
+            <li>
+              <strong className="text-lg">Step 2:</strong> Use the navigation
+              bar to access different sections.
+            </li>
+            <li>
+              <strong className="text-lg">Step 3:</strong> Click on a restaurant
+              to view its menu and details.
+            </li>
+          </ul>
+        </div>
+      </div>
+    ),
   },
   {
     section: "browsing restaurants and menus",
