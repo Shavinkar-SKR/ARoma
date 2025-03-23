@@ -112,7 +112,7 @@ function AdminDashboard() {
     price: '',
     image: '',
     category: '',
-    dietary: { // Object with boolean properties
+    dietary: { 
       isVegan: false,
       isNutFree: false,
       isGlutenFree: false,

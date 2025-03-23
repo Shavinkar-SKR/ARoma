@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { ObjectId } from "mongodb";
 import { Order } from "../models/orderModel";
 import { connectDB } from "../config/dbConfig"; // Import the connectDB utility
-import { emitOrderUpdate } from "../realTimeUpdates/realtimeUpdates"; // Import the emitOrderUpdate function
+// import { emitOrderUpdate } from "../realTimeUpdates/realtimeUpdates"; // Import the emitOrderUpdate function
 
 // Function to place an order
 export const placeOrder = async (req: Request, res: Response): Promise<void> => {
@@ -130,7 +130,7 @@ export const updateOrderStatus = async (req: Request, res: Response): Promise<vo
     }
 
     // Emit the updated order to all connected clients (real-time update)
-    emitOrderUpdate(result.value);
+    // emitOrderUpdate(result.value);
 
     // Respond with the updated order
     res.status(200).json(result.value);

@@ -36,7 +36,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.emitOrderUpdate = void 0;
 var cors = require("cors");
 var express = require("express");
 var http_1 = require("http");
@@ -49,7 +48,7 @@ var restaurantRoutes_1 = require("./routes/restaurantRoutes");
 var menuRoutes_1 = require("./routes/menuRoutes");
 var dotenv = require("dotenv");
 var restaurantMenuRoutes_1 = require("./routes/restaurantMenuRoutes");
-var paymentRoutes_1 = require("./routes/paymentRoutes");
+// import paymentRoutes from "./routes/paymentRoutes";
 dotenv.config();
 var app = express();
 var PORT = process.env.PORT || 5001;
@@ -74,7 +73,7 @@ app.use("/api/orders", orderRoutes_1["default"]);
 app.use("/api/carts", cartRoutes_1["default"]);
 app.use("/api/restaurants", restaurantRoutes_1["default"]);
 app.use("/api/menus", menuRoutes_1["default"]);
-app.use("/api/payment", paymentRoutes_1["default"]);
+// app.use("/api/payment", paymentRoutes);
 app.use('/api/restaurants', restaurantMenuRoutes_1["default"]);
 app.use(bodyParser.json());
 // WebSocket connection
@@ -88,7 +87,6 @@ io.on("connection", function (socket) {
 var emitOrderUpdate = function (updatedOrder) {
     io.emit("orderUpdated", updatedOrder);
 };
-exports.emitOrderUpdate = emitOrderUpdate;
 // Start the server
 var startServer = function () { return __awaiter(void 0, void 0, void 0, function () {
     var error_1;
@@ -114,3 +112,5 @@ var startServer = function () { return __awaiter(void 0, void 0, void 0, functio
     });
 }); };
 startServer();
+// Export the emitOrderUpdate function for use in orderRoutes
+"";
