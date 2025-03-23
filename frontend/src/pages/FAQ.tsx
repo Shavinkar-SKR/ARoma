@@ -201,7 +201,7 @@ const staticFAQs: FAQ[] = [
   {
     section: "How to request services",
     video: "/cd/howto_request.mp4",
-    description: "Learn how to contact us",
+    description: "Learn how to request services while dinning",
     content: (
       <div className="space-y-6 flex flex-col md:flex-row items-center md:items-start p-6 md:space-x-10">
         <div className="w-full md:w-1/2 flex justify-center">
