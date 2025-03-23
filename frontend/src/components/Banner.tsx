@@ -130,7 +130,7 @@ const Banner: React.FC = () => {
                       onClick={() => setSearchFocused(true)}
                       className="cursor-text text-gray-500 text-sm sm:text-base"
                     >
-                      Search for restaurant and Cuisine
+                      Search for restaurant
                     </div>
                   )}
                 </div>
