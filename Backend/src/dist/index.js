@@ -112,7 +112,7 @@ app.use("/api/orders", orderRoutes_1["default"]);
 app.use("/api/carts", cartRoutes_1["default"]);
 app.use("/api/restaurants", restaurantRoutes_1["default"]);
 app.use("/api/menus", menuRoutes_1["default"]);
-app.use('/api/restaurants', restaurantMenuRoutes_1["default"]);
+app.use('/api/restaurantsMenu', restaurantMenuRoutes_1["default"]);
 app.use("/api/requests", serviceRequestRoutes_1["default"]);
 app.use("/api/sales", salesRoutes_1["default"]);
 app.use("/api/staff", staffRoutes_1["default"]);
