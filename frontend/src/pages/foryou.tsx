@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 interface MealRecommendation {
   name: string;
   category: string;
+  image: string;
 }
 
 interface RestaurantRecommendation {
@@ -79,6 +80,12 @@ const ForYou: React.FC = () => {
                   <CardTitle>{meal.name}</CardTitle>
                 </CardHeader>
                 <CardContent>
+                  {/* Add the image here */}
+                  <img
+                    src={meal.image || "https://via.placeholder.com/300"} // Use a placeholder if no image is available
+                    alt={meal.name}
+                    className="w-full h-48 object-cover rounded-lg mb-4"
+                  />
                   <p>Category: {meal.category}</p>
                 </CardContent>
               </Card>

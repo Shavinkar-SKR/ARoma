@@ -57,13 +57,34 @@ def recommend_meals(user_id, top_n=3):
         # Get top N similar meals (excluding the meal itself)
         recommended_indices = [i for i, score in similarity_scores[1:top_n+1]]
 
+        # Fetch the menus collection
+        menus_collection = db["menus"]
+
         # Prepare recommendations
         recommendations = []
         for idx in recommended_indices:
-            recommendations.append({
-                "name": history_df.iloc[idx]['name'],
-                "category": history_df.iloc[idx]['category'],
-            })
+            meal_name = history_df.iloc[idx]['name']
+            meal_category = history_df.iloc[idx]['category']
+
+            # Find the meal in the menus collection using name and category
+            meal_details = menus_collection.find_one(
+                {"name": meal_name, "category": meal_category},
+                {"name": 1, "category": 1, "image": 1, "_id": 0}
+            )
+
+            if meal_details:
+                recommendations.append({
+                    "name": meal_details['name'],
+                    "category": meal_details['category'],
+                    "image": meal_details.get('image', "https://via.placeholder.com/300")  # Use placeholder if no image
+                })
+            else:
+                # If meal not found in menus, still include it with a placeholder image
+                recommendations.append({
+                    "name": meal_name,
+                    "category": meal_category,
+                    "image": "https://via.placeholder.com/300"  # Placeholder image
+                })
 
         return recommendations
 
@@ -77,4 +98,4 @@ if __name__ == '__main__':
     recommendations = recommend_meals(user_id)
     print(f"\nRecommendations for user '{user_id}':")
     for meal in recommendations:
-        print(f" - {meal['name']} (Category: {meal['category']})")
+        print(f" - {meal['name']} (Category: {meal['category']}, Image: {meal['image']})")
