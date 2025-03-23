@@ -181,7 +181,7 @@ function AdminDashboard() {
     const fetchRestaurants = async () => {
       setLoading(true);
       try {
-        const response = await fetch("http://localhost:5001/api/restaurants");
+        const response = await fetch("http://localhost:5001/api/restaurantsMenu");
         if (!response.ok) throw new Error("Failed to fetch restaurants");
         const data = await response.json();
         setRestaurants(data);
@@ -245,7 +245,7 @@ function AdminDashboard() {
     setLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:5001/api/restaurants/${restaurantId}`
+        `http://localhost:5001/api/restaurantsMenu/${restaurantId}`
       );
       if (!response.ok) throw new Error("Failed to fetch menu items");
       const data = await response.json();
@@ -324,7 +324,7 @@ function AdminDashboard() {
       };
 
       const response = await fetch(
-        `http://localhost:5001/api/restaurants/${selectedRestaurant._id}/menus`,
+        `http://localhost:5001/api/restaurantsMenu/${selectedRestaurant._id}/menus`,
         {
           method: "POST",
           headers: {
@@ -373,7 +373,7 @@ function AdminDashboard() {
       };
 
       const response = await fetch(
-        `http://localhost:5001/api/restaurants/menus/${editingItemId}`,
+        `http://localhost:5001/api/restaurantsMenu/menus/${editingItemId}`,
         {
           method: "PUT",
           headers: {
@@ -420,7 +420,7 @@ function AdminDashboard() {
     setLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:5001/api/restaurants/menus/${menuItemId}`,
+        `http://localhost:5001/api/restaurantsMenu/menus/${menuItemId}`,
         {
           method: "DELETE",
         }
@@ -948,7 +948,7 @@ function AdminDashboard() {
                     <h1 className="text-2xl font-bold text-gray-800">
                       Restaurants
                     </h1>
-                    <div className="relative">
+                    {/* <div className="relative">
                       <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                       <input
                         type="text"
@@ -957,7 +957,7 @@ function AdminDashboard() {
                         placeholder="Search restaurants..."
                         className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
-                    </div>
+                    </div> */}
                   </div>
                   {loading ? (
                     <div className="flex justify-center items-center h-64">
