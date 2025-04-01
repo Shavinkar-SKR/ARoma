@@ -1,5 +1,5 @@
 import React from "react";
-import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
+import { FaYoutube, FaTwitter, FaInstagram } from "react-icons/fa";
 
 const Footer: React.FC = () => {
   return (
@@ -24,13 +24,13 @@ const Footer: React.FC = () => {
         <nav className="text-center md:text-right md:mr-20">
           <h6 className="text-lg font-semibold mb-6 mr-16">Follow Us</h6>
           <div className="flex flex-row items-center justify-center space-x-6 -mr-14">
-            <a href="https://facebook.com" className="hover:text-red-500 transition-transform transform hover:scale-125">
-              <FaFacebook className="w-8 h-8" />
+            <a href="http://www.youtube.com/@ARomaOfficial-u7v" className="hover:text-red-500 transition-transform transform hover:scale-125">
+              <FaYoutube className="w-8 h-8" />
             </a>
             <a href="https://x.com/ARoma_2025" className="hover:text-red-500 transition-transform transform hover:scale-125">
               <FaTwitter className="w-8 h-8" />
             </a>
-            <a href="https://www.instagram.com/aroma_offcial?igsh=YzljYTk1ODg3Zg== " className="hover:text-red-500 transition-transform transform hover:scale-125">
+            <a href="https://www.instagram.com/aromaofficial2?igsh=YzljYTk1ODg3Zg==" className="hover:text-red-500 transition-transform transform hover:scale-125">
               <FaInstagram className="w-8 h-8" />
             </a>
           </div>
