@@ -16,7 +16,7 @@ interface Testimonial {
 const TestimonialsSection = () => {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [ setIsVisible] = useState(false);
+  // Removed unused isVisible state
 
   // Fetch testimonials data from backend API
   useEffect(() => {
@@ -41,22 +41,7 @@ const TestimonialsSection = () => {
     return () => clearInterval(interval);
   }, [testimonials, activeIndex]);
 
-  // Scroll effect to apply animation
-  useEffect(() => {
-    const handleScroll = () => {
-      const section = document.getElementById("testimonial-section");
-      if (section) {
-        const rect = section.getBoundingClientRect();
-        if (rect.top < window.innerHeight * 0.75) {
-          setIsVisible(true);
-        }
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  // Removed scroll effect logic as isVisible state is not used
 
   return (
     <section 
