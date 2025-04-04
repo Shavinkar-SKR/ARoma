@@ -1,4 +1,3 @@
-import React from "react";
 import before from "../assets/before.png";
 
 const BeforeSection = () => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import bghero from '../assets/bghero.jpg';
 
 const AboutSection = () => {

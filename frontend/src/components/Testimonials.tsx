@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Star } from 'lucide-react';
 import axios from 'axios';
 import LastImage from "../assets/last.jpg";
@@ -16,7 +16,7 @@ interface Testimonial {
 const TestimonialsSection = () => {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
+  const [ setIsVisible] = useState(false);
 
   // Fetch testimonials data from backend API
   useEffect(() => {

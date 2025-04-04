@@ -20,9 +20,7 @@ interface Restaurant {
 
 const Banner: React.FC = () => {
   const navigate = useNavigate();
-  const [locationFocused, setLocationFocused] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
-  const [location, setLocation] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(false);
